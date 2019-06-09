@@ -25,13 +25,22 @@ proc eval*(u: var ref EvalUnit, s: string):string=
         var nextToken: ref Token
         if idx < len(inp)-1:
             nextToken = getVal(inp[idx+1], u.mainCtx)
-        if not isNil(nextToken) and nextToken.tp == TypeEnum.op and (isNil(u.nowLine.line[0]) or u.nowLine.line[0].tp != TypeEnum.op):
-            var newLine = newEvalLine(3, u.nowLine)
-            newLine.idx = 2
-            newLine.line[0] = nextToken
-            newLine.line[1] = getVal(nowToken, u.mainCtx)
-            u.nowLine = newLine
-            idx += 1
+        if not isNil(nextToken) and nextToken.tp == TypeEnum.op:
+            if isNil(u.nowLine.line[0]) or (u.nowLine.line[0].tp != TypeEnum.op):
+                var newLine = newEvalLine(3, u.nowLine)
+                newLine.idx = 2
+                newLine.line[0] = nextToken
+                newLine.line[1] = getVal(nowToken, u.mainCtx)
+                u.nowLine = newLine
+                idx += 1
+            else:
+                var newLine = newEvalLine(3, u.nowLine.father)
+                newLine.idx = 1
+                newLine.line[0] = nextToken
+                u.nowLine.father = newLine
+                u.nowLine.line[u.nowLine.idx] = getVal(nowToken, u.mainCtx)
+                u.nowLine.idx += 1
+                idx += 1
         else:
             if nowToken.tp == TypeEnum.word:
                 nowToken = getVal(nowToken, u.mainCtx)
@@ -55,17 +64,22 @@ proc eval*(u: var ref EvalUnit, s: string):string=
                 newLine.line[0] = nowToken
                 u.nowLine = newLine
             
-            temp = nil
-            while not isNil(u.nowLine.line[0]) and (u.nowLine.idx.uint16 == u.nowLine.line[0].explen):
-                temp = u.nowLine.eval(u.mainCtx)
-                if not isNil(u.nowLine.father):
-                    u.nowLine = u.nowLine.father
-                    if not isNil(temp):
-                        u.nowLine.line[u.nowLine.idx] = temp
-                        if not isNil(u.nowLine.father):
-                            u.nowLine.idx += 1
-                else:
-                    break
+        while not isNil(u.nowLine.line[0]) and (u.nowLine.idx.uint16 == u.nowLine.line[0].explen):
+            temp = u.nowLine.eval(u.mainCtx)
+            if not isNil(temp) and temp.tp == TypeEnum.err:
+                result = $temp.val.string & "\n"
+                var i = 0
+                while i < len(u.nowLine.line) and (not isNil(u.nowLine.line[i])):
+                    result = result & $u.nowLine.line[i].toStr & " "
+                    i += 1
+            if not isNil(u.nowLine.father):
+                u.nowLine = u.nowLine.father
+                if not isNil(temp):
+                    u.nowLine.line[u.nowLine.idx] = temp
+                    if not isNil(u.nowLine.father):
+                        u.nowLine.idx += 1
+            else:
+                break
         idx += 1
     if isNil(u.nowLine.line[0]) or isNil(temp):
         return ""
@@ -74,7 +88,12 @@ proc eval*(u: var ref EvalUnit, s: string):string=
     else:
         u.nowLine.idx = 0
         u.nowLine.father = nil
-        return "Error: incomplete expression"
+        result = "Error: incomplete expression \n-- Near: "
+        var i = 0
+        while i < len(u.nowLine.line) and (not isNil(u.nowLine.line[i])):
+            result = result & $u.nowLine.line[i].toStr & " "
+            i += 1
+        return result
         
 
             

@@ -17,7 +17,7 @@ type
         floatArr*: array[0..1, float64]
         token*: ref Token
         list*: seq[ref Token]
-        exec*: proc(args: var seq[ref Token]):ref Token  
+        exec*: ref Exec 
 
     Context* = object
         map*: TableRef[cstring, ref Token]
@@ -29,12 +29,21 @@ type
         explen*: uint16
         context*: ref Context
 
+    Exec* = object
+        string*: cstring
+        run*: proc(args: var seq[ref Token]):ref Token 
+
 
 proc newContext*(size = 32):ref Context=
     result = new(Context)
     result.map = newTable[cstring, ref Token](size)
     return result 
 
+proc newExec*(s: string, f: proc(args: var seq[ref Token]):ref Token):ref Exec=
+    result = new Exec
+    result.string = cstring(s)
+    result.run = f
+    return result
 
 proc toStr*(t: ref Token):cstring=
     case t.tp
@@ -65,11 +74,11 @@ proc toStr*(t: ref Token):cstring=
     of TypeEnum.set_word:
         return cstring($t.val.string & ":")
     of TypeEnum.native:
-        return cstring("native")
+        return t.val.exec.string
     of TypeEnum.function:
         return cstring("function")
     of TypeEnum.op:
-        return t.val.string
+        return t.val.exec.string
 
 proc print*(t: ref Token)=
     echo(toStr(t))
@@ -104,11 +113,11 @@ proc outputStr*(t: ref Token):string=
     of TypeEnum.set_word:
         return $t.val.string & ":"
     of TypeEnum.native:
-        return "native"
+        return $t.val.exec.string
     of TypeEnum.function:
         return "function"
     of TypeEnum.op:
-        return $t.val.string
+        return $t.val.exec.string
 
 proc repr*(t: ref Token):string=
     result = "type = " & $t.tp & "\n"
@@ -135,7 +144,7 @@ proc getVal*(t: ref Token, c: ref Context):ref Token=
             cont = cont.father
         if result.tp >= TypeEnum.native and result.explen == 1:
             var temp = newSeq[ref Token]()
-            result = result.val.exec(temp)
+            result = result.val.exec.run(temp)
         return result
     else:
         return t
