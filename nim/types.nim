@@ -4,6 +4,8 @@ type
         err, 
         lit_word,
         get_word,
+        datatype,
+        logic,
         integer, 
         float, 
         char,

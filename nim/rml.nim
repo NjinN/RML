@@ -2,6 +2,7 @@ import evalunit
 import strtool
 import native/nativeinit
 import op/opinit
+import strutils
 
 var exectuor = newEvalUnit()
 initNative(exectuor.mainCtx)
@@ -12,13 +13,13 @@ while true:
     flushFile(stdout)
     var inputStr = readLine(stdin)
     inputStr = trim(inputStr)
-    if(inputStr == "quit" or inputStr == "q" or inputStr == "Quit" or inputStr == "QUIT" or inputStr == "Q"):
+    if(toLowerAscii(inputStr) == "quit" or toLowerAscii(inputStr) == "q"):
         quit(0)
 
     if(inputStr == ""):
         continue
 
     var answer = exectuor.eval(inputStr)
-    if answer != "":
-        echo(">> " & answer)
+    if $answer.val.string != "":
+        echo(">> " & $answer.val.string)
     

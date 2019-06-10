@@ -6,6 +6,7 @@ export tables
 
 type 
     TokenVal* {.union.} = object
+        logic*: bool
         byte*: byte
         char*: char
         integer*: int32
@@ -33,6 +34,11 @@ type
         string*: cstring
         run*: proc(args: var seq[ref Token]):ref Token 
 
+proc newToken*(tp: TypeEnum, l: uint16):ref Token=
+    result = new Token
+    result.tp = tp
+    result.explen = l
+    return result
 
 proc newContext*(size = 32):ref Context=
     result = new(Context)
@@ -55,6 +61,10 @@ proc toStr*(t: ref Token):cstring=
         return cstring("'" & $t.val.string)
     of TypeEnum.get_word:
         return cstring($t.val.string & ":")
+    of TypeEnum.datatype:
+        return t.val.string
+    of TypeEnum.logic:
+        return cstring($t.val.logic)
     of TypeEnum.integer:
         return cstring($t.val.integer)
     of TypeEnum.float:
@@ -94,6 +104,10 @@ proc outputStr*(t: ref Token):string=
         return "'" & $t.val.string
     of TypeEnum.get_word:
         return $t.val.string & ":"
+    of TypeEnum.datatype:
+        return $t.val.string
+    of TypeEnum.logic:
+        return $t.val.logic
     of TypeEnum.integer:
         return $t.val.integer
     of TypeEnum.float:

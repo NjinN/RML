@@ -7,9 +7,28 @@ proc toTokens*(s: string):seq[ref Token]
 proc toToken*(s: string):ref Token=
     result = new Token
     var str = trim(s)
-    if str == "":
+
+    if str == "none":
         result.tp = TypeEnum.none
         result.val.string = "none"
+        result.explen = 1
+        return result
+
+    if toLowerAscii(str) == "true":
+        result.tp = TypeEnum.logic
+        result.val.logic = true
+        result.explen = 1
+        return result
+
+    if toLowerAscii(str) == "false":
+        result.tp = TypeEnum.logic
+        result.val.logic = false
+        result.explen = 1
+        return result
+    
+    if  len(str) == 4 and (str[0..1] == "#'") and (str[3] == '\''):
+        result.tp = TypeEnum.char
+        result.val.char = str[2]
         result.explen = 1
         return result
 

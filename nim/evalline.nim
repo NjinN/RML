@@ -23,6 +23,7 @@ proc eval*(l: var ref EvalLine;c: ref Context):ref Token=
         c.map[l.line[0].val.string] = l.line[1]
         return l.line[1]
     of TypeEnum.native:
+        echo("start eval")
         return l.line[0].val.exec.run(l.line)
     of TypeEnum.op:
         return l.line[0].val.exec.run(l.line)

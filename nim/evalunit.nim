@@ -12,7 +12,10 @@ proc newEvalUnit*():ref EvalUnit=
     result.nowLine = newEvalLine(10, nil)
     return result
 
-proc eval*(u: var ref EvalUnit, s: string):string=
+proc eval*(u: var ref EvalUnit, s: string):ref Token=
+    result = new Token
+    result.tp = TypeEnum.string
+    result.explen = 1
     var inp = toTokens(s)
     if(len(inp) == 0):
         return
@@ -46,7 +49,8 @@ proc eval*(u: var ref EvalUnit, s: string):string=
                 nowToken = getVal(nowToken, u.mainCtx)
             if nowToken.tp == TypeEnum.op:
                 if isNil(u.nowLine.line[0]):
-                    return "Error: illegal grammar"
+                    result.val.string = cstring("Error: illegal grammar")
+                    return result
                 if u.nowLine.idx > 0:
                     u.nowLine.idx -= 1
                 var newLine = newEvalLine(3, u.nowLine)
@@ -67,11 +71,13 @@ proc eval*(u: var ref EvalUnit, s: string):string=
         while not isNil(u.nowLine.line[0]) and (u.nowLine.idx.uint16 == u.nowLine.line[0].explen):
             temp = u.nowLine.eval(u.mainCtx)
             if not isNil(temp) and temp.tp == TypeEnum.err:
-                result = $temp.val.string & "\n"
+                result.val.string = cstring($temp.val.string & "\n-->Near: ")
                 var i = 0
-                while i < len(u.nowLine.line) and (not isNil(u.nowLine.line[i])):
-                    result = result & $u.nowLine.line[i].toStr & " "
-                    i += 1
+                if idx >= 3:
+                    for i in 0..2:
+                        result.val.string = cstring($result.val.string & $inp[idx-i].toStr & " ")
+                else:
+                    result.val.string = cstring($result.val.string & $inp[idx].toStr)
             if not isNil(u.nowLine.father):
                 u.nowLine = u.nowLine.father
                 if not isNil(temp):
@@ -82,18 +88,20 @@ proc eval*(u: var ref EvalUnit, s: string):string=
                 break
         idx += 1
     if isNil(u.nowLine.line[0]) or isNil(temp):
-        return ""
+        result.val.string = ""
     elif isNil(u.nowLine.father) and (u.nowLine.line[0].explen == 1):
-        return $u.nowLine.line[0].toStr
+        result.val.string = u.nowLine.line[0].toStr
     else:
         u.nowLine.idx = 0
         u.nowLine.father = nil
-        result = "Error: incomplete expression \n-- Near: "
+        result.val.string = "Error: incomplete expression \n-- Near: "
         var i = 0
-        while i < len(u.nowLine.line) and (not isNil(u.nowLine.line[i])):
-            result = result & $u.nowLine.line[i].toStr & " "
-            i += 1
-        return result
+        if idx >= 3:
+            for i in 0..2:
+                result.val.string = cstring($result.val.string & $inp[idx-i].toStr & " ")
+        else:
+            result.val.string = cstring($result.val.string & $inp[idx].toStr)
+    return result
         
 
             
