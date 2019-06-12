@@ -23,8 +23,10 @@ proc strCut*(s: string):seq[string]=
         return result
     
     var startIdx = -1
+    var isParen = false
     var isStr = false
     var isBlock = false
+    var pFloor = 0
     var bFloor = 0
     var nowChar: char
 
@@ -45,13 +47,16 @@ proc strCut*(s: string):seq[string]=
         if startIdx < 0 and not isSpaceAscii(nowChar):
             if nowChar == '"':
                 isStr = true
+            if nowChar == '(':
+                isParen = true
+                pFloor = 1
             if nowChar == '[':
                 isBlock = true
                 bFloor = 1
             startIdx = nowIdx
             continue
 
-        if startIdx >= 0 and isSpaceAscii(nowChar) and not isStr and not isBlock:
+        if startIdx >= 0 and isSpaceAscii(nowChar) and not isStr and not isParen and not isBlock:
             result.add(str[startIdx..nowIdx-1])
             startIdx = -1
             continue
@@ -62,6 +67,16 @@ proc strCut*(s: string):seq[string]=
                 isStr = false
                 startIdx = -1
             continue
+        
+        if startIdx >= 0 and isParen:
+            if nowChar == '(':
+                pFloor += 1
+            if nowChar == ')':
+                pFloor -= 1
+            if pFloor == 0:
+                result.add(str[startIdx..nowIdx])
+                isParen = false
+                startIdx = -1
         
         if startIdx >= 0 and isBlock:
             if isStr:
@@ -77,6 +92,9 @@ proc strCut*(s: string):seq[string]=
                     isBlock = false
                     startIdx = -1
     return result
+
+
+
 
 
 proc isNumberStr*(s: string):int=
@@ -97,7 +115,7 @@ proc isNumberStr*(s: string):int=
 
 
 when isMainModule:
-    var strs = strCut("   123 \"this is a string  with space   ^\"  [ 1 2 3 ] and tranChar \"  [ 123 456 \"anthor ^\" str \" 987 ] 456 ")
+    var strs = strCut("   123 \"this is a string  with space   ^\"  ([ 1 2 3 ] and tranChar) \"  ([ 123 456 \"anthor ^\" str \" 987 ] 456) ")
 
     for s in strs:
         echo(s)

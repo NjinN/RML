@@ -7,13 +7,14 @@ type
         datatype,
         logic,
         integer, 
-        float, 
+        decimal, 
         char,
         string,
+        paren,
         list, 
         word,
         set_word, 
         op,
-        native
+        native,        
         function
 

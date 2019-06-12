@@ -48,6 +48,17 @@ proc toToken*(s: string):ref Token=
         result.val.list = toTokens(str[1..endIdx])
         result.explen = 1
         return result
+    
+    if str[0] == '(':
+        result.tp = TypeEnum.paren 
+        var endIdx = 0
+        for idx in countdown(len(str)-1, 1):
+            if str[idx] == ')':
+                endIdx = idx-1
+                break
+        result.val.list = toTokens(str[1..endIdx])
+        result.explen = 1
+        return result
 
     if isNumberStr(str) == 0:
         result.tp = TypeEnum.integer
@@ -56,8 +67,8 @@ proc toToken*(s: string):ref Token=
         return result
 
     if isNumberStr(str) == 1:
-        result.tp = TypeEnum.float
-        result.val.float = parseFloat(str)
+        result.tp = TypeEnum.decimal
+        result.val.decimal = parseFloat(str)
         result.explen = 1
         return result
 

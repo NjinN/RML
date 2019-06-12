@@ -17,7 +17,7 @@ proc initNative*(cont: ref Context)=
     divToken.val.exec = newExec("div", nativelib.divide)
     cont.map[cstring("div")] = divToken
 
-    var cpuTimeToken = newToken(TypeEnum.native, 3)
+    var cpuTimeToken = newToken(TypeEnum.native, 1)
     cpuTimeToken.val.exec = newExec("cputime", nativelib.getCpuTime)
     cont.map[cstring("cputime")] = cpuTimeToken
 
@@ -25,7 +25,18 @@ proc initNative*(cont: ref Context)=
     gmtToken.val.exec = newExec("gmt", nativelib.gmt)
     cont.map[cstring("gmt")] = gmtToken
 
-    var printToken = newToken(TypeEnum.native, 1)
+    var printToken = newToken(TypeEnum.native, 2)
     printToken.val.exec = newExec("print", nativelib.print)
     cont.map[cstring("print")] = printToken
+
+    var ifToken = newToken(TypeEnum.native, 3)
+    ifToken.val.exec = newExec("if", nativelib.iff)
+    cont.map[cstring("if")] = ifToken
+
+    var eitherToken = newToken(TypeEnum.native, 4)
+    eitherToken.val.exec = newExec("either", nativelib.either)
+    cont.map[cstring("either")] = eitherToken
   
+    var funcToken = newToken(TypeEnum.native, 3)
+    funcToken.val.exec = newExec("func", nativelib.fc)
+    cont.map[cstring("func")] = funcToken

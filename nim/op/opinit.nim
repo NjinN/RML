@@ -26,7 +26,7 @@ proc initOp*(cont: ref Context)=
     cont.map[cstring("<>")] = neToken
 
     var ltToken = newToken(TypeEnum.op, 3)
-    ltToken.val.exec = newExec("=", nativelib.lt)
+    ltToken.val.exec = newExec("<", nativelib.lt)
     cont.map[cstring("<")] = ltToken
 
     var gtToken = newToken(TypeEnum.op, 3)

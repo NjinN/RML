@@ -1,5 +1,5 @@
 
-proc eq*(args: var seq[ref Token]):ref Token=
+proc eq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
     result = newToken(TypeEnum.logic, 1)
     result.val.logic = false
     case args[1].tp
@@ -13,18 +13,18 @@ proc eq*(args: var seq[ref Token]):ref Token=
         case args[2].tp
         of TypeEnum.integer:
             result.val.logic = (args[1].val.integer == args[2].val.integer)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.integer.float == args[2].val.float)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.integer.float == args[2].val.decimal)
         of TypeEnum.char:
             result.val.logic = (args[1].val.integer == ord(args[2].val.char))
         else:
             discard 0
-    of TypeEnum.float:
+    of TypeEnum.decimal:
         case args[2].tp
         of TypeEnum.integer:
-            result.val.logic = (args[1].val.integer.float == args[2].val.float)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.float == args[2].val.float)
+            result.val.logic = (args[1].val.integer.float == args[2].val.decimal)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.decimal == args[2].val.decimal)
         else:
             discard 0
     of TypeEnum.char:
@@ -45,7 +45,7 @@ proc eq*(args: var seq[ref Token]):ref Token=
         discard 0
 
 
-proc ne*(args: var seq[ref Token]):ref Token=
+proc ne*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
     result = newToken(TypeEnum.logic, 1)
     result.val.logic = true
     case args[1].tp
@@ -59,18 +59,18 @@ proc ne*(args: var seq[ref Token]):ref Token=
         case args[2].tp
         of TypeEnum.integer:
             result.val.logic = (args[1].val.integer != args[2].val.integer)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.integer.float != args[2].val.float)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.integer.float != args[2].val.decimal)
         of TypeEnum.char:
             result.val.logic = (args[1].val.integer != ord(args[2].val.char))
         else:
             discard 0
-    of TypeEnum.float:
+    of TypeEnum.decimal:
         case args[2].tp
         of TypeEnum.integer:
-            result.val.logic = (args[1].val.integer.float != args[2].val.float)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.float != args[2].val.float)
+            result.val.logic = (args[1].val.integer.float != args[2].val.decimal)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.decimal != args[2].val.decimal)
         else:
             discard 0
     of TypeEnum.char:
@@ -92,7 +92,7 @@ proc ne*(args: var seq[ref Token]):ref Token=
 
 
 
-proc lt*(args: var seq[ref Token]):ref Token=
+proc lt*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
     result = newToken(TypeEnum.logic, 1)
     result.val.logic = false
     case args[1].tp
@@ -106,18 +106,18 @@ proc lt*(args: var seq[ref Token]):ref Token=
         case args[2].tp
         of TypeEnum.integer:
             result.val.logic = (args[1].val.integer < args[2].val.integer)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.integer.float < args[2].val.float)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.integer.float < args[2].val.decimal)
         of TypeEnum.char:
             result.val.logic = (args[1].val.integer < ord(args[2].val.char))
         else:
             discard 0
-    of TypeEnum.float:
+    of TypeEnum.decimal:
         case args[2].tp
         of TypeEnum.integer:
-            result.val.logic = (args[1].val.integer.float < args[2].val.float)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.float < args[2].val.float)
+            result.val.logic = (args[1].val.integer.float < args[2].val.decimal)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.decimal < args[2].val.decimal)
         else:
             discard 0
     of TypeEnum.char:
@@ -138,7 +138,7 @@ proc lt*(args: var seq[ref Token]):ref Token=
         discard 0
 
 
-proc gt*(args: var seq[ref Token]):ref Token=
+proc gt*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
     result = newToken(TypeEnum.logic, 1)
     result.val.logic = false
     case args[1].tp
@@ -152,18 +152,18 @@ proc gt*(args: var seq[ref Token]):ref Token=
         case args[2].tp
         of TypeEnum.integer:
             result.val.logic = (args[1].val.integer > args[2].val.integer)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.integer.float > args[2].val.float)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.integer.float > args[2].val.decimal)
         of TypeEnum.char:
             result.val.logic = (args[1].val.integer > ord(args[2].val.char))
         else:
             discard 0
-    of TypeEnum.float:
+    of TypeEnum.decimal:
         case args[2].tp
         of TypeEnum.integer:
-            result.val.logic = (args[1].val.integer.float > args[2].val.float)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.float > args[2].val.float)
+            result.val.logic = (args[1].val.integer.float > args[2].val.decimal)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.decimal > args[2].val.decimal)
         else:
             discard 0
     of TypeEnum.char:
@@ -184,7 +184,7 @@ proc gt*(args: var seq[ref Token]):ref Token=
         discard 0
 
 
-proc lteq*(args: var seq[ref Token]):ref Token=
+proc lteq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
     result = newToken(TypeEnum.logic, 1)
     result.val.logic = false
     case args[1].tp
@@ -198,18 +198,18 @@ proc lteq*(args: var seq[ref Token]):ref Token=
         case args[2].tp
         of TypeEnum.integer:
             result.val.logic = (args[1].val.integer <= args[2].val.integer)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.integer.float <= args[2].val.float)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.integer.float <= args[2].val.decimal)
         of TypeEnum.char:
             result.val.logic = (args[1].val.integer <= ord(args[2].val.char))
         else:
             discard 0
-    of TypeEnum.float:
+    of TypeEnum.decimal:
         case args[2].tp
         of TypeEnum.integer:
-            result.val.logic = (args[1].val.integer.float <= args[2].val.float)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.float <= args[2].val.float)
+            result.val.logic = (args[1].val.integer.float <= args[2].val.decimal)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.decimal <= args[2].val.decimal)
         else:
             discard 0
     of TypeEnum.char:
@@ -230,7 +230,7 @@ proc lteq*(args: var seq[ref Token]):ref Token=
         discard 0
 
 
-proc gteq*(args: var seq[ref Token]):ref Token=
+proc gteq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
     result = newToken(TypeEnum.logic, 1)
     result.val.logic = false
     case args[1].tp
@@ -244,18 +244,18 @@ proc gteq*(args: var seq[ref Token]):ref Token=
         case args[2].tp
         of TypeEnum.integer:
             result.val.logic = (args[1].val.integer >= args[2].val.integer)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.integer.float >= args[2].val.float)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.integer.float >= args[2].val.decimal)
         of TypeEnum.char:
             result.val.logic = (args[1].val.integer >= ord(args[2].val.char))
         else:
             discard 0
-    of TypeEnum.float:
+    of TypeEnum.decimal:
         case args[2].tp
         of TypeEnum.integer:
-            result.val.logic = (args[1].val.integer.float >= args[2].val.float)
-        of TypeEnum.float:
-            result.val.logic = (args[1].val.float >= args[2].val.float)
+            result.val.logic = (args[1].val.integer.float >= args[2].val.decimal)
+        of TypeEnum.decimal:
+            result.val.logic = (args[1].val.decimal >= args[2].val.decimal)
         else:
             discard 0
     of TypeEnum.char:

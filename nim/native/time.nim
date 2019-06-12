@@ -1,12 +1,12 @@
 import times
 
-proc getCpuTime*(args: var seq[ref Token]):ref Token=
-    result = newToken(TypeEnum.float, 1)
-    result.val.float = cpuTime()
+proc getCpuTime*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
+    result = newToken(TypeEnum.decimal, 1)
+    result.val.decimal = cpuTime()
     return result
 
-proc gmt*(args: var seq[ref Token]):ref Token=
-    result = newToken(TypeEnum.float, 1)
-    result.val.float = epochTime()
+proc gmt*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
+    result = newToken(TypeEnum.decimal, 1)
+    result.val.decimal = epochTime()
     return result
 

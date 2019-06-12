@@ -11,14 +11,15 @@ type
         char*: char
         integer*: int32
         long*: int64
-        float*: float64
+        decimal*: float64
         string*: cstring
         integerArr*: array[0..3, int32]
         longArr*: array[0..1, int64]
         floatArr*: array[0..1, float64]
         token*: ref Token
         list*: seq[ref Token]
-        exec*: ref Exec 
+        exec*: ref Exec
+        fc*: ref Func
 
     Context* = object
         map*: TableRef[cstring, ref Token]
@@ -32,24 +33,35 @@ type
 
     Exec* = object
         string*: cstring
-        run*: proc(args: var seq[ref Token]):ref Token 
+        run*: proc(args: var seq[ref Token], cont: ref Context = nil):ref Token 
 
-proc newToken*(tp: TypeEnum, l: uint16):ref Token=
+    Func* = object 
+        args*: seq[ref Token]
+        body*: seq[ref Token]
+
+proc newToken*(tp: TypeEnum, l: int):ref Token=
     result = new Token
     result.tp = tp
-    result.explen = l
+    result.explen = l.uint16
     return result
 
 proc newContext*(size = 32):ref Context=
-    result = new(Context)
+    result = new Context 
     result.map = newTable[cstring, ref Token](size)
     return result 
 
-proc newExec*(s: string, f: proc(args: var seq[ref Token]):ref Token):ref Exec=
+proc newExec*(s: string, f: proc(args: var seq[ref Token], cont: ref Context = nil):ref Token):ref Exec=
     result = new Exec
     result.string = cstring(s)
     result.run = f
     return result
+
+proc newFunc*(args: seq[ref Token], body: seq[ref Token]):ref Func=
+    result = new Func
+    result.args = args
+    result.body = body
+    return result
+
 
 proc toStr*(t: ref Token):cstring=
     case t.tp
@@ -67,8 +79,8 @@ proc toStr*(t: ref Token):cstring=
         return cstring($t.val.logic)
     of TypeEnum.integer:
         return cstring($t.val.integer)
-    of TypeEnum.float:
-        return cstring($t.val.float)
+    of TypeEnum.decimal:
+        return cstring($t.val.decimal)
     of TypeEnum.char:
         return cstring($t.val.char)
     of TypeEnum.string:
@@ -79,6 +91,12 @@ proc toStr*(t: ref Token):cstring=
             result = $result & $toStr(item) & " "
         result = $result & "]"
         return result
+    of TypeEnum.paren:
+        result = "( "
+        for item in t.val.list:
+            result = $result & $toStr(item) & " "
+        result = $result & ")"
+        return result
     of TypeEnum.word:
         return t.val.string
     of TypeEnum.set_word:
@@ -86,7 +104,15 @@ proc toStr*(t: ref Token):cstring=
     of TypeEnum.native:
         return t.val.exec.string
     of TypeEnum.function:
-        return cstring("function")
+        var str = "func [ "
+        for i in 0..len(t.val.fc.args)-1:
+            str = str & $t.val.fc.args[i].toStr & " "
+        str = str & "] [ "
+        for i in 0..len(t.val.fc.body)-1:
+            str = str & $t.val.fc.body[i].toStr & " "
+        str = str & "]"
+        return cstring(str)
+        # return cstring("function")
     of TypeEnum.op:
         return t.val.exec.string
 
@@ -110,8 +136,8 @@ proc outputStr*(t: ref Token):string=
         return $t.val.logic
     of TypeEnum.integer:
         return $t.val.integer
-    of TypeEnum.float:
-        return $t.val.float
+    of TypeEnum.decimal:
+        return $t.val.decimal
     of TypeEnum.char:
         return $t.val.char
     of TypeEnum.string:
@@ -121,6 +147,12 @@ proc outputStr*(t: ref Token):string=
         for item in t.val.list:
             result = result & outputStr(item) & " "
         result = result & "]"
+        return result
+    of TypeEnum.paren:
+        result = "( "
+        for item in t.val.list:
+            result = result & outputStr(item) & " "
+        result = result & ")"
         return result
     of TypeEnum.word:
         return $t.val.string
@@ -140,28 +172,6 @@ proc repr*(t: ref Token):string=
     result = result & repr(t.context) & "\n"
     return result
 
-proc getVal*(t: ref Token, c: ref Context):ref Token=
-    result = new(Token)
-    result.tp = TypeEnum.none
-    result.val.string = "none"
-    result.explen = 1
-    case t.tp
-    of TypeEnum.lit_word:
-        result.tp = TypeEnum.word
-        result.val.string = cstring(($t.val.string)[1..len(t.val.string)-1])
-        result.explen = 1
-        return result
-    of TypeEnum.word:
-        var cont = c
-        while result.tp == TypeEnum.none and (not isNil(cont)):
-            result = cont.map.getOrDefault(t.val.string, result)
-            cont = cont.father
-        if result.tp >= TypeEnum.native and result.explen == 1:
-            var temp = newSeq[ref Token]()
-            result = result.val.exec.run(temp)
-        return result
-    else:
-        return t
 
 
 

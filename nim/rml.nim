@@ -1,8 +1,11 @@
+import token
 import evalunit
 import strtool
 import native/nativeinit
 import op/opinit
 import strutils
+
+GC_disable()
 
 var exectuor = newEvalUnit()
 initNative(exectuor.mainCtx)
@@ -20,6 +23,6 @@ while true:
         continue
 
     var answer = exectuor.eval(inputStr)
-    if $answer.val.string != "":
-        echo(">> " & $answer.val.string)
+    if not (answer.tp == TypeEnum.string and $answer.val.string == ""):
+        echo(">> " & $answer.toStr)
     
