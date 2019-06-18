@@ -1,14 +1,14 @@
 import ../token
 export token
-import ../evalunit
+import ../evalUnit
 
 include "logic.nim"
 include "time.nim"
 include "control.nim"
 include "func.nim"
 
-proc plus*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.err, 1)
+proc plus*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
             result.tp = TypeEnum.integer
@@ -27,11 +27,11 @@ proc plus*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
             result.tp = TypeEnum.decimal
             result.val.decimal = args[1].val.decimal + args[2].val.decimal
             return result
-    result.val.string = cstring("Type Mismatch")
+    result.val.string = "Type Mismatch"
 
 
-proc minus*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.err, 1)
+proc minus*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
             result.tp = TypeEnum.integer
@@ -50,11 +50,11 @@ proc minus*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
             result.tp = TypeEnum.decimal
             result.val.decimal = args[1].val.decimal - args[2].val.decimal
             return result
-    result.val.string = cstring("Type Mismatch")
+    result.val.string = "Type Mismatch"
     
     
-proc multiply*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.err, 1)
+proc multiply*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
             result.tp = TypeEnum.integer
@@ -73,11 +73,11 @@ proc multiply*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
             result.tp = TypeEnum.decimal
             result.val.decimal = args[1].val.decimal * args[2].val.decimal
             return result
-    result.val.string = cstring("Type Mismatch")
+    result.val.string = "Type Mismatch"
 
 
-proc divide*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.err, 1)
+proc divide*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
             result.tp = TypeEnum.decimal
@@ -96,13 +96,13 @@ proc divide*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
             result.tp = TypeEnum.decimal
             result.val.decimal = args[1].val.decimal / args[2].val.decimal
             return result
-    result.val.string = cstring("Type Mismatch")
+    result.val.string = "Type Mismatch"
 
 
-proc print*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
+proc print*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     if args[1].tp == TypeEnum.list:
         for i in 0..len(args[1].val.list)-1:
-            write(stdout, $args[1].val.list[i].toStr)
+            write(stdout, args[1].val.list[i].toStr)
         write(stdout, "\n")
         flushFile(stdout)
     else:

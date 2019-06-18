@@ -1,35 +1,45 @@
 # import evalline
 import totoken
 
-include "evalline.nim"
+include "evalLine.nim"
  
 
-proc newEvalUnit*():ref EvalUnit=
-    result = new(EvalUnit)
-    result.mainCtx = newContext()
-    result.nowLine = newEvalLine(10, nil)
+proc newEvalUnit*():ptr EvalUnit=
+    result = cast[ptr EvalUnit](alloc0(sizeof(EvalUnit)))
+    result.mainCtx = newBindMap[ptr Token](16)
+    result.nowLine = newEvalLine(8, nil)
     return result
 
-proc newEvalUnit*(cont: ref Context):ref EvalUnit=
-    result = new(EvalUnit)
-    result.mainCtx = cont
-    result.nowLine = newEvalLine(10, nil)
+proc newEvalUnit*(cont: ptr BindMap[ptr Token]):ptr EvalUnit=
+    result = cast[ptr EvalUnit](alloc0(sizeof(EvalUnit)))
+    result.mainCtx = newBindMap[ptr Token](16)
+    result.mainCtx.father = cont
+    result.nowLine = newEvalLine(8, nil)
     return result
 
-proc eval*(u: var ref EvalUnit, inp: seq[ref Token]):ref Token=
-    result = newToken(TypeEnum.string, 1)
-    if(len(inp) == 0):
+proc freeEvalUnit*(u: ptr EvalUnit)=
+    freeBindMap(u.mainCtx)
+    freeEvalLine(u.nowLine)
+    dealloc(u)
+
+proc eval*(u: var ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
+    # echo("start new unit")
+    # for i in 0..len(inp)-1:
+    #     print inp[i]
+    result = newToken(TypeEnum.string)
+    if(high(inp) < 0):
         result.val.string = ""
         return result
-    var temp = new(Token)
+    var temp = newToken()
+
     var idx = 0
-    # echo(len(inp))
-    while idx < len(inp):
+
+    while idx <= high(inp):
         # echo idx
         var nowToken = inp[idx]
         # print nowToken
-        var nextToken: ref Token
-        if idx < len(inp)-1:
+        var nextToken: ptr Token
+        if idx < high(inp):
             # print inp[idx+1]
             nextToken = getFinalToken(inp[idx+1], u.mainCtx)
         if not isNil(nextToken) and nextToken.tp == TypeEnum.op:
@@ -54,7 +64,7 @@ proc eval*(u: var ref EvalUnit, inp: seq[ref Token]):ref Token=
             if nowToken.tp == TypeEnum.op:
                 if isNil(u.nowLine.line[0]):
                     result.tp = TypeEnum.err
-                    result.val.string = cstring("Illegal grammar!!!")
+                    result.val.string = "Illegal grammar!!!"
                 if u.nowLine.idx > 0:
                     u.nowLine.idx -= 1
                 var newLine = newEvalLine(3, u.nowLine)
@@ -72,7 +82,7 @@ proc eval*(u: var ref EvalUnit, inp: seq[ref Token]):ref Token=
                 newLine.line[0] = nowToken
                 u.nowLine = newLine
             
-        while not isNil(u.nowLine.line[0]) and (u.nowLine.idx.uint16 == u.nowLine.line[0].explen):
+        while not isNil(u.nowLine.line[0]) and (u.nowLine.idx == u.nowLine.line[0].explen):
             
             # for i in 0..u.nowLine.idx-1:
             #     write(stdout, $u.nowLine.line[i].toStr & " ")
@@ -82,15 +92,16 @@ proc eval*(u: var ref EvalUnit, inp: seq[ref Token]):ref Token=
 
             temp = u.nowLine.eval(u.mainCtx)
             if not isNil(temp) and temp.tp == TypeEnum.err:
-                result.val.string = cstring($temp.val.string & "\n-->Near: ")
+                result.val.string = $temp.val.string & "\n-->Near: "
                 if idx >= 3:
                     for i in countdown(2, 0):
-                        result.val.string = cstring($result.val.string & $inp[idx-i].toStr & " ")
+                        result.val.string = result.val.string & inp[idx-i].toStr & " "
                 else:
-                    result.val.string = cstring($result.val.string & $inp[idx].toStr)
+                    result.val.string = result.val.string & inp[idx].toStr
             if not isNil(u.nowLine.father):
-                var g = u.nowLine
+                var oldLine = u.nowLine
                 u.nowLine = u.nowLine.father
+                freeEvalLine(oldLine)
                 u.nowLine.line[u.nowLine.idx] = temp
                 if not isNil(u.nowLine.father):
                     u.nowLine.idx += 1
@@ -108,13 +119,13 @@ proc eval*(u: var ref EvalUnit, inp: seq[ref Token]):ref Token=
         result.val.string = "Incomplete expression \n-> Near: "
         if idx >= 3:
             for i in countdown(3, 1):
-                result.val.string = cstring($result.val.string & $inp[idx-i].toStr & " ")
+                result.val.string = result.val.string & inp[idx-i].toStr & " "
         else:
-            result.val.string = cstring($result.val.string & $inp[idx-1].toStr)
+            result.val.string = result.val.string & inp[idx-1].toStr
     return result
         
 
-proc eval*(u: var ref EvalUnit, s: string):ref Token=
+proc eval*(u: var ptr EvalUnit, s: string):ptr Token=
     return u.eval(toTokens(s))
             
 
@@ -122,9 +133,8 @@ proc eval*(u: var ref EvalUnit, s: string):ref Token=
 when isMainModule:
     var unit = newEvalUnit()
 
-    discard unit.eval("i: 123 j: 456")
+    print unit.eval("i: 123 j: 456")
     # echo(isNil(unit.mainCtx.map[cstring("i")]))
-    for item in unit.mainCtx.map.keys:
-        echo(item)
+    echo(repr(unit.mainCtx))
 
 

@@ -1,6 +1,6 @@
 
-proc eq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.logic, 1)
+proc eq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
     of TypeEnum.none:
@@ -45,8 +45,8 @@ proc eq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
         discard 0
 
 
-proc ne*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.logic, 1)
+proc ne*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.logic)
     result.val.logic = true
     case args[1].tp
     of TypeEnum.none:
@@ -92,8 +92,8 @@ proc ne*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
 
 
 
-proc lt*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.logic, 1)
+proc lt*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
     of TypeEnum.none:
@@ -138,8 +138,8 @@ proc lt*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
         discard 0
 
 
-proc gt*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.logic, 1)
+proc gt*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
     of TypeEnum.none:
@@ -184,8 +184,8 @@ proc gt*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
         discard 0
 
 
-proc lteq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.logic, 1)
+proc lteq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
     of TypeEnum.none:
@@ -230,8 +230,8 @@ proc lteq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
         discard 0
 
 
-proc gteq*(args: var seq[ref Token], cont: ref Context = nil):ref Token=
-    result = newToken(TypeEnum.logic, 1)
+proc gteq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
     of TypeEnum.none:

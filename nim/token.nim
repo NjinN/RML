@@ -1,8 +1,11 @@
-import tables
+import listType
+import bindMap
 import types
 
+export listType
+export bindMap
 export types
-export tables
+
 
 type 
     TokenVal* {.union.} = object
@@ -12,126 +15,66 @@ type
         integer*: int32
         long*: int64
         decimal*: float64
-        string*: cstring
+        string*: string
         integerArr*: array[0..3, int32]
         longArr*: array[0..1, int64]
         floatArr*: array[0..1, float64]
-        token*: ref Token
-        list*: seq[ref Token]
-        exec*: ref Exec
-        fc*: ref Func
+        token*: ptr Token
+        list*: ptr List[ptr Token]
+        exec*: ptr Exec
+        fc*: ptr Func
 
-    Context* = object
-        map*: TableRef[cstring, ref Token]
-        father*: ref Context
-
-    Token*  = object
+    Token* {.packed.}  = object
         tp*: TypeEnum
         val*: TokenVal
-        explen*: uint16
-        context*: ref Context
 
     Exec* = object
-        string*: cstring
-        run*: proc(args: var seq[ref Token], cont: ref Context = nil):ref Token 
+        string*: string
+        explen*: uint16
+        run*: proc(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token 
 
     Func* = object 
-        args*: seq[ref Token]
-        body*: seq[ref Token]
+        args*: ptr List[ptr Token]
+        body*: ptr List[ptr Token]
+        explen*: uint16
 
-proc newToken*(tp: TypeEnum, l: int):ref Token=
-    result = new Token
+proc newToken*():ptr Token=
+    result = cast[ptr Token](alloc0(sizeof(Token)))
+    return result
+
+proc newToken*(tp: TypeEnum):ptr Token=
+    result = cast[ptr Token](alloc0(sizeof(Token)))
     result.tp = tp
+    return result
+
+
+proc newExec*(s: string, f: proc(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token, l: int):ptr Exec=
+    result = cast[ptr Exec](alloc0(sizeof(Exec)))
+    result.string = s
+    result.run = f
     result.explen = l.uint16
     return result
 
-proc newContext*(size = 32):ref Context=
-    result = new Context 
-    result.map = newTable[cstring, ref Token](size)
-    return result 
-
-proc newExec*(s: string, f: proc(args: var seq[ref Token], cont: ref Context = nil):ref Token):ref Exec=
-    result = new Exec
-    result.string = cstring(s)
-    result.run = f
-    return result
-
-proc newFunc*(args: seq[ref Token], body: seq[ref Token]):ref Func=
-    result = new Func
+proc newFunc*(args: ptr List[ptr Token], body: ptr List[ptr Token]):ptr Func=
+    result = cast[ptr Func](alloc0(sizeof(Func)))
     result.args = args
     result.body = body
+    result.explen = uint16(high(args) + 2)
     return result
 
 
-proc toStr*(t: ref Token):cstring=
-    case t.tp
-    of TypeEnum.none:
-        return cstring("none")
-    of TypeEnum.err:
-        return cstring("Error: " & $t.val.string)
-    of TypeEnum.lit_word:
-        return cstring("'" & $t.val.string)
-    of TypeEnum.get_word:
-        return cstring($t.val.string & ":")
-    of TypeEnum.datatype:
-        return t.val.string
-    of TypeEnum.logic:
-        return cstring($t.val.logic)
-    of TypeEnum.integer:
-        return cstring($t.val.integer)
-    of TypeEnum.decimal:
-        return cstring($t.val.decimal)
-    of TypeEnum.char:
-        return cstring($t.val.char)
-    of TypeEnum.string:
-        return "\"" & $t.val.string & "\""
-    of TypeEnum.list:
-        result = "[ "
-        for item in t.val.list:
-            result = $result & $toStr(item) & " "
-        result = $result & "]"
-        return result
-    of TypeEnum.paren:
-        result = "( "
-        for item in t.val.list:
-            result = $result & $toStr(item) & " "
-        result = $result & ")"
-        return result
-    of TypeEnum.word:
-        return t.val.string
-    of TypeEnum.set_word:
-        return cstring($t.val.string & ":")
-    of TypeEnum.native:
-        return t.val.exec.string
-    of TypeEnum.function:
-        var str = "func [ "
-        for i in 0..len(t.val.fc.args)-1:
-            str = str & $t.val.fc.args[i].toStr & " "
-        str = str & "] [ "
-        for i in 0..len(t.val.fc.body)-1:
-            str = str & $t.val.fc.body[i].toStr & " "
-        str = str & "]"
-        return cstring(str)
-        # return cstring("function")
-    of TypeEnum.op:
-        return t.val.exec.string
-
-proc print*(t: ref Token)=
-    echo(toStr(t))
-
-
-proc outputStr*(t: ref Token):string=
+proc toStr*(t: ptr Token):string=
     case t.tp
     of TypeEnum.none:
         return "none"
     of TypeEnum.err:
-        return "Error: " & $t.val.string
+        return "Error: " & t.val.string
     of TypeEnum.lit_word:
-        return "'" & $t.val.string
+        return "'" & t.val.string
     of TypeEnum.get_word:
-        return $t.val.string & ":"
+        return t.val.string & ":"
     of TypeEnum.datatype:
-        return $t.val.string
+        return t.val.string
     of TypeEnum.logic:
         return $t.val.logic
     of TypeEnum.integer:
@@ -141,37 +84,128 @@ proc outputStr*(t: ref Token):string=
     of TypeEnum.char:
         return $t.val.char
     of TypeEnum.string:
-        return $t.val.string 
+        return "\"" & t.val.string & "\""
     of TypeEnum.list:
         result = "[ "
-        for item in t.val.list:
-            result = result & outputStr(item) & " "
+        for i in 0..high(t.val.list):
+            result = result & toStr(t.val.list[i]) & " "
         result = result & "]"
         return result
     of TypeEnum.paren:
         result = "( "
-        for item in t.val.list:
-            result = result & outputStr(item) & " "
+        for i in 0..high(t.val.list):
+            result = result & toStr(t.val.list[i]) & " "
         result = result & ")"
         return result
     of TypeEnum.word:
-        return $t.val.string
+        return t.val.string
     of TypeEnum.set_word:
-        return $t.val.string & ":"
+        return t.val.string & ":"
     of TypeEnum.native:
-        return $t.val.exec.string
+        return t.val.exec.string
+    of TypeEnum.function:
+        var str = "func [ "
+        for i in 0..high(t.val.fc.args):
+            str = str & t.val.fc.args[i].toStr & " "
+        str = str & "] [ "
+        for i in 0..high(t.val.fc.body):
+            str = str & t.val.fc.body[i].toStr & " "
+        str = str & "]"
+        return str
+        # return "function"
+    of TypeEnum.op:
+        return t.val.exec.string
+
+proc print*(t: ptr Token)=
+    echo(toStr(t))
+
+
+proc outputStr*(t: ptr Token):string=
+    case t.tp
+    of TypeEnum.none:
+        return "none"
+    of TypeEnum.err:
+        return "Error: " & t.val.string
+    of TypeEnum.lit_word:
+        return "'" & t.val.string
+    of TypeEnum.get_word:
+        return t.val.string & ":"
+    of TypeEnum.datatype:
+        return t.val.string
+    of TypeEnum.logic:
+        return $t.val.logic
+    of TypeEnum.integer:
+        return $t.val.integer
+    of TypeEnum.decimal:
+        return $t.val.decimal
+    of TypeEnum.char:
+        return $t.val.char
+    of TypeEnum.string:
+        return t.val.string 
+    of TypeEnum.list:
+        result = "[ "
+        for i in 0..high(t.val.list):
+            result = result & toStr(t.val.list[i]) & " "
+        result = result & "]"
+        return result
+    of TypeEnum.paren:
+        result = "( "
+        for i in 0..high(t.val.list):
+            result = result & toStr(t.val.list[i]) & " "
+        result = result & ")"
+        return result
+    of TypeEnum.word:
+        return t.val.string
+    of TypeEnum.set_word:
+        return t.val.string & ":"
+    of TypeEnum.native:
+        return t.val.exec.string
     of TypeEnum.function:
         return "function"
     of TypeEnum.op:
-        return $t.val.exec.string
+        return t.val.exec.string
 
-proc repr*(t: ref Token):string=
+proc repr*(t: ptr Token):string=
     result = "type = " & $t.tp & "\n"
-    result = result & "val = " & $t.toStr & "\n"
-    result = result & "explen = " & $t.explen & "\n"
-    result = result & repr(t.context) & "\n"
+    result = result & "val = " & t.toStr & "\n"
     return result
 
+proc explen*(t: ptr Token):int=
+    case t.tp
+    of TypeEnum.none:
+        return 1
+    of TypeEnum.err:
+        return 1
+    of TypeEnum.lit_word:
+        return 1
+    of TypeEnum.get_word:
+        return 1
+    of TypeEnum.datatype:
+        return 1
+    of TypeEnum.logic:
+        return 1
+    of TypeEnum.integer:
+        return 1
+    of TypeEnum.decimal:
+        return 1
+    of TypeEnum.char:
+        return 1
+    of TypeEnum.string:
+        return 1
+    of TypeEnum.list:
+        return 1
+    of TypeEnum.paren:
+        return 1
+    of TypeEnum.word:
+        return 1
+    of TypeEnum.set_word:
+        return 2
+    of TypeEnum.native:
+        return t.val.exec.explen.int
+    of TypeEnum.function:
+        return t.val.fc.explen.int
+    of TypeEnum.op:
+        return t.val.exec.explen.int
 
 
 
@@ -201,14 +235,14 @@ when isMainModule:
 
     echo(sizeof Token)
 
-    proc fc(arg: var seq[ref Token]):ref Token=
-        return nil
+    # proc fc(arg: var seq[ref Token]):ref Token=
+    #     return nil
 
-    var token = new(Token)
-    token.tp = TypeEnum.function
-    token.val.exec = fc
-    var temp = newSeq[ref Token]()
-    discard token.val.exec(temp)
+    # var token = new(Token)
+    # token.tp = TypeEnum.function
+    # token.val.exec = fc
+    # var temp = newSeq[ref Token]()
+    # discard token.val.exec(temp)
    
 
 

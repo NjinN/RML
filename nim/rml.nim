@@ -1,15 +1,17 @@
 import token
-import evalunit
-import strtool
-import native/nativeinit
-import op/opinit
+import evalUnit
+import strTool
+import native/nativeInit
+import op/opInit
 import strutils
 
-GC_disable()
 
-var exectuor = newEvalUnit()
-initNative(exectuor.mainCtx)
-initOp(exectuor.mainCtx)
+var libCtx = newBindMap[ptr Token](128)
+initNative(libCtx)
+initOp(libCtx)
+var exectuor = newEvalUnit(libCtx)
+
+GC_disable()
 
 while true:
     write(stdout, ">> ")
@@ -23,6 +25,6 @@ while true:
         continue
 
     var answer = exectuor.eval(inputStr)
-    if not (answer.tp == TypeEnum.string and $answer.val.string == ""):
-        echo(">> " & $answer.toStr)
+    if not (answer.tp == TypeEnum.string and answer.val.string == ""):
+        echo(">> " & answer.toStr)
     

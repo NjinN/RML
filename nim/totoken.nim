@@ -2,40 +2,35 @@ import token
 import strtool
 import strutils
 
-proc toTokens*(s: string):seq[ref Token]
+proc toTokens*(s: string):ptr List[ptr Token]
 
-proc toToken*(s: string):ref Token=
-    result = new Token
+proc toToken*(s: string):ptr Token=
+    result = newToken()
     var str = trim(s)
 
     if str == "none":
         result.tp = TypeEnum.none
         result.val.string = "none"
-        result.explen = 1
         return result
 
     if toLowerAscii(str) == "true":
         result.tp = TypeEnum.logic
         result.val.logic = true
-        result.explen = 1
         return result
 
     if toLowerAscii(str) == "false":
         result.tp = TypeEnum.logic
         result.val.logic = false
-        result.explen = 1
         return result
     
     if  len(str) == 4 and (str[0..1] == "#'") and (str[3] == '\''):
         result.tp = TypeEnum.char
         result.val.char = str[2]
-        result.explen = 1
         return result
 
     if str[0] == '"':
         result.tp = TypeEnum.string
         result.val.string = str[1..len(str)-2]
-        result.explen = 1
         return result
 
     if str[0] == '[':
@@ -46,7 +41,6 @@ proc toToken*(s: string):ref Token=
                 endIdx = idx-1
                 break
         result.val.list = toTokens(str[1..endIdx])
-        result.explen = 1
         return result
     
     if str[0] == '(':
@@ -57,43 +51,37 @@ proc toToken*(s: string):ref Token=
                 endIdx = idx-1
                 break
         result.val.list = toTokens(str[1..endIdx])
-        result.explen = 1
         return result
 
     if isNumberStr(str) == 0:
         result.tp = TypeEnum.integer
         result.val.integer = parseInt(str).int32
-        result.explen = 1
         return result
 
     if isNumberStr(str) == 1:
         result.tp = TypeEnum.decimal
         result.val.decimal = parseFloat(str)
-        result.explen = 1
         return result
 
     if str[len(str)-1] == ':':
         result.tp = TypeEnum.set_word
         result.val.string = str[0..len(str)-2]
-        result.explen = 2
         return result
 
     if $str[0] == "'":
         result.tp = TypeEnum.lit_word
         result.val.string = str[1..len(str)-1]
-        result.explen = 1
         return result
 
     
     result.tp = TypeEnum.word
-    result.val.string = str
-    result.explen = 1 
+    result.val.string = str 
 
     return result
 
 
-proc toTokens*(s: string):seq[ref Token]=
-    result = newSeq[ref Token]()
+proc toTokens*(s: string):ptr List[ptr Token]=
+    result = newList[ptr Token]()
     var strs = strCut(s)
 
     for str in strs:
@@ -105,8 +93,8 @@ proc toTokens*(s: string):seq[ref Token]=
 when isMainModule:
     var t = toTokens("  123 \"this is a string  with space   ^\"  [1 2 3] and tranChar \"  [ [1 2 3] 123 456 \"anthor ^\" str \" 987 ] 456  -1.23 'word ")
     # var t = toTokens("[1 2 3")
-    for item in t:
-        print(item)
+    for i in 0..high(t):
+        print(t[i])
 
 
 

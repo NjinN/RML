@@ -94,18 +94,21 @@ proc strCut*(s: string):seq[string]=
     return result
 
 
-
+proc isNumber(c: char):bool=
+    if ord(c) >= 48 and ord(c) <= 57:
+        return true
+    return false
 
 
 proc isNumberStr*(s: string):int=
     if len(s) == 0:
         return -1
-    if s[0] != '-' and not isDigit($s[0]):
+    if s[0] != '-' and not isNumber(s[0]):
         return -1
     
     var dot = 0
     for idx in 0..len(s)-1:
-        if not isDigit($s[idx]) and s[idx] != '.':
+        if not isNumber(s[idx]) and s[idx] != '.':
             return -1
         if s[idx] == '.':
             dot += 1
@@ -119,6 +122,3 @@ when isMainModule:
 
     for s in strs:
         echo(s)
-
-
-
