@@ -7,7 +7,7 @@ include "time.nim"
 include "control.nim"
 include "func.nim"
 
-proc plus*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc plus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -30,7 +30,7 @@ proc plus*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):pt
     result.val.string = "Type Mismatch"
 
 
-proc minus*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc minus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -53,7 +53,7 @@ proc minus*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):p
     result.val.string = "Type Mismatch"
     
     
-proc multiply*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc multiply*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -76,7 +76,7 @@ proc multiply*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil
     result.val.string = "Type Mismatch"
 
 
-proc divide*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc divide*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -99,7 +99,7 @@ proc divide*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):
     result.val.string = "Type Mismatch"
 
 
-proc print*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc print*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     if args[1].tp == TypeEnum.list:
         for i in 0..len(args[1].val.list)-1:
             write(stdout, args[1].val.list[i].toStr)

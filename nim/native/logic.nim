@@ -1,5 +1,5 @@
 
-proc eq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc eq*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
@@ -45,7 +45,7 @@ proc eq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
         discard 0
 
 
-proc ne*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc ne*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.logic)
     result.val.logic = true
     case args[1].tp
@@ -92,7 +92,7 @@ proc ne*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
 
 
 
-proc lt*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc lt*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
@@ -138,7 +138,7 @@ proc lt*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
         discard 0
 
 
-proc gt*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc gt*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
@@ -184,7 +184,7 @@ proc gt*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
         discard 0
 
 
-proc lteq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc lteq*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp
@@ -230,7 +230,7 @@ proc lteq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):pt
         discard 0
 
 
-proc gteq*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc gteq*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     result = newToken(TypeEnum.logic)
     result.val.logic = false
     case args[1].tp

@@ -30,7 +30,7 @@ proc toToken*(s: string):ptr Token=
 
     if str[0] == '"':
         result.tp = TypeEnum.string
-        result.val.string = str[1..len(str)-2]
+        result.val.string = cstring(str[1..len(str)-2])
         return result
 
     if str[0] == '[':
@@ -65,17 +65,17 @@ proc toToken*(s: string):ptr Token=
 
     if str[len(str)-1] == ':':
         result.tp = TypeEnum.set_word
-        result.val.string = str[0..len(str)-2]
+        result.val.string = cstring(str[0..len(str)-2])
         return result
 
     if $str[0] == "'":
         result.tp = TypeEnum.lit_word
-        result.val.string = str[1..len(str)-1]
+        result.val.string = cstring(str[1..len(str)-1])
         return result
 
     
     result.tp = TypeEnum.word
-    result.val.string = str 
+    result.val.string = cstring(str) 
 
     return result
 

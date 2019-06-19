@@ -1,4 +1,4 @@
-proc fc*(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc fc*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     if args[1].tp != TypeEnum.list or args[2].tp != TypeEnum.list:
         result = newToken(TypeEnum.err)
         result.val.string = "Type Mismatch"

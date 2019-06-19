@@ -26,5 +26,5 @@ while true:
 
     var answer = exectuor.eval(inputStr)
     if not (answer.tp == TypeEnum.string and answer.val.string == ""):
-        echo(">> " & answer.toStr)
+        echo(">> " & $answer.toStr)
     

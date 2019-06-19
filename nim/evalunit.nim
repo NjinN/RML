@@ -14,6 +14,13 @@ proc newEvalUnit*(cont: ptr BindMap[ptr Token]):ptr EvalUnit=
     result = cast[ptr EvalUnit](alloc0(sizeof(EvalUnit)))
     result.mainCtx = newBindMap[ptr Token](16)
     result.mainCtx.father = cont
+    # result.mainCtx = cont
+    result.nowLine = newEvalLine(8, nil)
+    return result
+
+proc newEvalUnitWithMap*(cont: ptr BindMap[ptr Token]):ptr EvalUnit=
+    result = cast[ptr EvalUnit](alloc0(sizeof(EvalUnit)))
+    result.mainCtx = cont
     result.nowLine = newEvalLine(8, nil)
     return result
 
@@ -22,7 +29,11 @@ proc freeEvalUnit*(u: ptr EvalUnit)=
     freeEvalLine(u.nowLine)
     dealloc(u)
 
-proc eval*(u: var ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
+proc freeEvalUnitWithoutMap*(u: ptr EvalUnit)=
+    freeEvalLine(u.nowLine)
+    dealloc(u)
+
+proc eval*(u: ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
     # echo("start new unit")
     # for i in 0..len(inp)-1:
     #     print inp[i]
@@ -95,9 +106,9 @@ proc eval*(u: var ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
                 result.val.string = $temp.val.string & "\n-->Near: "
                 if idx >= 3:
                     for i in countdown(2, 0):
-                        result.val.string = result.val.string & inp[idx-i].toStr & " "
+                        result.val.string = cstring($result.val.string & $inp[idx-i].toStr & " ")
                 else:
-                    result.val.string = result.val.string & inp[idx].toStr
+                    result.val.string = cstring($result.val.string & $inp[idx].toStr)
             if not isNil(u.nowLine.father):
                 var oldLine = u.nowLine
                 u.nowLine = u.nowLine.father
@@ -119,13 +130,13 @@ proc eval*(u: var ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
         result.val.string = "Incomplete expression \n-> Near: "
         if idx >= 3:
             for i in countdown(3, 1):
-                result.val.string = result.val.string & inp[idx-i].toStr & " "
+                result.val.string = cstring($result.val.string & $inp[idx-i].toStr & " ")
         else:
-            result.val.string = result.val.string & inp[idx-1].toStr
+            result.val.string = cstring($result.val.string & $inp[idx-1].toStr)
     return result
         
 
-proc eval*(u: var ptr EvalUnit, s: string):ptr Token=
+proc eval*(u: ptr EvalUnit, s: string):ptr Token=
     return u.eval(toTokens(s))
             
 

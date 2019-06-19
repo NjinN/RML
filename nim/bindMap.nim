@@ -1,9 +1,10 @@
 import listType
 import strutils
+import times
 
 type
     HashBucket*[T] = object
-        key*: string
+        key*: cstring
         val*: T
         next*: ptr HashBucket[T]
 
@@ -14,7 +15,7 @@ type
         father*: ptr BindMap[T]
 
 
-proc hashCode*(s: string):uint=
+proc hashCode*(s: cstring):uint=
     var seed = 131.uint
     result = 0
     for i in 0..len(s)-1:
@@ -37,15 +38,18 @@ proc newBindMap*[T](size: int = 16):ptr BindMap[T]=
     result.line = newList[ptr HashBucket[T]](size)
 
 proc freeBindMap*[T](m: ptr BindMap[T])=
+    # var t1 = cpuTime()
     if not isNil(m):
         for i in 0..len(m.line)-1:
             freeHashBucket(m.line[i.int])
         freeList(m.line)
         dealloc(m)
+    # var t2 = cpuTime()
+    # echo("free use time: " , t2 - t1)
 
 proc upSize*[T](m: ptr BindMap[T], newSize: int)
 
-proc put*[T](m: ptr BindMap[T], k: string, v: T)=
+proc put*[T](m: ptr BindMap[T], k: cstring, v: T)=
     var idx = hashCode(k) mod m.size
     var bt = m.line[idx.int]
     if isNull(bt):
@@ -69,7 +73,7 @@ proc put*[T](m: ptr BindMap[T], k: string, v: T)=
         m.upSize(2 * m.size.int)
 
 
-proc get*[T](m: ptr BindMap[T], k: string):T=
+proc get*[T](m: ptr BindMap[T], k: cstring):T=
     try:
         var idx = hashCode(k) mod m.size
         var bt = m.line[idx.int]
@@ -79,7 +83,7 @@ proc get*[T](m: ptr BindMap[T], k: string):T=
             if bt.key == k:
                 result = bt.val
                 return result
-        if isNil(bt) and not isNil(m.father):
+        if isNull(result) and not isNil(m.father):
             result = m.father.get(k)
             if not isNull(result):
                 m[k] = result
@@ -87,10 +91,10 @@ proc get*[T](m: ptr BindMap[T], k: string):T=
         var rs: T
         return rs
 
-proc `[]=`*[T](m: ptr BindMap[T], k: string, v: T)=
+proc `[]=`*[T](m: ptr BindMap[T], k: cstring, v: T)=
     m.put(k, v)
 
-proc `[]`*[T](m: ptr BindMap[T], k: string):T=
+proc `[]`*[T](m: ptr BindMap[T], k: cstring):T=
     result = m.get(k)
 
 proc upSize*[T](m: ptr BindMap[T], newSize: int)=

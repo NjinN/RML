@@ -25,6 +25,10 @@ proc initNative*(cont: ptr BindMap[ptr Token])=
     gmtToken.val.exec = newExec("gmt", nativelib.gmt, 1)
     cont["gmt"] = gmtToken
 
+    var costToken = newToken(TypeEnum.native)
+    costToken.val.exec = newExec("cost", nativelib.cost, 2)
+    cont["cost"] = costToken
+
     var printToken = newToken(TypeEnum.native)
     printToken.val.exec = newExec("print", nativelib.print, 2)
     cont["print"] = printToken
@@ -40,3 +44,19 @@ proc initNative*(cont: ptr BindMap[ptr Token])=
     var funcToken = newToken(TypeEnum.native)
     funcToken.val.exec = newExec("func", nativelib.fc, 3)
     cont["func"] = funcToken
+
+    var loopToken = newToken(TypeEnum.native)
+    loopToken.val.exec = newExec("loop", nativelib.loop, 3)
+    cont["loop"] = loopToken
+
+    var repeatToken = newToken(TypeEnum.native)
+    repeatToken.val.exec = newExec("repeat", nativelib.repeat, 4)
+    cont["repeat"] = repeatToken
+
+    var forToken = newToken(TypeEnum.native)
+    forToken.val.exec = newExec("for", nativelib.ffor, 6)
+    cont["for"] = forToken
+
+    var whileToken = newToken(TypeEnum.native)
+    whileToken.val.exec = newExec("while", nativelib.wwhile, 3)
+    cont["while"] = whileToken

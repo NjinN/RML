@@ -26,9 +26,9 @@ proc freeEvalLine*(l: ptr EvalLine)=
 
 proc newEvalUnit*(cont: ptr BindMap[ptr Token]):ptr EvalUnit
 proc freeEvalUnit*(u: ptr EvalUnit)
-proc eval*(u: var ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token
+proc eval*(u: ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token
 
-proc run*(f: var ptr Func; args: var ptr List[ptr Token], c: ptr BindMap[ptr Token]):ptr Token=
+proc run*(f: ptr Func; args: ptr List[ptr Token], c: ptr BindMap[ptr Token]):ptr Token=
     var cont = newBindMap[ptr Token](16)
     cont.father = c
     for idx in 0..high(f.args):
@@ -37,7 +37,7 @@ proc run*(f: var ptr Func; args: var ptr List[ptr Token], c: ptr BindMap[ptr Tok
     result = unit.eval(f.body)
     return result
 
-proc eval*(l: var ptr EvalLine;c: ptr BindMap[ptr Token]):ptr Token=
+proc eval*(l: ptr EvalLine;c: ptr BindMap[ptr Token]):ptr Token=
     try:
         case l.line[0].tp
         of TypeEnum.set_word:
@@ -66,13 +66,14 @@ proc getFinalToken*(t: ptr Token, c: ptr BindMap[ptr Token]):ptr Token=
     of TypeEnum.lit_word:
         result = newToken()
         result.tp = TypeEnum.word
-        result.val.string = t.val.string[1..len(t.val.string)-1]
+        result.val.string = t.val.string
         return result
     of TypeEnum.word:
-        var cont = c
-        while isNil(result) and (not isNil(cont)):
-            result = cont[t.val.string]
-            cont = cont.father
+        # var cont = c
+        result = c[t.val.string]
+        # while isNil(result) and (not isNil(cont)):
+        #     result = cont[t.val.string]
+        #     cont = cont.father
         if isNil(result):
             result = newToken()
             result.tp = TypeEnum.none

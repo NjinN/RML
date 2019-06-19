@@ -15,7 +15,7 @@ type
         integer*: int32
         long*: int64
         decimal*: float64
-        string*: string
+        string*: cstring
         integerArr*: array[0..3, int32]
         longArr*: array[0..1, int64]
         floatArr*: array[0..1, float64]
@@ -29,9 +29,9 @@ type
         val*: TokenVal
 
     Exec* = object
-        string*: string
+        string*: cstring
         explen*: uint16
-        run*: proc(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token 
+        run*: proc(args:ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token 
 
     Func* = object 
         args*: ptr List[ptr Token]
@@ -48,7 +48,7 @@ proc newToken*(tp: TypeEnum):ptr Token=
     return result
 
 
-proc newExec*(s: string, f: proc(args: var ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token, l: int):ptr Exec=
+proc newExec*(s: cstring, f: proc(args:ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token, l: int):ptr Exec=
     result = cast[ptr Exec](alloc0(sizeof(Exec)))
     result.string = s
     result.run = f
@@ -63,54 +63,54 @@ proc newFunc*(args: ptr List[ptr Token], body: ptr List[ptr Token]):ptr Func=
     return result
 
 
-proc toStr*(t: ptr Token):string=
+proc toStr*(t: ptr Token):cstring=
     case t.tp
     of TypeEnum.none:
         return "none"
     of TypeEnum.err:
-        return "Error: " & t.val.string
+        return cstring("Error: " & $t.val.string)
     of TypeEnum.lit_word:
-        return "'" & t.val.string
+        return cstring("'" & $t.val.string)
     of TypeEnum.get_word:
-        return t.val.string & ":"
+        return cstring($t.val.string & ":")
     of TypeEnum.datatype:
         return t.val.string
     of TypeEnum.logic:
-        return $t.val.logic
+        return cstring($t.val.logic)
     of TypeEnum.integer:
-        return $t.val.integer
+        return cstring($t.val.integer)
     of TypeEnum.decimal:
-        return $t.val.decimal
+        return cstring($t.val.decimal)
     of TypeEnum.char:
-        return $t.val.char
+        return cstring($t.val.char)
     of TypeEnum.string:
-        return "\"" & t.val.string & "\""
+        return cstring("\"" & $t.val.string & "\"")
     of TypeEnum.list:
         result = "[ "
         for i in 0..high(t.val.list):
-            result = result & toStr(t.val.list[i]) & " "
-        result = result & "]"
+            result = cstring($result & $toStr(t.val.list[i]) & " ")
+        result = cstring($result & "]")
         return result
     of TypeEnum.paren:
         result = "( "
         for i in 0..high(t.val.list):
-            result = result & toStr(t.val.list[i]) & " "
-        result = result & ")"
+            result = cstring($result & $toStr(t.val.list[i]) & " ")
+        result = cstring($result & ")")
         return result
     of TypeEnum.word:
         return t.val.string
     of TypeEnum.set_word:
-        return t.val.string & ":"
+        return cstring($t.val.string & ":")
     of TypeEnum.native:
         return t.val.exec.string
     of TypeEnum.function:
-        var str = "func [ "
+        var str = cstring("func [ ")
         for i in 0..high(t.val.fc.args):
-            str = str & t.val.fc.args[i].toStr & " "
-        str = str & "] [ "
+            str = cstring($str & $t.val.fc.args[i].toStr & " ")
+        str = cstring($str & "] [ ")
         for i in 0..high(t.val.fc.body):
-            str = str & t.val.fc.body[i].toStr & " "
-        str = str & "]"
+            str = cstring($str & $t.val.fc.body[i].toStr & " ")
+        str = cstring($str & "]")
         return str
         # return "function"
     of TypeEnum.op:
@@ -120,54 +120,62 @@ proc print*(t: ptr Token)=
     echo(toStr(t))
 
 
-proc outputStr*(t: ptr Token):string=
+proc outputStr*(t: ptr Token):cstring=
     case t.tp
     of TypeEnum.none:
         return "none"
     of TypeEnum.err:
-        return "Error: " & t.val.string
+        return cstring("Error: " & $t.val.string)
     of TypeEnum.lit_word:
-        return "'" & t.val.string
+        return cstring("'" & $t.val.string)
     of TypeEnum.get_word:
-        return t.val.string & ":"
+        return cstring($t.val.string & ":")
     of TypeEnum.datatype:
         return t.val.string
     of TypeEnum.logic:
-        return $t.val.logic
+        return cstring($t.val.logic)
     of TypeEnum.integer:
-        return $t.val.integer
+        return cstring($t.val.integer)
     of TypeEnum.decimal:
-        return $t.val.decimal
+        return cstring($t.val.decimal)
     of TypeEnum.char:
-        return $t.val.char
+        return cstring($t.val.char)
     of TypeEnum.string:
-        return t.val.string 
+        return t.val.string
     of TypeEnum.list:
         result = "[ "
         for i in 0..high(t.val.list):
-            result = result & toStr(t.val.list[i]) & " "
-        result = result & "]"
+            result = cstring($result & $toStr(t.val.list[i]) & " ")
+        result = cstring($result & "]")
         return result
     of TypeEnum.paren:
         result = "( "
         for i in 0..high(t.val.list):
-            result = result & toStr(t.val.list[i]) & " "
-        result = result & ")"
+            result = cstring($result & $toStr(t.val.list[i]) & " ")
+        result = cstring($result & ")")
         return result
     of TypeEnum.word:
         return t.val.string
     of TypeEnum.set_word:
-        return t.val.string & ":"
+        return cstring($t.val.string & ":")
     of TypeEnum.native:
         return t.val.exec.string
     of TypeEnum.function:
-        return "function"
+        var str = cstring("func [ ")
+        for i in 0..high(t.val.fc.args):
+            str = cstring($str & $t.val.fc.args[i].toStr & " ")
+        str = cstring($str & "] [ ")
+        for i in 0..high(t.val.fc.body):
+            str = cstring($str & $t.val.fc.body[i].toStr & " ")
+        str = cstring($str & "]")
+        return str
+        # return "function"
     of TypeEnum.op:
         return t.val.exec.string
 
 proc repr*(t: ptr Token):string=
     result = "type = " & $t.tp & "\n"
-    result = result & "val = " & t.toStr & "\n"
+    result = result & "val = " & $t.toStr & "\n"
     return result
 
 proc explen*(t: ptr Token):int=
