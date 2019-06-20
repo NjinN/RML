@@ -40,15 +40,12 @@ proc newBindMap*[T](size: int = 16):ptr BindMap[T]=
     result.child = newList[ptr BindMap[T]](2)
 
 proc freeBindMap*[T](m: ptr BindMap[T])=
-    # var t1 = cpuTime()
     if not isNil(m):
-        for i in 0..len(m.line)-1:
+        for i in 0..high(m.line):
             freeHashBucket(m.line[i.int])
         freeList(m.line)
         freeList(m.child)
         dealloc(m)
-    # var t2 = cpuTime()
-    # echo("free use time: " , t2 - t1)
 
 proc upSize*[T](m: ptr BindMap[T], newSize: int)
 
@@ -103,14 +100,13 @@ proc `[]`*[T](m: ptr BindMap[T], k: cstring):T=
 proc upSize*[T](m: ptr BindMap[T], newSize: int)=
     var oldLine = m.line
     m.size = newSize.uint
+    m.len = 0
     m.line = newList[ptr HashBucket[T]](newSize)
-    for i in 0..len(oldLine)-1:
+    for i in 0..high(oldLine):
         var bt = oldLine[i]
         while not isNull(bt) and not isNull(bt.key):
             m[bt.key] = bt.val
             bt = bt.next
-            if isNull(bt):
-                break
     freeList(oldLine)
 
 proc size*[T](m: ptr BindMap[T]):int=
