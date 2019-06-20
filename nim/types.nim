@@ -1,5 +1,6 @@
 type
-    TypeEnum* = enum 
+    TypeEnum* = enum
+        null, 
         none, 
         err, 
         lit_word,

@@ -13,6 +13,7 @@ type
         len*: uint
         line*: ptr List[ptr HashBucket[T]]
         father*: ptr BindMap[T]
+        child*: ptr List[ptr BindMap[T]]
 
 
 proc hashCode*(s: cstring):uint=
@@ -36,6 +37,7 @@ proc newBindMap*[T](size: int = 16):ptr BindMap[T]=
     result.size = size.uint
     result.len = 0
     result.line = newList[ptr HashBucket[T]](size)
+    result.child = newList[ptr BindMap[T]](2)
 
 proc freeBindMap*[T](m: ptr BindMap[T])=
     # var t1 = cpuTime()
@@ -43,6 +45,7 @@ proc freeBindMap*[T](m: ptr BindMap[T])=
         for i in 0..len(m.line)-1:
             freeHashBucket(m.line[i.int])
         freeList(m.line)
+        freeList(m.child)
         dealloc(m)
     # var t2 = cpuTime()
     # echo("free use time: " , t2 - t1)

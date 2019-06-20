@@ -11,7 +11,7 @@ initNative(libCtx)
 initOp(libCtx)
 var exectuor = newEvalUnit(libCtx)
 
-GC_disable()
+# GC_disable()
 
 while true:
     write(stdout, ">> ")

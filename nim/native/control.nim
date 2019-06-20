@@ -84,8 +84,18 @@ proc either*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
 proc loop*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
     if args[1].tp == TypeEnum.integer and args[2].tp == TypeEnum.list:
         var unit = newEvalUnit(cont)
+    
         for i in 1..args[1].val.integer:
-            result = unit.eval(args[2].val.list)
+            try:
+                result = unit.eval(args[2].val.list)
+            except:
+                if getCurrentExceptionMsg() == "continue":
+                    continue
+                elif getCurrentExceptionMsg() == "break":
+                    break
+                else:
+                    raise getCurrentException()
+    
         freeEvalUnit(unit)
     else:
         result = newToken(TypeEnum.err)
@@ -96,12 +106,23 @@ proc repeat*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
     if args[1].tp == TypeEnum.word and args[2].tp == TypeEnum.integer and args[3].tp == TypeEnum.list:
         var unit = newEvalUnit(cont)
         var countToken = newToken(TypeEnum.integer)
+        
         countToken.val.integer = 1
         unit.mainCtx[args[1].val.string] = countToken 
         while unit.mainCtx[args[1].val.string].val.integer <= args[2].val.integer:
-            result = unit.eval(args[3].val.list)
-            # echo(repr(unit.mainCtx[args[1].val.string]))
-            unit.mainCtx[args[1].val.string].val.integer += 1
+            try:
+                result = unit.eval(args[3].val.list)
+            except:
+                if getCurrentExceptionMsg() == "continue":
+                    continue
+                elif getCurrentExceptionMsg() == "break":
+                    break
+                else:
+                    raise getCurrentException()
+            finally:
+                # echo(repr(unit.mainCtx[args[1].val.string]))
+                unit.mainCtx[args[1].val.string].val.integer += 1
+      
         freeEvalUnit(unit)
     else:
         result = newToken(TypeEnum.err)
@@ -114,15 +135,27 @@ proc ffor*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr To
         if(args[2].tp == TypeEnum.integer and args[3].tp == TypeEnum.integer and args[4].tp == TypeEnum.integer):
             var unit = newEvalUnit(cont)
             var count = newToken(TypeEnum.integer)
+            
             count.val.integer = args[2].val.integer
             unit.mainCtx[args[1].val.string] = count
             while unit.mainCtx[args[1].val.string].val.integer <= args[3].val.integer:
-                result = unit.eval(args[5].val.list)
-                unit.mainCtx[args[1].val.string].val.integer += args[4].val.integer
+                try:
+                    result = unit.eval(args[5].val.list)
+                except:
+                    if getCurrentExceptionMsg() == "continue":
+                        continue
+                    elif getCurrentExceptionMsg() == "break":
+                        break
+                    else:
+                        raise getCurrentException()
+                finally:
+                    unit.mainCtx[args[1].val.string].val.integer += args[4].val.integer
+            
             freeEvalUnit(unit)
         else:
             var unit = newEvalUnit(cont)
             var count = newToken(TypeEnum.decimal)
+            
             if args[2].tp == TypeEnum.integer:
                 count.val.decimal = float64(args[2].val.integer)
             else:
@@ -131,18 +164,37 @@ proc ffor*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr To
 
             if args[3].tp == TypeEnum.integer:
                 while unit.mainCtx[args[1].val.string].val.decimal <= args[3].val.integer.float64:
-                    result = unit.eval(args[5].val.list)
-                    if args[4].tp == TypeEnum.integer:
-                        unit.mainCtx[args[1].val.string].val.decimal += args[4].val.integer.float64
-                    else:
-                        unit.mainCtx[args[1].val.string].val.decimal += args[4].val.decimal
+                    try:
+                        result = unit.eval(args[5].val.list)
+                    except:
+                        if getCurrentExceptionMsg() == "continue":
+                            continue
+                        elif getCurrentExceptionMsg() == "break":
+                            break
+                        else:
+                            raise getCurrentException()
+                    finally:
+                        if args[4].tp == TypeEnum.integer:
+                            unit.mainCtx[args[1].val.string].val.decimal += args[4].val.integer.float64
+                        else:
+                            unit.mainCtx[args[1].val.string].val.decimal += args[4].val.decimal
             else:
                 while unit.mainCtx[args[1].val.string].val.decimal <= args[3].val.decimal:
-                    result = unit.eval(args[5].val.list)
-                    if args[4].tp == TypeEnum.integer:
-                        unit.mainCtx[args[1].val.string].val.decimal += args[4].val.integer.float64
-                    else:
-                        unit.mainCtx[args[1].val.string].val.decimal += args[4].val.decimal
+                    try:
+                        result = unit.eval(args[5].val.list)
+                    except:
+                        if getCurrentExceptionMsg() == "continue":
+                            continue
+                        elif getCurrentExceptionMsg() == "break":
+                            break
+                        else:
+                            raise getCurrentException()
+                    finally:
+                        if args[4].tp == TypeEnum.integer:
+                            unit.mainCtx[args[1].val.string].val.decimal += args[4].val.integer.float64
+                        else:
+                            unit.mainCtx[args[1].val.string].val.decimal += args[4].val.decimal
+            
             freeEvalUnit(unit)
     else:
         result = newToken(TypeEnum.err)
@@ -155,16 +207,34 @@ proc wwhile*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
         var condUnit = newEvalUnitWithMap(cont)
         var bodyUnit = newEvalUnitWithMap(cont)
         var b = condUnit.eval(args[1].val.list)
+        
         while b.tp == TypeEnum.logic and b.val.logic:
-            result = bodyUnit.eval(args[2].val.list)
-            b = condUnit.eval(args[1].val.list)
+            try:
+                result = bodyUnit.eval(args[2].val.list)
+            except:
+                if getCurrentExceptionMsg() == "continue":
+                    continue
+                elif getCurrentExceptionMsg() == "break":
+                    break
+                else:
+                    raise getCurrentException()
+            finally:
+                b = condUnit.eval(args[1].val.list)
 
-        if not (b.tp == TypeEnum.logic):
-            result = newToken(TypeEnum.err)
-            result.val.string = "Bad Logic Expression "
+                if not (b.tp == TypeEnum.logic):
+                    result = newToken(TypeEnum.err)
+                    result.val.string = "Bad Logic Expression "
+                    return result
+        
         freeEvalUnitWithoutMap(condUnit)
         freeEvalUnitWithoutMap(bodyUnit)
     else:
         result = newToken(TypeEnum.err)
         result.val.string = "Type Mismatch"
     return result
+
+proc bbreak*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    raise newException(CatchableError, "break")
+
+proc ccontinue*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    raise newException(CatchableError, "continue")

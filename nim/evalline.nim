@@ -55,6 +55,11 @@ proc eval*(l: ptr EvalLine;c: ptr BindMap[ptr Token]):ptr Token=
             return l.line[0].val.fc.run(l.line, c)
         else:
             return nil
+    except CatchableError:
+        if getCurrentExceptionMsg() == "break":
+            raise getCurrentException()
+        elif getCurrentExceptionMsg() == "continue":
+            raise getCurrentException()
     except:
         result = newToken(TypeEnum.err)
         result.val.string = "Illegal grammar!!!"

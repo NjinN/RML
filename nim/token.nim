@@ -65,6 +65,8 @@ proc newFunc*(args: ptr List[ptr Token], body: ptr List[ptr Token]):ptr Func=
 
 proc toStr*(t: ptr Token):cstring=
     case t.tp
+    of TypeEnum.null:
+        return "null"
     of TypeEnum.none:
         return "none"
     of TypeEnum.err:
@@ -122,6 +124,8 @@ proc print*(t: ptr Token)=
 
 proc outputStr*(t: ptr Token):cstring=
     case t.tp
+    of TypeEnum.null:
+        return "null"
     of TypeEnum.none:
         return "none"
     of TypeEnum.err:
@@ -180,6 +184,8 @@ proc repr*(t: ptr Token):string=
 
 proc explen*(t: ptr Token):int=
     case t.tp
+    of TypeEnum.null:
+        return 1
     of TypeEnum.none:
         return 1
     of TypeEnum.err:

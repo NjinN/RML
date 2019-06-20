@@ -33,6 +33,10 @@ proc initNative*(cont: ptr BindMap[ptr Token])=
     printToken.val.exec = newExec("print", nativelib.print, 2)
     cont["print"] = printToken
 
+    var typeOfToken = newToken(TypeEnum.native)
+    typeOfToken.val.exec = newExec("type?", nativelib.ttypeof, 2)
+    cont["type?"] = typeOfToken
+
     var ifToken = newToken(TypeEnum.native)
     ifToken.val.exec = newExec("if", nativelib.iff, 3)
     cont["if"] = ifToken
@@ -60,3 +64,11 @@ proc initNative*(cont: ptr BindMap[ptr Token])=
     var whileToken = newToken(TypeEnum.native)
     whileToken.val.exec = newExec("while", nativelib.wwhile, 3)
     cont["while"] = whileToken
+
+    var breakToken = newToken(TypeEnum.native)
+    breakToken.val.exec = newExec("break", nativelib.bbreak, 1)
+    cont["break"] = breakToken
+
+    var continueToken = newToken(TypeEnum.native)
+    continueToken.val.exec = newExec("continue", nativelib.ccontinue, 1)
+    cont["continue"] = continueToken

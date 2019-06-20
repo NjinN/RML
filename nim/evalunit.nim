@@ -14,6 +14,7 @@ proc newEvalUnit*(cont: ptr BindMap[ptr Token]):ptr EvalUnit=
     result = cast[ptr EvalUnit](alloc0(sizeof(EvalUnit)))
     result.mainCtx = newBindMap[ptr Token](16)
     result.mainCtx.father = cont
+    cont.child.add(result.mainCtx)
     # result.mainCtx = cont
     result.nowLine = newEvalLine(8, nil)
     return result
@@ -46,6 +47,7 @@ proc eval*(u: ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
     var idx = 0
 
     while idx <= high(inp):
+        {.unroll: 10.}
         # echo idx
         var nowToken = inp[idx]
         # print nowToken

@@ -108,3 +108,11 @@ proc print*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr T
     else:
         echo(outputStr(args[1]))
     return nil
+
+proc ttypeof*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+    if not isNull(args[1]):
+        result = newToken(TypeEnum.dataType)
+        result.val.string = cstring($args[1].tp & "!")
+    else:
+        result = newToken(TypeEnum.null)
+        result.val.string = "null" & "!"
