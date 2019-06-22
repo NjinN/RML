@@ -148,6 +148,15 @@ proc del*[T](s: ptr Set[T], t: T):int{.discardable.}=
                 dealloc(bt)
                 return 1
 
+iterator each*[T](s: ptr Set[T]): T=
+    for item in s.line.each:
+        if not isNil(item):
+            yield item.val
+            var temp = item
+            while not isNil(temp.next):
+                temp = temp.next
+                yield temp.val
+
 
 when isMainModule:
     var set = newSet[int](16)
@@ -167,6 +176,11 @@ when isMainModule:
     var t = 10
     set.add(t)
     echo(set.has(t))
+
+    set.add(2)
+    set.add(3)
+    for item in set.each:
+        echo item
 
 
 

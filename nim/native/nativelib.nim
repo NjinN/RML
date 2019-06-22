@@ -7,7 +7,7 @@ include "time.nim"
 include "control.nim"
 include "func.nim"
 
-proc plus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc plus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -30,7 +30,7 @@ proc plus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr To
     result.val.string = "Type Mismatch"
 
 
-proc minus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc minus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -53,7 +53,7 @@ proc minus*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr T
     result.val.string = "Type Mismatch"
     
     
-proc multiply*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc multiply*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -76,7 +76,7 @@ proc multiply*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):pt
     result.val.string = "Type Mismatch"
 
 
-proc divide*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc divide*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     result = newToken(TypeEnum.err)
     if args[1].tp == TypeEnum.integer:
         if args[2].tp == TypeEnum.integer:
@@ -99,7 +99,7 @@ proc divide*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
     result.val.string = "Type Mismatch"
 
 
-proc print*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc print*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if args[1].tp == TypeEnum.list:
         for i in 0..len(args[1].val.list)-1:
             write(stdout, args[1].val.list[i].toStr)
@@ -109,7 +109,7 @@ proc print*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr T
         echo(outputStr(args[1]))
     return nil
 
-proc ttypeof*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc ttypeof*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if not isNull(args[1]):
         result = newToken(TypeEnum.dataType)
         result.val.string = cstring($args[1].tp & "!")

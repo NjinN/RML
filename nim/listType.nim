@@ -78,6 +78,10 @@ proc drop*[T](l: ptr List[T], idx: int)=
             l[i]=l[i + 1]
         pop(l)
 
+iterator each*[T](l: ptr List[T]): T=
+    for i in 0..high(l):
+        yield l[i]
+
 
 when isMainModule:
     # echo GC_getStatistics()
@@ -87,11 +91,14 @@ when isMainModule:
     l[2]=2
     l[3]=3
 
+    for item in l.each:
+        echo(item)
+
     # echo GC_getStatistics()
-    echo(l[99])
-    l.insert(199, 100)
+    # echo(l[99])
+    # l.insert(199, 100)
     # l.pop()
-    echo(high(l))
+    # echo(high(l))
     # echo GC_getStatistics()
-    freeList(l)
+    # freeList(l)
     # echo GC_getStatistics()

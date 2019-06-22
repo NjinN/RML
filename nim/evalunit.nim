@@ -4,19 +4,24 @@ import totoken
 include "evalLine.nim"
  
 
-proc newEvalUnit*():ptr EvalUnit=
+proc newEvalUnit*(u: ptr EvalUnit = nil):ptr EvalUnit=
     result = cast[ptr EvalUnit](alloc0(sizeof(EvalUnit)))
     result.mainCtx = newBindMap[ptr Token](16)
     result.nowLine = newEvalLine(8, nil)
+    if not isNil(u):
+        result.father = u
+        if not isNil(u.mainCtx):
+            u.mainCtx.child.add(result.mainCtx)
     return result
 
-proc newEvalUnit*(cont: ptr BindMap[ptr Token]):ptr EvalUnit=
+proc newEvalUnit*(cont: ptr BindMap[ptr Token], u: ptr EvalUnit = nil):ptr EvalUnit=
     result = cast[ptr EvalUnit](alloc0(sizeof(EvalUnit)))
-    result.mainCtx = newBindMap[ptr Token](16)
+    result.mainCtx = newBindMap[ptr Token](2)
     result.mainCtx.father = cont
-    cont.child.add(result.mainCtx)
-    # result.mainCtx = cont
+    if not isNil(cont) and not isNil(cont.child):
+        cont.child.add(result.mainCtx)
     result.nowLine = newEvalLine(8, nil)
+    result.father = u
     return result
 
 proc newEvalUnitWithMap*(cont: ptr BindMap[ptr Token]):ptr EvalUnit=
@@ -54,13 +59,13 @@ proc eval*(u: ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
         var nextToken: ptr Token
         if idx < high(inp):
             # print inp[idx+1]
-            nextToken = getFinalToken(inp[idx+1], u.mainCtx)
+            nextToken = getFinalToken(inp[idx+1], u.mainCtx, u)
         if not isNil(nextToken) and nextToken.tp == TypeEnum.op:
             if isNil(u.nowLine.line[0]) or (u.nowLine.line[0].tp != TypeEnum.op):
                 var newLine = newEvalLine(3, u.nowLine)
                 newLine.idx = 2
                 newLine.line[0] = nextToken
-                newLine.line[1] = getFinalToken(nowToken, u.mainCtx)
+                newLine.line[1] = getFinalToken(nowToken, u.mainCtx, u)
                 u.nowLine = newLine
                 idx += 1
             else:
@@ -68,12 +73,12 @@ proc eval*(u: ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
                 newLine.idx = 1
                 newLine.line[0] = nextToken
                 u.nowLine.father = newLine
-                u.nowLine.line[u.nowLine.idx] = getFinalToken(nowToken, u.mainCtx)
+                u.nowLine.line[u.nowLine.idx] = getFinalToken(nowToken, u.mainCtx, u)
                 u.nowLine.idx += 1
                 idx += 1
         else:
             if nowToken.tp == TypeEnum.word:
-                nowToken = getFinalToken(nowToken, u.mainCtx)
+                nowToken = getFinalToken(nowToken, u.mainCtx, u)
             if nowToken.tp == TypeEnum.op:
                 if isNil(u.nowLine.line[0]):
                     result.tp = TypeEnum.err
@@ -86,7 +91,7 @@ proc eval*(u: ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
                 newLine.line[1] = u.nowLine.line[u.nowLine.idx]
                 u.nowLine = newLine
             elif nowToken.tp < TypeEnum.set_word:
-                u.nowLine.line[u.nowLine.idx] = getFinalToken(nowToken, u.mainCtx)
+                u.nowLine.line[u.nowLine.idx] = getFinalToken(nowToken, u.mainCtx, u)
                 if not isNil(u.nowLine.father):
                     u.nowLine.idx += 1
             else:
@@ -103,7 +108,7 @@ proc eval*(u: ptr EvalUnit, inp: ptr List[ptr Token]):ptr Token=
             # flushFile(stdout)
             # var s = readLine(stdin)
 
-            temp = u.nowLine.eval(u.mainCtx)
+            temp = u.nowLine.eval(u.mainCtx, u)
             if not isNil(temp) and temp.tp == TypeEnum.err:
                 result.val.string = $temp.val.string & "\n-->Near: "
                 if idx >= 3:

@@ -1,6 +1,7 @@
 import listType
 import strutils
 import times
+import tSet
 
 type
     HashBucket*[T] = object
@@ -13,7 +14,7 @@ type
         len*: uint
         line*: ptr List[ptr HashBucket[T]]
         father*: ptr BindMap[T]
-        child*: ptr List[ptr BindMap[T]]
+        child*: ptr Set[ptr BindMap[T]]
 
 
 proc hashCode*(s: cstring):uint=
@@ -37,14 +38,14 @@ proc newBindMap*[T](size: int = 16):ptr BindMap[T]=
     result.size = size.uint
     result.len = 0
     result.line = newList[ptr HashBucket[T]](size)
-    result.child = newList[ptr BindMap[T]](2)
+    result.child = newSet[ptr BindMap[T]](2)
 
 proc freeBindMap*[T](m: ptr BindMap[T])=
     if not isNil(m):
         for i in 0..high(m.line):
             freeHashBucket(m.line[i.int])
         freeList(m.line)
-        freeList(m.child)
+        freeSet(m.child)
         dealloc(m)
 
 proc upSize*[T](m: ptr BindMap[T], newSize: int)
@@ -115,6 +116,14 @@ proc size*[T](m: ptr BindMap[T]):int=
 proc len*[T](m: ptr BindMap[T]):int=
     return m.len.int  
 
+iterator each*[T](m: ptr BindMap[T]):T=
+    for item in m.line.each:
+        if not isNil(item):
+            yield item.val
+            var temp = item
+            while not isNil(temp.next):
+                temp = temp.next
+                yield temp.val
 
 
 when isMainModule:
@@ -129,3 +138,8 @@ when isMainModule:
     # echo(map["123"])
     # freeBindMap(map)
     echo(GC_getStatistics())
+
+    for i in 0..100:
+        map[cstring($i)]=i
+    for item in map.each:
+        echo item

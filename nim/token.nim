@@ -1,9 +1,11 @@
 import listType
 import bindMap
+import tSet
 import types
 
 export listType
 export bindMap
+export tSet
 export types
 
 
@@ -31,12 +33,22 @@ type
     Exec* = object
         string*: cstring
         explen*: uint16
-        run*: proc(args:ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token 
+        run*: proc(args:ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token 
 
     Func* = object 
         args*: ptr List[ptr Token]
         body*: ptr List[ptr Token]
         explen*: uint16
+
+    EvalLine* = object 
+        idx*: int
+        line*: ptr List[ptr Token]
+        father*: ptr EvalLine
+
+    EvalUnit* = object
+        mainCtx*: ptr BindMap[ptr Token]
+        nowLine*: ptr EvalLine
+        father*: ptr EvalUnit
 
 proc newToken*():ptr Token=
     result = cast[ptr Token](alloc0(sizeof(Token)))
@@ -48,7 +60,7 @@ proc newToken*(tp: TypeEnum):ptr Token=
     return result
 
 
-proc newExec*(s: cstring, f: proc(args:ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token, l: int):ptr Exec=
+proc newExec*(s: cstring, f: proc(args:ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token, l: int):ptr Exec=
     result = cast[ptr Exec](alloc0(sizeof(Exec)))
     result.string = s
     result.run = f

@@ -1,9 +1,9 @@
-proc iff*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc iff*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if args[2].tp == TypeEnum.list:
         case args[1].tp
         of TypeEnum.logic:
             if args[1].val.logic:
-                var unit = newEvalUnit(cont)
+                var unit = newEvalUnit(cont, unit)
                 result = unit.eval(args[2].val.list)
                 freeEvalUnit(unit)
                 return result
@@ -11,7 +11,7 @@ proc iff*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Tok
                 return nil
         of TypeEnum.integer:
             if args[1].val.integer != 0:
-                var unit = newEvalUnit(cont)
+                var unit = newEvalUnit(cont, unit)
                 result = unit.eval(args[2].val.list)
                 freeEvalUnit(unit)
                 return result
@@ -19,7 +19,7 @@ proc iff*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Tok
                 return nil
         of TypeEnum.decimal:
             if args[1].val.decimal != 0.0:
-                var unit = newEvalUnit(cont)
+                var unit = newEvalUnit(cont, unit)
                 result = unit.eval(args[2].val.list)
                 freeEvalUnit(unit)
                 return result
@@ -27,7 +27,7 @@ proc iff*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Tok
                 return nil
         of TypeEnum.string:
             if args[1].val.string != "":
-                var unit = newEvalUnit(cont)
+                var unit = newEvalUnit(cont, unit)
                 result = unit.eval(args[2].val.list)
                 freeEvalUnit(unit)
                 return result
@@ -36,7 +36,7 @@ proc iff*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Tok
         of TypeEnum.none:
             return nil
         else:
-            var unit = newEvalUnit(cont)
+            var unit = newEvalUnit(cont, unit)
             result = unit.eval(args[2].val.list)
             freeEvalUnit(unit)
             return result
@@ -46,9 +46,9 @@ proc iff*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Tok
         return result
 
 
-proc either*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc either*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if args[2].tp == TypeEnum.list and args[3].tp == TypeEnum.list:
-        var unit = newEvalUnit(cont)
+        var unit = newEvalUnit(cont, unit)
         case args[1].tp
         of TypeEnum.logic:
             if args[1].val.logic:
@@ -81,9 +81,9 @@ proc either*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
     return result
 
 
-proc loop*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc loop*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if args[1].tp == TypeEnum.integer and args[2].tp == TypeEnum.list:
-        var unit = newEvalUnit(cont)
+        var unit = newEvalUnit(cont, unit)
     
         for i in 1..args[1].val.integer:
             try:
@@ -102,9 +102,9 @@ proc loop*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr To
         result.val.string = "Type Mismatch"
     return result
 
-proc repeat*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc repeat*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if args[1].tp == TypeEnum.word and args[2].tp == TypeEnum.integer and args[3].tp == TypeEnum.list:
-        var unit = newEvalUnit(cont)
+        var unit = newEvalUnit(cont, unit)
         var countToken = newToken(TypeEnum.integer)
         
         countToken.val.integer = 1
@@ -130,10 +130,10 @@ proc repeat*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
     return result
 
 
-proc ffor*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc ffor*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if args[1].tp == TypeEnum.word and args[5].tp == TypeEnum.list and (args[2].tp == TypeEnum.integer or args[2].tp == TypeEnum.decimal) and (args[3].tp == TypeEnum.integer or args[3].tp == TypeEnum.decimal) and (args[4].tp == TypeEnum.integer or args[4].tp == TypeEnum.decimal) :
         if(args[2].tp == TypeEnum.integer and args[3].tp == TypeEnum.integer and args[4].tp == TypeEnum.integer):
-            var unit = newEvalUnit(cont)
+            var unit = newEvalUnit(cont, unit)
             var count = newToken(TypeEnum.integer)
             
             count.val.integer = args[2].val.integer
@@ -153,7 +153,7 @@ proc ffor*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr To
             
             freeEvalUnit(unit)
         else:
-            var unit = newEvalUnit(cont)
+            var unit = newEvalUnit(cont, unit)
             var count = newToken(TypeEnum.decimal)
             
             if args[2].tp == TypeEnum.integer:
@@ -202,7 +202,7 @@ proc ffor*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr To
     return result
 
 
-proc wwhile*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc wwhile*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     if args[1].tp == TypeEnum.list and args[2].tp == TypeEnum.list:
         var condUnit = newEvalUnitWithMap(cont)
         var bodyUnit = newEvalUnitWithMap(cont)
@@ -233,8 +233,8 @@ proc wwhile*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr 
         result.val.string = "Type Mismatch"
     return result
 
-proc bbreak*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc bbreak*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     raise newException(CatchableError, "break")
 
-proc ccontinue*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil):ptr Token=
+proc ccontinue*(args: ptr List[ptr Token], cont: ptr BindMap[ptr Token] = nil, unit: ptr EvalUnit = nil):ptr Token=
     raise newException(CatchableError, "continue")
