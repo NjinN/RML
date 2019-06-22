@@ -1,8 +1,6 @@
 import ptrMath
 import listType
 
-from bindMap import hashCode
-
 type
     SetBucket*[T] = object
         val*: T
@@ -13,6 +11,12 @@ type
         len*: uint
         line*: ptr List[ptr SetBucket[T]]
 
+
+proc hashCode(s: cstring):uint=
+    var seed = 131.uint
+    result = 0
+    for i in 0..len(s)-1:
+        result = (result * seed) + ord(s[i]).uint
 
 proc newSetBucket*[T](t: T):ptr SetBucket[T]=
     result = cast[ptr SetBucket[T]](alloc0(sizeof(SetBucket[T])))
@@ -39,6 +43,32 @@ proc freeSet*[T](s: ptr Set[T])=
    
 proc upSize*[T](s: ptr Set[T], newSize: int)
 
+
+proc add*[T](s: ptr Set[ptr T], t: ptr T):int{.discardable.}=
+    var idx = hashCode(repr(cast[uint](t))) mod s.size
+    var bt = s.line[idx.int]
+    if not isNil(bt) and bt.val == t:
+        result = 0
+    elif isNil(bt):
+        var bucket = newSetBucket[ptr T](t)
+        s.line[idx.int] = bucket
+        s.len += 1
+        result = 1
+    else:
+        while not isNil(bt.next):
+            bt = bt.next
+        if bt.val == t:
+            result = 0
+        else:
+            var bucket = newSetBucket[ptr T](t)
+            bucket.next = s.line[idx.int]
+            s.line[idx.int] = bucket
+            s.len += 1
+            result = 1
+    if s.len > uint(int(s.size) / 4 * 3):
+        s.upSize(s.size.int * 2)
+
+
 proc add*[T](s: ptr Set[T], t: T):int{.discardable.}=
     var idx = hashCode(repr(t)) mod s.size
     var bt = s.line[idx.int]
@@ -63,14 +93,24 @@ proc add*[T](s: ptr Set[T], t: T):int{.discardable.}=
     if s.len > uint(int(s.size) / 4 * 3):
         s.upSize(s.size.int * 2)
 
-proc has*[T](s: ptr Set[T], t: T):bool=
-    var idx = hashCode(repr(t)) mod s.size
+proc has*[T](s: ptr Set[ptr T], t: ptr T):bool=
+    var idx = hashCode(repr(cast[uint](t))) mod s.size
     var bt = s.line[idx.int]
     result = false
     while not isNil(bt):
         if bt.val == t:
             return true
         bt = bt.next
+
+proc has*[T](s: ptr Set[T], t: T):bool=
+    var idx = hashCode(repr(t)) mod s.size
+    var bt = s.line[idx.int]
+    result = false
+    while not isNil(bt):
+        if  bt.val == t:
+            return true
+        bt = bt.next
+
 
 proc upSize*[T](s: ptr Set[T], newSize: int)=
     var oldLine = s.line
@@ -110,18 +150,23 @@ proc del*[T](s: ptr Set[T], t: T):int{.discardable.}=
 
 
 when isMainModule:
-    var set = newSet[int](2)
-    set.add(1)
-    set.add(2)
-    set.add(1)
-    echo(repr(set))
-    set.del(1)
-    echo set.has(2)
-    echo set.has(3)
-    set.upSize(1000000)
-    echo(GC_getStatistics())
-    set.freeSet()
-    echo(GC_getStatistics())
+    var set = newSet[int](16)
+
+    # set.add(1)
+    # set.add(2)
+    # set.add(1)
+    # echo(repr(set))
+    # set.del(1)
+    # echo set.has(2)
+    # echo set.has(3)
+    # set.upSize(1000000)
+    # echo(GC_getStatistics())
+    # set.freeSet()
+    # echo(GC_getStatistics())
+
+    var t = 10
+    set.add(t)
+    echo(set.has(t))
 
 
 
