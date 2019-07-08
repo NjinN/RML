@@ -11,6 +11,7 @@ import nativelib.compare;
 import nativelib.output;
 import nativelib.deffunc;
 import nativelib.control;
+import nativelib.time;
 
 void initNative(BindMap ctx){
     Token typeofToken = new Token(TypeEnum.native);
@@ -96,6 +97,10 @@ void initNative(BindMap ctx){
     Token continueToken = new Token(TypeEnum.native);
     continueToken.val.exec = new Native("continue", &ccontinue, 1);
     ctx.put("continue", continueToken);
+
+    Token costToken = new Token(TypeEnum.native);
+    costToken.val.exec = new Native("cost", &cost, 2);
+    ctx.put("cost", costToken);
 }
 
 

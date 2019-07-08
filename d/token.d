@@ -4,8 +4,6 @@ import bindmap;
 import evalstack;
 import native;
 import func;
-import strtool;
-import totoken;
 
 import std.stdio;
 import std.conv;
@@ -120,7 +118,7 @@ class Token {
             case TypeEnum.native:
                 return val.exec.explen;
             case TypeEnum.func:
-                return val.func.args.length + 1;
+                return cast(uint)(val.func.args.length + 1);
             case TypeEnum.op:
                 return 3;
             default:

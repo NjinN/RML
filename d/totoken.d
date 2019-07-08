@@ -43,7 +43,7 @@ Token toToken(string s){
     if(str[0] == '['){
         result.type = TypeEnum.block;
         int endIdx = 0;
-        for(int idx=str.length-1; idx>=0; idx--){
+        for(int idx=cast(int)(str.length-1); idx>=0; idx--){
             if(str[idx] == ']'){
                 endIdx = idx;
                 break;
@@ -56,7 +56,7 @@ Token toToken(string s){
     if(str[0] == '('){
         result.type = TypeEnum.paren;
         int endIdx = 0;
-        for(int idx=str.length-1; idx>=0; idx--){
+        for(int idx=cast(int)(str.length-1); idx>=0; idx--){
             if(str[idx] == ')'){
                 endIdx = idx;
                 break;

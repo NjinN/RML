@@ -36,7 +36,7 @@ class EvalStack {
         }
 
         uint startIdx = idx;
-        uint startDeep = endPos.length;
+        uint startDeep = cast(uint)endPos.length;
 
         uint i = 0;
         while(i < inp.length){
