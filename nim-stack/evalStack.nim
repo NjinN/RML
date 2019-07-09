@@ -92,11 +92,19 @@ proc eval*(stack: var EvalStack, inp: ptr List[Token], ctx: var BindMap[Token]):
         if idx < high(inp):
             nextToken = getVal(inp[idx + 1], ctx, stack)
 
-        if nextToken.tp == TypeEnum.op and (startDeep < 0 or stack.idx > stack.endPos[startDeep]) and stack.line[stack.startPos.last].tp != TypeEnum.op:
-            stack.startPos.add(stack.idx)
-            stack.push(nextToken)
-            stack.push(getVal(nowToken, ctx, stack))
-            stack.endPos.add(stack.idx)
+        if nextToken.tp == TypeEnum.op and (startDeep < 0 or stack.idx > stack.endPos[startDeep]) :
+            if high(stack.startPos) < 0 or stack.line[stack.startPos.last].tp != TypeEnum.op:
+                stack.startPos.add(stack.idx)
+                stack.push(nextToken)
+                stack.push(getVal(nowToken, ctx, stack))
+                stack.endPos.add(stack.idx)
+            elif high(stack.startPos) < 0 or stack.line[stack.startPos.last].tp == TypeEnum.op:
+                stack.push(getVal(nowToken, ctx, stack))
+                stack.evalExp(ctx)
+                stack.push(stack.line[stack.idx - 1])
+                stack.line[stack.idx - 2] = nextToken
+                stack.startPos.add(stack.idx - 2)
+                stack.endPos.add(stack.idx)
             idx += 1
         else:
             nowToken = getVal(nowToken, ctx, stack)
