@@ -133,7 +133,7 @@ Token repeat(EvalStack stack, BindMap ctx){
         BindMap c = new BindMap(ctx);
         Token countToken = new Token(TypeEnum.integer);
         countToken.val.integer = 1;
-        c.put(args[1].val.str, countToken);
+        c.putNow(args[1].val.str, countToken);
         while(c.get(args[1].val.str).val.integer <= args[2].val.integer){
             try{
                 result = stack.eval(args[3].val.block, c);
@@ -148,7 +148,7 @@ Token repeat(EvalStack stack, BindMap ctx){
             }finally{
                 Token temp = c.get(args[1].val.str);
                 temp.val.integer += 1;
-                c.put(args[1].val.str, temp);
+                c.putNow(args[1].val.str, temp);
             }
         }
     }else{
@@ -168,7 +168,7 @@ Token ffor(EvalStack stack, BindMap ctx){
         if(args[2].type == TypeEnum.integer && args[3].type == TypeEnum.integer && args[4].type == TypeEnum.integer){
             Token countToken = new Token(TypeEnum.integer);
             countToken.val.integer = args[2].val.integer;
-            c.put(args[1].val.str, countToken);
+            c.putNow(args[1].val.str, countToken);
 
             while(c.get(args[1].val.str).val.integer <= args[3].val.integer){
                 try{
@@ -184,7 +184,7 @@ Token ffor(EvalStack stack, BindMap ctx){
                 }finally{
                     Token temp = c.get(args[1].val.str);
                     temp.val.integer += args[4].val.integer;
-                    c.put(args[1].val.str, temp);
+                    c.putNow(args[1].val.str, temp);
                 }
             }
         }else{
@@ -194,7 +194,7 @@ Token ffor(EvalStack stack, BindMap ctx){
             }else{
                 countToken.val.decimal = args[2].val.decimal;
             }
-            c.put(args[1].val.str, countToken);
+            c.putNow(args[1].val.str, countToken);
             Token temp;
             if(args[3].type == TypeEnum.integer){
                 while(c.get(args[1].val.str).val.decimal <= cast(double)args[3].val.integer){
@@ -215,7 +215,7 @@ Token ffor(EvalStack stack, BindMap ctx){
                         }else{
                             temp.val.decimal += args[4].val.decimal;
                         }
-                        c.put(args[1].val.str, temp);
+                        c.putNow(args[1].val.str, temp);
                     }
                 }
             }else{
@@ -237,7 +237,7 @@ Token ffor(EvalStack stack, BindMap ctx){
                         }else{
                             temp.val.decimal += args[4].val.decimal;
                         }
-                        c.put(args[1].val.str, temp);
+                        c.putNow(args[1].val.str, temp);
                     }
                 }
             }

@@ -11,6 +11,7 @@ import common;
 class EvalStack {
     uint[]              startPos;
     uint[]              endPos;
+    int[]               quoteList;
     Token[1024 * 1024]  line;
     uint                idx;
 
@@ -62,7 +63,15 @@ class EvalStack {
                 }
                 i += 1;
             }else{
-                nowToken = nowToken.getVal(ctx, this);
+                if(quoteList.length > 0){
+                    if(quoteList[0]){
+                        nowToken = nowToken.getVal(ctx, this);
+                    }
+                    quoteList = quoteList[1..$];
+                }else{
+                    nowToken = nowToken.getVal(ctx, this);
+                }
+                
                 if(nowToken && nowToken.type == TypeEnum.err){
                     return nowToken;
                 }else if(nowToken && nowToken.type == TypeEnum.op){
@@ -79,11 +88,19 @@ class EvalStack {
                 }else if(nowToken && nowToken.type < TypeEnum.set_word){
                     push(nowToken);
                 }else{
+                    if(nowToken.type == TypeEnum.native){
+                        if(nowToken.val.exec.quoteList.length > 0){
+                            quoteList ~= nowToken.val.exec.quoteList;
+                        }
+                    }else if(nowToken.type == TypeEnum.func){
+                        if(nowToken.val.func.quoteList.length > 0){
+                            quoteList ~= nowToken.val.func.quoteList;
+                        }
+                    }
+
                     startPos ~= idx;
                     endPos ~= idx + nowToken.explen() - 1;
                     push(nowToken);
-                    // writeln("last endPos is ", last(endPos));
-                    // writeln("last startPos is ", last(startPos));
                 }
             }
          

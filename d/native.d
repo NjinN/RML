@@ -8,6 +8,7 @@ class Native {
     string  str;
     uint    explen;
     Token   function(EvalStack stack, BindMap ctx) run;
+    int[]   quoteList;
 
     this(){}
     this(string name, Token   function(EvalStack stack, BindMap ctx) f, uint len){

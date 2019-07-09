@@ -80,10 +80,12 @@ void initNative(BindMap ctx){
 
     Token repeatToken = new Token(TypeEnum.native);
     repeatToken.val.exec = new Native("repeat", &repeat, 4);
+    repeatToken.val.exec.quoteList = [0, 1, 1];
     ctx.put("repeat", repeatToken);
 
     Token forToken = new Token(TypeEnum.native);
     forToken.val.exec = new Native("for", &ffor, 6);
+    forToken.val.exec.quoteList = [0, 1, 1, 1, 1];
     ctx.put("for", forToken);
 
     Token whileToken = new Token(TypeEnum.native);
