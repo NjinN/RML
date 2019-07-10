@@ -1,39 +1,39 @@
 module nativelib.compare;
 
 import common;
-import typeenum;
 import token;
 import bindmap;
 import evalstack;
+import arrlist;
 
 Token eq(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.logic);
-    result.val.logic = false;
+    result.logic = false;
 
     switch(args[1].type){
         case TypeEnum.none:
             if(args[2].type == TypeEnum.none){
-                result.val.logic = true;
+                result.logic = true;
                 return result;
             }
             break;
         case TypeEnum.logic:
             if(args[2].type == TypeEnum.logic){
-                result.val.logic = args[1].val.logic == args[2].val.logic;
+                result.logic = args[1].logic == args[2].logic;
                 return result;
             }
             break;
         case TypeEnum.integer:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.integer == args[2].val.integer;
+                    result.logic = args[1].integer == args[2].integer;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = cast(double)args[1].val.integer == args[2].val.decimal;
+                    result.logic = cast(double)args[1].integer == args[2].decimal;
                     return result;
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.integer == cast(int)args[2].val.cchar;
+                    result.logic = args[1].integer == cast(int)args[2].cchar;
                     return result;
                 default:
                     return result;
@@ -42,10 +42,10 @@ Token eq(EvalStack stack, BindMap ctx){
         case TypeEnum.decimal:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.decimal == cast(double)args[2].val.decimal;
+                    result.logic = args[1].decimal == cast(double)args[2].decimal;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = args[1].val.decimal == args[2].val.decimal;
+                    result.logic = args[1].decimal == args[2].decimal;
                     return result;
                 default:
                     return result;
@@ -54,10 +54,10 @@ Token eq(EvalStack stack, BindMap ctx){
         case TypeEnum.cchar:
             switch(args[2].type){
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.cchar == args[2].val.cchar;
+                    result.logic = args[1].cchar == args[2].cchar;
                     return result;
                 case TypeEnum.integer:
-                    result.val.logic = cast(int)args[1].val.cchar == args[2].val.integer;
+                    result.logic = cast(int)args[1].cchar == args[2].integer;
                     return result;
                 default:
                     return result;
@@ -65,13 +65,13 @@ Token eq(EvalStack stack, BindMap ctx){
             break;
         case TypeEnum.str:
             if(args[2].type == TypeEnum.str){
-                result.val.logic = args[1].val.str == args[2].val.str;
+                result.logic = args[1].str == args[2].str;
                 return result;
             }
             break;
         case TypeEnum.word:
             if(args[2].type == TypeEnum.word){
-                result.val.logic = args[1].val.str == args[2].val.str;
+                result.logic = args[1].str == args[2].str;
                 return result;
             }
             break;
@@ -83,33 +83,33 @@ Token eq(EvalStack stack, BindMap ctx){
 
 
 Token ne(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.logic);
-    result.val.logic = false;
+    result.logic = false;
 
     switch(args[1].type){
         case TypeEnum.none:
             if(args[2].type == TypeEnum.none){
-                result.val.logic = false;
+                result.logic = false;
                 return result;
             }
             break;
         case TypeEnum.logic:
             if(args[2].type == TypeEnum.logic){
-                result.val.logic = args[1].val.logic != args[2].val.logic;
+                result.logic = args[1].logic != args[2].logic;
                 return result;
             }
             break;
         case TypeEnum.integer:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.integer != args[2].val.integer;
+                    result.logic = args[1].integer != args[2].integer;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = cast(double)args[1].val.integer != args[2].val.decimal;
+                    result.logic = cast(double)args[1].integer != args[2].decimal;
                     return result;
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.integer != cast(int)args[2].val.cchar;
+                    result.logic = args[1].integer != cast(int)args[2].cchar;
                     return result;
                 default:
                     return result;
@@ -118,10 +118,10 @@ Token ne(EvalStack stack, BindMap ctx){
         case TypeEnum.decimal:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.decimal != cast(double)args[2].val.decimal;
+                    result.logic = args[1].decimal != cast(double)args[2].decimal;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = args[1].val.decimal != args[2].val.decimal;
+                    result.logic = args[1].decimal != args[2].decimal;
                     return result;
                 default:
                     return result;
@@ -130,10 +130,10 @@ Token ne(EvalStack stack, BindMap ctx){
         case TypeEnum.cchar:
             switch(args[2].type){
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.cchar != args[2].val.cchar;
+                    result.logic = args[1].cchar != args[2].cchar;
                     return result;
                 case TypeEnum.integer:
-                    result.val.logic = cast(int)args[1].val.cchar != args[2].val.integer;
+                    result.logic = cast(int)args[1].cchar != args[2].integer;
                     return result;
                 default:
                     return result;
@@ -141,13 +141,13 @@ Token ne(EvalStack stack, BindMap ctx){
             break;
         case TypeEnum.str:
             if(args[2].type == TypeEnum.str){
-                result.val.logic = args[1].val.str != args[2].val.str;
+                result.logic = args[1].str != args[2].str;
                 return result;
             }
             break;
         case TypeEnum.word:
             if(args[2].type == TypeEnum.word){
-                result.val.logic = args[1].val.str != args[2].val.str;
+                result.logic = args[1].str != args[2].str;
                 return result;
             }
             break;
@@ -159,33 +159,33 @@ Token ne(EvalStack stack, BindMap ctx){
 
 
 Token gt(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.logic);
-    result.val.logic = false;
+    result.logic = false;
 
     switch(args[1].type){
         case TypeEnum.none:
             if(args[2].type == TypeEnum.none){
-                result.val.logic = false;
+                result.logic = false;
                 return result;
             }
             break;
         case TypeEnum.logic:
             if(args[2].type == TypeEnum.logic){
-                result.val.logic = args[1].val.logic > args[2].val.logic;
+                result.logic = args[1].logic > args[2].logic;
                 return result;
             }
             break;
         case TypeEnum.integer:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.integer > args[2].val.integer;
+                    result.logic = args[1].integer > args[2].integer;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = cast(double)args[1].val.integer > args[2].val.decimal;
+                    result.logic = cast(double)args[1].integer > args[2].decimal;
                     return result;
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.integer > cast(int)args[2].val.cchar;
+                    result.logic = args[1].integer > cast(int)args[2].cchar;
                     return result;
                 default:
                     return result;
@@ -194,10 +194,10 @@ Token gt(EvalStack stack, BindMap ctx){
         case TypeEnum.decimal:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.decimal > cast(double)args[2].val.decimal;
+                    result.logic = args[1].decimal > cast(double)args[2].decimal;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = args[1].val.decimal > args[2].val.decimal;
+                    result.logic = args[1].decimal > args[2].decimal;
                     return result;
                 default:
                     return result;
@@ -206,10 +206,10 @@ Token gt(EvalStack stack, BindMap ctx){
         case TypeEnum.cchar:
             switch(args[2].type){
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.cchar > args[2].val.cchar;
+                    result.logic = args[1].cchar > args[2].cchar;
                     return result;
                 case TypeEnum.integer:
-                    result.val.logic = cast(int)args[1].val.cchar > args[2].val.integer;
+                    result.logic = cast(int)args[1].cchar > args[2].integer;
                     return result;
                 default:
                     return result;
@@ -217,13 +217,13 @@ Token gt(EvalStack stack, BindMap ctx){
             break;
         case TypeEnum.str:
             if(args[2].type == TypeEnum.str){
-                result.val.logic = args[1].val.str > args[2].val.str;
+                result.logic = args[1].str > args[2].str;
                 return result;
             }
             break;
         case TypeEnum.word:
             if(args[2].type == TypeEnum.word){
-                result.val.logic = args[1].val.str > args[2].val.str;
+                result.logic = args[1].str > args[2].str;
                 return result;
             }
             break;
@@ -235,33 +235,33 @@ Token gt(EvalStack stack, BindMap ctx){
 
 
 Token lt(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.logic);
-    result.val.logic = false;
+    result.logic = false;
 
     switch(args[1].type){
         case TypeEnum.none:
             if(args[2].type == TypeEnum.none){
-                result.val.logic = false;
+                result.logic = false;
                 return result;
             }
             break;
         case TypeEnum.logic:
             if(args[2].type == TypeEnum.logic){
-                result.val.logic = args[1].val.logic < args[2].val.logic;
+                result.logic = args[1].logic < args[2].logic;
                 return result;
             }
             break;
         case TypeEnum.integer:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.integer < args[2].val.integer;
+                    result.logic = args[1].integer < args[2].integer;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = cast(double)args[1].val.integer < args[2].val.decimal;
+                    result.logic = cast(double)args[1].integer < args[2].decimal;
                     return result;
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.integer < cast(int)args[2].val.cchar;
+                    result.logic = args[1].integer < cast(int)args[2].cchar;
                     return result;
                 default:
                     return result;
@@ -270,10 +270,10 @@ Token lt(EvalStack stack, BindMap ctx){
         case TypeEnum.decimal:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.decimal < cast(double)args[2].val.decimal;
+                    result.logic = args[1].decimal < cast(double)args[2].decimal;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = args[1].val.decimal < args[2].val.decimal;
+                    result.logic = args[1].decimal < args[2].decimal;
                     return result;
                 default:
                     return result;
@@ -282,10 +282,10 @@ Token lt(EvalStack stack, BindMap ctx){
         case TypeEnum.cchar:
             switch(args[2].type){
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.cchar < args[2].val.cchar;
+                    result.logic = args[1].cchar < args[2].cchar;
                     return result;
                 case TypeEnum.integer:
-                    result.val.logic = cast(int)args[1].val.cchar < args[2].val.integer;
+                    result.logic = cast(int)args[1].cchar < args[2].integer;
                     return result;
                 default:
                     return result;
@@ -293,13 +293,13 @@ Token lt(EvalStack stack, BindMap ctx){
             break;
         case TypeEnum.str:
             if(args[2].type == TypeEnum.str){
-                result.val.logic = args[1].val.str < args[2].val.str;
+                result.logic = args[1].str < args[2].str;
                 return result;
             }
             break;
         case TypeEnum.word:
             if(args[2].type == TypeEnum.word){
-                result.val.logic = args[1].val.str < args[2].val.str;
+                result.logic = args[1].str < args[2].str;
                 return result;
             }
             break;
@@ -311,33 +311,33 @@ Token lt(EvalStack stack, BindMap ctx){
 
 
 Token gteq(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.logic);
-    result.val.logic = false;
+    result.logic = false;
 
     switch(args[1].type){
         case TypeEnum.none:
             if(args[2].type == TypeEnum.none){
-                result.val.logic = true;
+                result.logic = true;
                 return result;
             }
             break;
         case TypeEnum.logic:
             if(args[2].type == TypeEnum.logic){
-                result.val.logic = args[1].val.logic >= args[2].val.logic;
+                result.logic = args[1].logic >= args[2].logic;
                 return result;
             }
             break;
         case TypeEnum.integer:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.integer >= args[2].val.integer;
+                    result.logic = args[1].integer >= args[2].integer;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = cast(double)args[1].val.integer >= args[2].val.decimal;
+                    result.logic = cast(double)args[1].integer >= args[2].decimal;
                     return result;
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.integer >= cast(int)args[2].val.cchar;
+                    result.logic = args[1].integer >= cast(int)args[2].cchar;
                     return result;
                 default:
                     return result;
@@ -346,10 +346,10 @@ Token gteq(EvalStack stack, BindMap ctx){
         case TypeEnum.decimal:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.decimal >= cast(double)args[2].val.decimal;
+                    result.logic = args[1].decimal >= cast(double)args[2].decimal;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = args[1].val.decimal >= args[2].val.decimal;
+                    result.logic = args[1].decimal >= args[2].decimal;
                     return result;
                 default:
                     return result;
@@ -358,10 +358,10 @@ Token gteq(EvalStack stack, BindMap ctx){
         case TypeEnum.cchar:
             switch(args[2].type){
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.cchar >= args[2].val.cchar;
+                    result.logic = args[1].cchar >= args[2].cchar;
                     return result;
                 case TypeEnum.integer:
-                    result.val.logic = cast(int)args[1].val.cchar >= args[2].val.integer;
+                    result.logic = cast(int)args[1].cchar >= args[2].integer;
                     return result;
                 default:
                     return result;
@@ -369,13 +369,13 @@ Token gteq(EvalStack stack, BindMap ctx){
             break;
         case TypeEnum.str:
             if(args[2].type == TypeEnum.str){
-                result.val.logic = args[1].val.str >= args[2].val.str;
+                result.logic = args[1].str >= args[2].str;
                 return result;
             }
             break;
         case TypeEnum.word:
             if(args[2].type == TypeEnum.word){
-                result.val.logic = args[1].val.str >= args[2].val.str;
+                result.logic = args[1].str >= args[2].str;
                 return result;
             }
             break;
@@ -387,33 +387,33 @@ Token gteq(EvalStack stack, BindMap ctx){
 
 
 Token lteq(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.logic);
-    result.val.logic = false;
+    result.logic = false;
 
     switch(args[1].type){
         case TypeEnum.none:
             if(args[2].type == TypeEnum.none){
-                result.val.logic = true;
+                result.logic = true;
                 return result;
             }
             break;
         case TypeEnum.logic:
             if(args[2].type == TypeEnum.logic){
-                result.val.logic = args[1].val.logic <= args[2].val.logic;
+                result.logic = args[1].logic <= args[2].logic;
                 return result;
             }
             break;
         case TypeEnum.integer:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.integer <= args[2].val.integer;
+                    result.logic = args[1].integer <= args[2].integer;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = cast(double)args[1].val.integer <= args[2].val.decimal;
+                    result.logic = cast(double)args[1].integer <= args[2].decimal;
                     return result;
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.integer <= cast(int)args[2].val.cchar;
+                    result.logic = args[1].integer <= cast(int)args[2].cchar;
                     return result;
                 default:
                     return result;
@@ -422,10 +422,10 @@ Token lteq(EvalStack stack, BindMap ctx){
         case TypeEnum.decimal:
             switch(args[2].type){
                 case TypeEnum.integer:
-                    result.val.logic = args[1].val.decimal <= cast(double)args[2].val.decimal;
+                    result.logic = args[1].decimal <= cast(double)args[2].decimal;
                     return result;
                 case TypeEnum.decimal:
-                    result.val.logic = args[1].val.decimal <= args[2].val.decimal;
+                    result.logic = args[1].decimal <= args[2].decimal;
                     return result;
                 default:
                     return result;
@@ -434,10 +434,10 @@ Token lteq(EvalStack stack, BindMap ctx){
         case TypeEnum.cchar:
             switch(args[2].type){
                 case TypeEnum.cchar:
-                    result.val.logic = args[1].val.cchar <= args[2].val.cchar;
+                    result.logic = args[1].cchar <= args[2].cchar;
                     return result;
                 case TypeEnum.integer:
-                    result.val.logic = cast(int)args[1].val.cchar <= args[2].val.integer;
+                    result.logic = cast(int)args[1].cchar <= args[2].integer;
                     return result;
                 default:
                     return result;
@@ -445,13 +445,13 @@ Token lteq(EvalStack stack, BindMap ctx){
             break;
         case TypeEnum.str:
             if(args[2].type == TypeEnum.str){
-                result.val.logic = args[1].val.str <= args[2].val.str;
+                result.logic = args[1].str <= args[2].str;
                 return result;
             }
             break;
         case TypeEnum.word:
             if(args[2].type == TypeEnum.word){
-                result.val.logic = args[1].val.str <= args[2].val.str;
+                result.logic = args[1].str <= args[2].str;
                 return result;
             }
             break;

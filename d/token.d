@@ -1,5 +1,5 @@
 module token;
-import typeenum;
+public import typeenum;
 import bindmap;
 import evalstack;
 import native;
@@ -10,27 +10,27 @@ import std.conv;
 
 
 alias TK = Token;
-union TokenVal {
-    bool        logic;
-    byte        bt;
-    char        cchar;
-    int         integer;
-    long        bigint;
-    double      decimal;
-    string      str;
-    int[4]      integerArr;
-    long[2]     bigintArr;
-    double[2]   decimalArr;
-    TK          tk;
-    TK[]        block;
-    Native      exec;
-    Func        func;
-}
+
 
 
 class Token {
     TypeEnum    type;
-    TokenVal    val;
+    union {
+        bool        logic;
+        byte        bt;
+        char        cchar;
+        int         integer;
+        long        bigint;
+        double      decimal;
+        string      str;
+        int[4]      integerArr;
+        long[2]     bigintArr;
+        double[2]   decimalArr;
+        Token       tk;
+        Token[]     block;
+        Native      exec;
+        Func        func;
+    }
     
     this(){}
     this(TypeEnum tp){
@@ -44,58 +44,58 @@ class Token {
             case TypeEnum.none:
                 return "none";
             case TypeEnum.err:
-                return "Error: " ~ val.str;
+                return "Error: " ~ str;
             case TypeEnum.lit_word:
-                return "'" ~ val.str;
+                return "'" ~ str;
             case TypeEnum.get_word:
-                return ":" ~ val.str;
+                return ":" ~ str;
             case TypeEnum.datatype:
-                return val.str;
+                return str;
             case TypeEnum.logic:
-                return text(val.logic);
+                return text(logic);
             case TypeEnum.integer:
-                return text(val.integer);
+                return text(integer);
             case TypeEnum.decimal:
-                return text(val.decimal);
+                return text(decimal);
             case TypeEnum.cchar:
-                return text(val.cchar);
+                return text(cchar);
             case TypeEnum.str:
-                return "\"" ~ val.str ~ "\"";
+                return "\"" ~ str ~ "\"";
             case TypeEnum.block:
                 string str = "[ ";
-                for(int i=0; i < val.block.length; i++){
-                    str = str ~ val.block[i].toStr() ~ " ";
+                for(int i=0; i < block.length; i++){
+                    str = str ~ block[i].toStr() ~ " ";
                 }
                 str = str ~ "]";
                 return str;
             case TypeEnum.paren:
                 string str = "( ";
-                for(int i=0; i < val.block.length; i++){
-                    str = str ~ val.block[i].toStr() ~ " ";
+                for(int i=0; i < block.length; i++){
+                    str = str ~ block[i].toStr() ~ " ";
                 }
                 str = str ~ ")";
                 return str;
             case TypeEnum.word:
-                return val.str;
+                return str;
             case TypeEnum.set_word:
-                return val.str ~ ":";
+                return str ~ ":";
             case TypeEnum.native:
-                return "native: " ~ val.exec.str;
+                return "native: " ~ exec.str;
             case TypeEnum.func:
                 string str = "func [ ";
-                for(int i=0; i< val.func.args.length; i++){
-                    str = str ~ val.func.args[i].toStr ~ " ";
+                for(int i=0; i< func.args.length; i++){
+                    str = str ~ func.args[i].toStr ~ " ";
                 }
                 str = str ~ "] [ ";
-                for(int i=0; i< val.func.code.length; i++){
-                    str = str ~ val.func.code[i].toStr ~ " ";
+                for(int i=0; i< func.code.length; i++){
+                    str = str ~ func.code[i].toStr ~ " ";
                 }
                 str = str ~ "]";
                 return str;
             case TypeEnum.op:
-                return "op: " ~ val.exec.str;
+                return "op: " ~ exec.str;
             default:
-                return val.str;
+                return str;
         }
     }
 
@@ -116,9 +116,9 @@ class Token {
             case TypeEnum.set_word:
                 return 2;
             case TypeEnum.native:
-                return val.exec.explen;
+                return exec.explen;
             case TypeEnum.func:
-                return cast(uint)(val.func.args.length + 1);
+                return cast(uint)(func.args.length + 1);
             case TypeEnum.op:
                 return 3;
             default:
@@ -130,14 +130,14 @@ class Token {
         Token result = new Token();
         switch(this.type){
             case TypeEnum.word:
-                result = ctx.get(val.str);
+                result = ctx.get(str);
                 return result;
             case TypeEnum.lit_word:
                 result.type = TypeEnum.word;
-                result.val.str = val.str;
+                result.str = str;
                 return result;
             case TypeEnum.paren:
-                result = stack.eval(val.block, ctx);
+                result = stack.eval(block, ctx);
                 return result;
             default:
                 return this;
@@ -152,7 +152,7 @@ class Token {
 // void main(string[] args) {
 
 //     Token tk = new Token(TypeEnum.str);
-//     tk.val.str = "Hello world";
+//     tk.str = "Hello world";
 //     writeln(tk.type);
 //     tk.echo();
 

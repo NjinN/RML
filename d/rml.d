@@ -4,7 +4,7 @@ import std.stdio;
 import std.uni;
 import std.conv;
 import core.stdc.stdlib;
-import typeenum;
+
 import token;
 import bindmap;
 import evalstack;

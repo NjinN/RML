@@ -1,6 +1,6 @@
 module bindmap;
 import std.stdio;
-import typeenum;
+
 import token;
 
 

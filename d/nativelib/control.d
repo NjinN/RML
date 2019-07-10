@@ -1,36 +1,36 @@
 module nativelib.control;
 
 import common;
-import typeenum;
 import token;
 import bindmap;
 import evalstack;
+import arrlist;
 
 Token iif(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.nil);
 
     if(args[2].type == TypeEnum.block){
         switch(args[1].type){
             case TypeEnum.logic:
-                if(args[1].val.logic){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].logic){
+                    result = stack.eval(args[2].block, ctx);
                 }
                 return result;
             case TypeEnum.integer:
-                if(args[1].val.integer != 0){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].integer != 0){
+                    result = stack.eval(args[2].block, ctx);
                 }
                 return result;
             case TypeEnum.decimal:
-                if(args[1].val.decimal != 0.0){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].decimal != 0.0){
+                    result = stack.eval(args[2].block, ctx);
                 }
                 return result;
 
             case TypeEnum.str:
-                if(args[1].val.str != ""){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].str != ""){
+                    result = stack.eval(args[2].block, ctx);
                 }
                 return result;
             case TypeEnum.none:
@@ -41,7 +41,7 @@ Token iif(EvalStack stack, BindMap ctx){
 
     }else{
         result.type = TypeEnum.err;
-        result.val.str = "Type Mismatch";
+        result.str = "Type Mismatch";
         return result;
     }
 
@@ -49,50 +49,50 @@ Token iif(EvalStack stack, BindMap ctx){
 
 
 Token either(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.nil);
 
     if(args[2].type == TypeEnum.block && args[3].type == TypeEnum.block){
         switch(args[1].type){
             case TypeEnum.logic:
-                if(args[1].val.logic){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].logic){
+                    result = stack.eval(args[2].block, ctx);
                 }else{
-                    result = stack.eval(args[3].val.block, ctx);
+                    result = stack.eval(args[3].block, ctx);
                 }
                 return result;
             case TypeEnum.integer:
-                if(args[1].val.integer != 0){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].integer != 0){
+                    result = stack.eval(args[2].block, ctx);
                 }else{
-                    result = stack.eval(args[3].val.block, ctx);
+                    result = stack.eval(args[3].block, ctx);
                 }
                 return result;
             case TypeEnum.decimal:
-                if(args[1].val.decimal != 0.0){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].decimal != 0.0){
+                    result = stack.eval(args[2].block, ctx);
                 }else{
-                    result = stack.eval(args[3].val.block, ctx);
+                    result = stack.eval(args[3].block, ctx);
                 }
                 return result;
             case TypeEnum.str:
-                if(args[1].val.str != ""){
-                    result = stack.eval(args[2].val.block, ctx);
+                if(args[1].str != ""){
+                    result = stack.eval(args[2].block, ctx);
                 }else{
-                    result = stack.eval(args[3].val.block, ctx);
+                    result = stack.eval(args[3].block, ctx);
                 }
                 return result;
             case TypeEnum.none:
-                result = stack.eval(args[3].val.block, ctx);
+                result = stack.eval(args[3].block, ctx);
                 return result;
             default:
-                result = stack.eval(args[3].val.block, ctx);
+                result = stack.eval(args[3].block, ctx);
                 return result;
         }
 
     }else{
         result.type = TypeEnum.err;
-        result.val.str = "Type Mismatch";
+        result.str = "Type Mismatch";
         return result;
     }
 
@@ -100,13 +100,13 @@ Token either(EvalStack stack, BindMap ctx){
 
 
 Token loop(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.err);
 
     if(args[1].type == TypeEnum.integer && args[2].type == TypeEnum.block){
-        for(int i=1; i <= args[1].val.integer; i++){
+        for(int i=1; i <= args[1].integer; i++){
             try{
-                result = stack.eval(args[2].val.block, ctx);
+                result = stack.eval(args[2].block, ctx);
             }catch(Exception e){
                 if(e.msg == "continue"){
                     continue;
@@ -120,23 +120,23 @@ Token loop(EvalStack stack, BindMap ctx){
 
     }else{
         result.type = TypeEnum.err;
-        result.val.str = "Type Mismatch";
+        result.str = "Type Mismatch";
     }
     return result;
 }
 
 Token repeat(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.err);
 
     if(args[1].type == TypeEnum.word && args[2].type == TypeEnum.integer && args[3].type == TypeEnum.block){
         BindMap c = new BindMap(ctx);
         Token countToken = new Token(TypeEnum.integer);
-        countToken.val.integer = 1;
-        c.putNow(args[1].val.str, countToken);
-        while(c.get(args[1].val.str).val.integer <= args[2].val.integer){
+        countToken.integer = 1;
+        c.putNow(args[1].str, countToken);
+        while(c.get(args[1].str).integer <= args[2].integer){
             try{
-                result = stack.eval(args[3].val.block, c);
+                result = stack.eval(args[3].block, c);
             }catch(Exception e){
                 if(e.msg == "continue"){
                     continue;
@@ -146,20 +146,20 @@ Token repeat(EvalStack stack, BindMap ctx){
                     throw new Exception("Runtime Error!");
                 }
             }finally{
-                Token temp = c.get(args[1].val.str);
-                temp.val.integer += 1;
-                c.putNow(args[1].val.str, temp);
+                Token temp = c.get(args[1].str);
+                temp.integer += 1;
+                c.putNow(args[1].str, temp);
             }
         }
     }else{
-        result.val.str = "Type Mismatch";
+        result.str = "Type Mismatch";
     }
     return result;
 }
 
 
 Token ffor(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.err);
 
     if(args[1].type == TypeEnum.word && args[5].type == TypeEnum.block && (args[2].type == TypeEnum.integer || args[2].type == TypeEnum.decimal) && (args[3].type == TypeEnum.integer || args[3].type == TypeEnum.decimal) && (args[4].type == TypeEnum.integer || args[4].type == TypeEnum.decimal)){
@@ -167,12 +167,12 @@ Token ffor(EvalStack stack, BindMap ctx){
 
         if(args[2].type == TypeEnum.integer && args[3].type == TypeEnum.integer && args[4].type == TypeEnum.integer){
             Token countToken = new Token(TypeEnum.integer);
-            countToken.val.integer = args[2].val.integer;
-            c.putNow(args[1].val.str, countToken);
+            countToken.integer = args[2].integer;
+            c.putNow(args[1].str, countToken);
 
-            while(c.get(args[1].val.str).val.integer <= args[3].val.integer){
+            while(c.get(args[1].str).integer <= args[3].integer){
                 try{
-                    result = stack.eval(args[5].val.block, c);
+                    result = stack.eval(args[5].block, c);
                 }catch(Exception e){
                     if(e.msg == "continue"){
                         continue;
@@ -182,24 +182,24 @@ Token ffor(EvalStack stack, BindMap ctx){
                         throw new Exception("Runtime Error!");
                     }
                 }finally{
-                    Token temp = c.get(args[1].val.str);
-                    temp.val.integer += args[4].val.integer;
-                    c.putNow(args[1].val.str, temp);
+                    Token temp = c.get(args[1].str);
+                    temp.integer += args[4].integer;
+                    c.putNow(args[1].str, temp);
                 }
             }
         }else{
             Token countToken = new Token(TypeEnum.decimal);
             if(args[2].type == TypeEnum.integer){
-                countToken.val.decimal = cast(double)args[2].val.decimal;
+                countToken.decimal = cast(double)args[2].decimal;
             }else{
-                countToken.val.decimal = args[2].val.decimal;
+                countToken.decimal = args[2].decimal;
             }
-            c.putNow(args[1].val.str, countToken);
+            c.putNow(args[1].str, countToken);
             Token temp;
             if(args[3].type == TypeEnum.integer){
-                while(c.get(args[1].val.str).val.decimal <= cast(double)args[3].val.integer){
+                while(c.get(args[1].str).decimal <= cast(double)args[3].integer){
                     try{
-                        result = stack.eval(args[5].val.block, c);
+                        result = stack.eval(args[5].block, c);
                     }catch(Exception e){
                         if(e.msg == "continue"){
                             continue;
@@ -209,19 +209,19 @@ Token ffor(EvalStack stack, BindMap ctx){
                             throw new Exception("Runtime Error!");
                         }
                     }finally{
-                        temp = c.get(args[1].val.str);
+                        temp = c.get(args[1].str);
                         if(args[4].type == TypeEnum.integer){
-                            temp.val.decimal += cast(double)args[4].val.integer;
+                            temp.decimal += cast(double)args[4].integer;
                         }else{
-                            temp.val.decimal += args[4].val.decimal;
+                            temp.decimal += args[4].decimal;
                         }
-                        c.putNow(args[1].val.str, temp);
+                        c.putNow(args[1].str, temp);
                     }
                 }
             }else{
-                while(c.get(args[1].val.str).val.decimal <= args[3].val.decimal){
+                while(c.get(args[1].str).decimal <= args[3].decimal){
                     try{
-                        result = stack.eval(args[5].val.block, c);
+                        result = stack.eval(args[5].block, c);
                     }catch(Exception e){
                         if(e.msg == "continue"){
                             continue;
@@ -231,13 +231,13 @@ Token ffor(EvalStack stack, BindMap ctx){
                             throw new Exception("Runtime Error!");
                         }
                     }finally{
-                        temp = c.get(args[1].val.str);
+                        temp = c.get(args[1].str);
                         if(args[4].type == TypeEnum.integer){
-                            temp.val.decimal += cast(double)args[4].val.integer;
+                            temp.decimal += cast(double)args[4].integer;
                         }else{
-                            temp.val.decimal += args[4].val.decimal;
+                            temp.decimal += args[4].decimal;
                         }
-                        c.putNow(args[1].val.str, temp);
+                        c.putNow(args[1].str, temp);
                     }
                 }
             }
@@ -245,24 +245,24 @@ Token ffor(EvalStack stack, BindMap ctx){
         }
 
     }else{
-        result.val.str = "Type Mismatch";
+        result.str = "Type Mismatch";
     }
     return result;
 }
 
 
 Token wwhile(EvalStack stack, BindMap ctx){
-    Token[] args = stack.line[last(stack.startPos)..(last(stack.endPos) + 1)];
+    Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.none);
     if(args[1].type == TypeEnum.block && args[2].type == TypeEnum.block){
         BindMap c = new BindMap(ctx);
-        Token b = stack.eval(args[1].val.block, c);
-        while(b.type == TypeEnum.logic && b.val.logic){
+        Token b = stack.eval(args[1].block, c);
+        while(b.type == TypeEnum.logic && b.logic){
             if(result.type == TypeEnum.err){
                 return result;
             }
             try{
-                result = stack.eval(args[2].val.block, c);
+                result = stack.eval(args[2].block, c);
             }catch(Exception e){
                 if(e.msg == "continue"){
                     continue;
@@ -272,16 +272,16 @@ Token wwhile(EvalStack stack, BindMap ctx){
                     throw new Exception("Runtime Error!");
                 }
             }finally{
-                b = stack.eval(args[1].val.block, c);
+                b = stack.eval(args[1].block, c);
                 if(b.type != TypeEnum.logic){
                     result.type = TypeEnum.err;
-                    result.val.str = "Bad Logic Expression!";
+                    result.str = "Bad Logic Expression!";
                 }
             }
         }
     }else{
         result.type = TypeEnum.err;
-        result.val.str = "Type Mismatch";
+        result.str = "Type Mismatch";
     }
     return result;
 }
