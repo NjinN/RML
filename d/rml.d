@@ -3,7 +3,6 @@ module rml;
 import std.stdio;
 import std.uni;
 import std.conv;
-import core.stdc.stdlib;
 
 import token;
 import bindmap;
@@ -29,10 +28,8 @@ void main(string[] args) {
         
         char[] inp;
         stdin.readln(inp);
-        string inpStr = trim(text(inp));
-        if(toLower(inpStr) == "quit" || toLower(inpStr) == "q"){
-            exit(0);
-        }
+        string inpStr = trim(toLower(text(inp)));
+
         if(inpStr == ""){
             continue;
         }

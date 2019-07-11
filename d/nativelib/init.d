@@ -14,6 +14,11 @@ import nativelib.time;
 import arrlist;
 
 void initNative(BindMap ctx){
+    Token quitToken = new Token(TypeEnum.native);
+    quitToken.exec = new Native("quit", &quit, 1);
+    ctx.put("quit", quitToken);
+    ctx.put("q", quitToken);
+
     Token typeofToken = new Token(TypeEnum.native);
     typeofToken.exec = new Native("type?", &ttypeof, 2);
     ctx.put("type?", typeofToken);

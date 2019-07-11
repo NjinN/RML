@@ -148,7 +148,6 @@ Token repeat(EvalStack stack, BindMap ctx){
             }finally{
                 Token temp = c.get(args[1].str);
                 temp.integer += 1;
-                c.putNow(args[1].str, temp);
             }
         }
     }else{
@@ -184,7 +183,6 @@ Token ffor(EvalStack stack, BindMap ctx){
                 }finally{
                     Token temp = c.get(args[1].str);
                     temp.integer += args[4].integer;
-                    c.putNow(args[1].str, temp);
                 }
             }
         }else{
@@ -215,7 +213,6 @@ Token ffor(EvalStack stack, BindMap ctx){
                         }else{
                             temp.decimal += args[4].decimal;
                         }
-                        c.putNow(args[1].str, temp);
                     }
                 }
             }else{
@@ -237,7 +234,6 @@ Token ffor(EvalStack stack, BindMap ctx){
                         }else{
                             temp.decimal += args[4].decimal;
                         }
-                        c.putNow(args[1].str, temp);
                     }
                 }
             }

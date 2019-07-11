@@ -1,6 +1,7 @@
 module nativelib.core;
 
 import std.conv;
+import core.stdc.stdlib;
 
 import common;
 import token;
@@ -19,4 +20,7 @@ Token ttypeof(EvalStack stack, BindMap ctx){
     return result;
 }
 
-
+Token quit(EvalStack stack, BindMap ctx){
+    exit(0);
+    return null;
+}

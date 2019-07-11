@@ -1,8 +1,6 @@
 module arrlist;
 import std.stdio;
 
-import std.stdio;
-
 class ArrList(T){
     uint    size;
     uint    endIdx;
@@ -99,7 +97,7 @@ class ArrList(T){
     }
     void addAll(ArrList!T al){
         if(al.len > 0){
-            for(int i=0; i<= al.endIdx; i++){
+            for(int i=0; i< al.endIdx; i++){
                 add(al.line[i]);
             }
         }

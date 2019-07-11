@@ -110,7 +110,6 @@ class EvalStack {
                     push(nowToken);
                 }
             }
-         
             while(endPos.len > startDeep && idx == endPos.last + 1){
                 evalExp(ctx);
             }
