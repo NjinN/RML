@@ -4,6 +4,7 @@ import token;
 import native;
 import bindmap;
 
+import arrlist;
 import nativelib.core;
 import nativelib.math;
 import nativelib.compare;
@@ -11,7 +12,7 @@ import nativelib.output;
 import nativelib.deffunc;
 import nativelib.control;
 import nativelib.time;
-import arrlist;
+import nativelib.series;
 
 void initNative(BindMap ctx){
     Token quitToken = new Token(TypeEnum.native);
@@ -22,6 +23,10 @@ void initNative(BindMap ctx){
     Token typeofToken = new Token(TypeEnum.native);
     typeofToken.exec = new Native("type?", &ttypeof, 2);
     ctx.put("type?", typeofToken);
+
+    Token doToken = new Token(TypeEnum.native);
+    doToken.exec = new Native("do", &ddo, 2);
+    ctx.put("do", doToken);
 
     Token addToken = new Token(TypeEnum.native);
     addToken.exec = new Native("add", &add, 3);
@@ -108,6 +113,14 @@ void initNative(BindMap ctx){
     Token costToken = new Token(TypeEnum.native);
     costToken.exec = new Native("cost", &cost, 2);
     ctx.put("cost", costToken);
+
+    Token lenToken = new Token(TypeEnum.native);
+    lenToken.exec = new Native("len?", &len, 2);
+    ctx.put("len?", lenToken);
+
+    Token appendToken = new Token(TypeEnum.native);
+    appendToken.exec = new Native("append", &append, 3);
+    ctx.put("append", appendToken);
 }
 
 

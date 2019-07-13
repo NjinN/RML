@@ -15,8 +15,8 @@ Token defFunc(EvalStack stack, BindMap ctx){
         result.str = "Type Mismatch";
         return result;
     }
-    for(int i=0; i<args[1].block.length; i++){
-        if(args[1].block[i].type != TypeEnum.word){
+    for(int i=0; i<args[1].block.endIdx; i++){
+        if(args[1].block.get(i).type != TypeEnum.word){
             result.type = TypeEnum.err;
             result.str = "Type Mismatch";
             return result;

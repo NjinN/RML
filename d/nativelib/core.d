@@ -24,3 +24,21 @@ Token quit(EvalStack stack, BindMap ctx){
     exit(0);
     return null;
 }
+
+Token ddo(EvalStack stack, BindMap ctx){
+    Token *args = &stack.line[stack.startPos.last];
+    Token result;
+    if(args[1].type == TypeEnum.block || args[1].type == TypeEnum.str){
+        if(args[1].type == TypeEnum.block){
+            result = stack.eval(args[1].block, ctx);
+            return result;
+        }else if(args[1].type == TypeEnum.str){
+            result = stack.eval(args[1].str, ctx);
+            return result;
+        }
+    }
+    result = new Token(TypeEnum.err);
+    result.type = TypeEnum.err;
+    result.str = "Type Mismatch";
+    return result;
+}

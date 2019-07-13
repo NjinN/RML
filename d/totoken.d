@@ -4,6 +4,7 @@ import token;
 import strtool;
 import std.string;
 import std.conv;
+import arrlist;
 
 Token toToken(string s){
     string str = trim(s);
@@ -94,12 +95,12 @@ Token toToken(string s){
     return result;
 }
 
-Token[] toTokens(string str){
-    Token[] result;
+ArrList!Token toTokens(string str){
+    auto result = new ArrList!Token(8);
     string[] strs = strCut(str);
 
     for(int i=0; i<strs.length; i++){
-        result ~= toToken(strs[i]);
+        result.add(toToken(strs[i]));
     }
     return result;
 }

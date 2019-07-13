@@ -16,7 +16,7 @@ Token cost(EvalStack stack, BindMap ctx){
         auto before = MonoTime.currTime;
         Token temp = stack.eval(args[1].block, ctx);
         auto after = MonoTime.currTime;
-        writeln(after - before);
+        writeln("takes: ", (after - before).total!"msecs", " ms");
         return result;
     }
     result.type = TypeEnum.err;

@@ -4,6 +4,7 @@ import bindmap;
 import evalstack;
 import native;
 import func;
+import arrlist;
 
 import std.stdio;
 import std.conv;
@@ -19,22 +20,22 @@ class Word {
 class Token {
     TypeEnum    type;
     union {
-        bool        logic;
-        byte        bt;
-        char        cchar;
-        int         integer;
-        long        bigint;
-        double      decimal;
-        string      str;
-        int[4]      integerArr;
-        long[2]     bigintArr;
-        double[2]   decimalArr;
-        Token       tk;
-        Token[]     block;
-        Native      exec;
-        Func        func;
-        byte[16]    all;
-        Word        word;
+        bool            logic;
+        byte            bt;
+        char            cchar;
+        int             integer;
+        long            bigint;
+        double          decimal;
+        string          str;
+        int[4]          integerArr;
+        long[2]         bigintArr;
+        double[2]       decimalArr;
+        Token           tk;
+        ArrList!Token   block;
+        Native          exec;
+        Func            func;
+        byte[16]        all;
+        Word            word;
     }
     
     this(){}
@@ -71,15 +72,15 @@ class Token {
                 return "\"" ~ str ~ "\"";
             case TypeEnum.block:
                 string str = "[ ";
-                for(int i=0; i < block.length; i++){
-                    str = str ~ block[i].toStr() ~ " ";
+                for(int i=0; i < block.len; i++){
+                    str = str ~ block.get(i).toStr() ~ " ";
                 }
                 str = str ~ "]";
                 return str;
             case TypeEnum.paren:
                 string str = "( ";
-                for(int i=0; i < block.length; i++){
-                    str = str ~ block[i].toStr() ~ " ";
+                for(int i=0; i < block.len; i++){
+                    str = str ~ block.get(i).toStr() ~ " ";
                 }
                 str = str ~ ")";
                 return str;
@@ -91,12 +92,12 @@ class Token {
                 return "native: " ~ exec.str;
             case TypeEnum.func:
                 string str = "func [ ";
-                for(int i=0; i< func.args.length; i++){
-                    str = str ~ func.args[i].toStr ~ " ";
+                for(int i=0; i< func.args.len; i++){
+                    str = str ~ func.args.get(i).toStr ~ " ";
                 }
                 str = str ~ "] [ ";
-                for(int i=0; i< func.code.length; i++){
-                    str = str ~ func.code[i].toStr ~ " ";
+                for(int i=0; i< func.code.len; i++){
+                    str = str ~ func.code.get(i).toStr ~ " ";
                 }
                 str = str ~ "]";
                 return str;
@@ -126,7 +127,7 @@ class Token {
             case TypeEnum.native:
                 return exec.explen;
             case TypeEnum.func:
-                return cast(uint)(func.args.length + 1);
+                return cast(uint)(func.args.len + 1);
             case TypeEnum.op:
                 return 3;
             default:

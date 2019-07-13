@@ -12,6 +12,7 @@ import strtool;
 import nativelib.init;
 import oplib.init;
 
+
 void main(string[] args) {
 
     BindMap libCtx = new BindMap();
@@ -24,11 +25,17 @@ void main(string[] args) {
     EvalStack evalStack = new EvalStack();
     evalStack.mainCtx = userCtx;
 
+    char[] inp;
     while(true){
         write(">> ");
         
-        char[] inp;
-        stdin.readln(inp);
+        char[] temp;
+        stdin.readln(temp);
+        inp ~= temp;
+        if(inp[inp.length-2] == '~'){
+            inp.length = inp.length - 2;
+            continue;
+        }
         string inpStr = trim(toLower(text(inp)));
 
         if(inpStr == ""){
@@ -42,7 +49,7 @@ void main(string[] args) {
         }else{
             writeln("");
         }
-
+        inp.length = 0;
     }
 
 }

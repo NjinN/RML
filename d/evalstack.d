@@ -38,9 +38,9 @@ class EvalStack {
         return eval(toTokens(inpStr), ctx);
     }
 
-    Token eval(Token[] inp, BindMap ctx){
+    Token eval(ArrList!Token inp, BindMap ctx){
         Token result = new Token();
-        if(inp.length == 0){
+        if(inp.len == 0){
             return result;
         }
 
@@ -48,11 +48,11 @@ class EvalStack {
         uint startDeep = endPos.len;
 
         uint i = 0;
-        while(i < inp.length){
-            Token nowToken = inp[i];
+        while(i < inp.len){
+            Token nowToken = inp.get(i);
             Token nextToken;
-            if(i < inp.length-1){
-                nextToken = inp[i + 1].getVal(ctx, this);
+            if(i < inp.len-1){
+                nextToken = inp.get(i + 1).getVal(ctx, this);
             }
             
             if(nextToken && nextToken.type == TypeEnum.op && (startDeep == 0 || idx > endPos.get(startDeep - 1))){
