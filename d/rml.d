@@ -22,6 +22,7 @@ void main(string[] args) {
     userCtx.father = libCtx;
 
     EvalStack evalStack = new EvalStack();
+    evalStack.mainCtx = userCtx;
 
     while(true){
         write(">> ");
@@ -37,7 +38,9 @@ void main(string[] args) {
         evalStack.init();
         Token answer = evalStack.eval(inpStr, userCtx);
         if(answer && answer.type != TypeEnum.nil){
-            writeln(">> ", answer.toStr());
+            writeln("== ", answer.toStr(), "\n");
+        }else{
+            writeln("");
         }
 
     }

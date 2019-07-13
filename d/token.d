@@ -11,7 +11,10 @@ import std.conv;
 
 alias TK = Token;
 
-
+class Word {
+    string  name;
+    TK   val;
+}
 
 class Token {
     TypeEnum    type;
@@ -30,11 +33,16 @@ class Token {
         Token[]     block;
         Native      exec;
         Func        func;
+        byte[16]    all;
+        Word        word;
     }
     
     this(){}
     this(TypeEnum tp){
         type = tp;
+        if(tp == TypeEnum.word){
+            word = new Word();
+        }
     }
 
     string toStr(){
@@ -76,7 +84,7 @@ class Token {
                 str = str ~ ")";
                 return str;
             case TypeEnum.word:
-                return str;
+                return word.name;
             case TypeEnum.set_word:
                 return str ~ ":";
             case TypeEnum.native:
@@ -127,14 +135,23 @@ class Token {
     }
 
     Token getVal(BindMap ctx, EvalStack stack){
-        Token result = new Token();
+        Token result;
         switch(this.type){
             case TypeEnum.word:
-                result = ctx.get(str);
-                return result;
+                result = ctx.map.get(word.name, null);
+                if(result){
+                    word.val = result;
+                    return result;
+                }else if(word.val){
+                    return word.val;
+                }else{
+                    result = ctx.get(word.name);
+                    word.val = result;
+                    return result;
+                }  
             case TypeEnum.lit_word:
-                result.type = TypeEnum.word;
-                result.str = str;
+                result = new Token(TypeEnum.word);
+                result.word.name = str;
                 return result;
             case TypeEnum.paren:
                 result = stack.eval(block, ctx);
@@ -144,22 +161,40 @@ class Token {
         }
 
     }
-}
 
+    Token dup(){
+        Token result = new Token();
+        result.type = type;
+        result.all = all;
+        return result;
+    }
+
+    void copy(Token val){
+        type = val.type;
+        all = val.all;
+    }
+}
 
 
 
 // void main(string[] args) {
 
-//     Token tk = new Token(TypeEnum.str);
-//     tk.str = "Hello world";
-//     writeln(tk.type);
-//     tk.echo();
+    // Token tk = new Token(TypeEnum.integer);
+    // tk.integer = 99;
+    // Token tk2 = tk.dup;
+    // tk2.integer = 100;
 
-//     // writeln(trim(" 123  "));
-//     // Token tks = toToken("123");
-//     Token[] tks = toTokens("   123 \"this is a string  with space   ^\"  ([ 1 2 3 ] and tranChar) \"  ([ 123 456 \"anthor ^\" str \" 987 ] 456) ");
-//     for(int i=0; i<tks.length; i++){
-//         tks[i].echo();
-//     }
+    // writeln(tk2.integer);
+
+    // Token tk = new Token(TypeEnum.str);
+    // tk.str = "Hello world";
+    // writeln(tk.type);
+    // tk.echo();
+
+    // // writeln(trim(" 123  "));
+    // // Token tks = toToken("123");
+    // Token[] tks = toTokens("   123 \"this is a string  with space   ^\"  ([ 1 2 3 ] and tranChar) \"  ([ 123 456 \"anthor ^\" str \" 987 ] 456) ");
+    // for(int i=0; i<tks.length; i++){
+    //     tks[i].echo();
+    // }
 // }

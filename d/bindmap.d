@@ -51,7 +51,7 @@ class BindMap {
             tk = ctx.map.get(key, null);
         }
         if(tk){
-            map[key] = val;
+            map[key].copy(val);
             inserted = true;
         }else{
             while(!tk && ctx.father){
@@ -60,7 +60,7 @@ class BindMap {
                     tk = ctx.map.get(key, null);
                 } 
                 if(tk){
-                    ctx.map[key] = val;
+                    ctx.map[key].copy(val);
                     inserted = true;
                     break;
                 }
@@ -72,4 +72,3 @@ class BindMap {
     }
 
 }
-

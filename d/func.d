@@ -18,10 +18,9 @@ class Func {
     }
 
     Token run(EvalStack stack, BindMap ctx){
-        BindMap c = new BindMap();
-        c.father = ctx;
+        BindMap c = new BindMap(stack.mainCtx);
         for(int i=0; i<args.length; i++){
-            c.putNow(args[i].str, stack.line[stack.startPos.last + i + 1]);
+            c.putNow(args[i].word.name, stack.line[stack.startPos.last + i + 1]);
         }
         return stack.eval(code, c);
     }

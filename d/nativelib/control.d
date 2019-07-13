@@ -125,6 +125,7 @@ Token loop(EvalStack stack, BindMap ctx){
     return result;
 }
 
+
 Token repeat(EvalStack stack, BindMap ctx){
     Token *args = &stack.line[stack.startPos.last];
     Token result = new Token(TypeEnum.err);
@@ -133,8 +134,9 @@ Token repeat(EvalStack stack, BindMap ctx){
         BindMap c = new BindMap(ctx);
         Token countToken = new Token(TypeEnum.integer);
         countToken.integer = 1;
-        c.putNow(args[1].str, countToken);
-        while(c.get(args[1].str).integer <= args[2].integer){
+        args[1].word.val = countToken;
+        c.putNow(args[1].word.name, countToken);
+        while(countToken.integer <= args[2].integer){
             try{
                 result = stack.eval(args[3].block, c);
             }catch(Exception e){
@@ -146,8 +148,7 @@ Token repeat(EvalStack stack, BindMap ctx){
                     throw new Exception("Runtime Error!");
                 }
             }finally{
-                Token temp = c.get(args[1].str);
-                temp.integer += 1;
+                countToken.integer += 1;
             }
         }
     }else{
@@ -167,9 +168,9 @@ Token ffor(EvalStack stack, BindMap ctx){
         if(args[2].type == TypeEnum.integer && args[3].type == TypeEnum.integer && args[4].type == TypeEnum.integer){
             Token countToken = new Token(TypeEnum.integer);
             countToken.integer = args[2].integer;
-            c.putNow(args[1].str, countToken);
+            c.putNow(args[1].word.name, countToken);
 
-            while(c.get(args[1].str).integer <= args[3].integer){
+            while(countToken.integer <= args[3].integer){
                 try{
                     result = stack.eval(args[5].block, c);
                 }catch(Exception e){
@@ -181,8 +182,7 @@ Token ffor(EvalStack stack, BindMap ctx){
                         throw new Exception("Runtime Error!");
                     }
                 }finally{
-                    Token temp = c.get(args[1].str);
-                    temp.integer += args[4].integer;
+                    countToken.integer += args[4].integer;
                 }
             }
         }else{
@@ -192,10 +192,10 @@ Token ffor(EvalStack stack, BindMap ctx){
             }else{
                 countToken.decimal = args[2].decimal;
             }
-            c.putNow(args[1].str, countToken);
+            c.putNow(args[1].word.name, countToken);
             Token temp;
             if(args[3].type == TypeEnum.integer){
-                while(c.get(args[1].str).decimal <= cast(double)args[3].integer){
+                while(countToken.decimal <= cast(double)args[3].integer){
                     try{
                         result = stack.eval(args[5].block, c);
                     }catch(Exception e){
@@ -207,16 +207,15 @@ Token ffor(EvalStack stack, BindMap ctx){
                             throw new Exception("Runtime Error!");
                         }
                     }finally{
-                        temp = c.get(args[1].str);
                         if(args[4].type == TypeEnum.integer){
-                            temp.decimal += cast(double)args[4].integer;
+                            countToken.decimal += cast(double)args[4].integer;
                         }else{
-                            temp.decimal += args[4].decimal;
+                            countToken.decimal += args[4].decimal;
                         }
                     }
                 }
             }else{
-                while(c.get(args[1].str).decimal <= args[3].decimal){
+                while(countToken.decimal <= args[3].decimal){
                     try{
                         result = stack.eval(args[5].block, c);
                     }catch(Exception e){
@@ -228,11 +227,10 @@ Token ffor(EvalStack stack, BindMap ctx){
                             throw new Exception("Runtime Error!");
                         }
                     }finally{
-                        temp = c.get(args[1].str);
                         if(args[4].type == TypeEnum.integer){
-                            temp.decimal += cast(double)args[4].integer;
+                            countToken.decimal += cast(double)args[4].integer;
                         }else{
-                            temp.decimal += args[4].decimal;
+                            countToken.decimal += args[4].decimal;
                         }
                     }
                 }

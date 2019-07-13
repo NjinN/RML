@@ -14,6 +14,7 @@ class EvalStack {
     ArrList!int         quoteList;
     Token[1024 * 1024]  line;
     uint                idx;
+    BindMap             mainCtx;
 
     this(){
         startPos = new ArrList!uint;
