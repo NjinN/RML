@@ -188,7 +188,7 @@ Token ffor(EvalStack stack, BindMap ctx){
         }else{
             Token countToken = new Token(TypeEnum.decimal);
             if(args[2].type == TypeEnum.integer){
-                countToken.decimal = cast(double)args[2].decimal;
+                countToken.decimal = cast(double)args[2].integer;
             }else{
                 countToken.decimal = args[2].decimal;
             }

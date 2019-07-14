@@ -44,6 +44,10 @@ void initNative(BindMap ctx){
     divToken.exec = new Native("div", &div, 3);
     ctx.put("div", divToken);
 
+    Token modToken = new Token(TypeEnum.native);
+    modToken.exec = new Native("mod", &mod, 3);
+    ctx.put("mod", modToken);
+
     Token eqToken = new Token(TypeEnum.native);
     eqToken.exec = new Native("eq", &eq, 3);
     ctx.put("eq", eqToken);

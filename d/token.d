@@ -45,6 +45,15 @@ class Token {
             word = new Word();
         }
     }
+    this(TypeEnum tp, string s){
+        type = tp;
+        if(tp == TypeEnum.word){
+            word = new Word();
+            word.name = s;
+        }else{
+            str = s;
+        }
+    }
 
     string toStr(){
         switch(type){

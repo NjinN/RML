@@ -27,6 +27,7 @@ void main(string[] args) {
 
     char[] inp;
     while(true){
+
         write(">> ");
         
         char[] temp;
