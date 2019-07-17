@@ -134,8 +134,7 @@ Token repeat(EvalStack stack, BindMap ctx){
         BindMap c = new BindMap(ctx);
         Token countToken = new Token(TypeEnum.integer);
         countToken.integer = 1;
-        args[1].word.val = countToken;
-        c.putNow(args[1].word.name, countToken);
+        c.putNow(args[1].str, countToken);
         while(countToken.integer <= args[2].integer){
             try{
                 result = stack.eval(args[3].block, c);
@@ -165,12 +164,15 @@ Token ffor(EvalStack stack, BindMap ctx){
     if(args[1].type == TypeEnum.word && args[5].type == TypeEnum.block && (args[2].type == TypeEnum.integer || args[2].type == TypeEnum.decimal) && (args[3].type == TypeEnum.integer || args[3].type == TypeEnum.decimal) && (args[4].type == TypeEnum.integer || args[4].type == TypeEnum.decimal)){
         BindMap c = new BindMap(ctx);
 
-        if(args[2].type == TypeEnum.integer && args[3].type == TypeEnum.integer && args[4].type == TypeEnum.integer){
+        if(args[2].type == TypeEnum.integer && args[4].type == TypeEnum.integer){
             Token countToken = new Token(TypeEnum.integer);
             countToken.integer = args[2].integer;
-            c.putNow(args[1].word.name, countToken);
-
-            while(countToken.integer <= args[3].integer){
+            c.putNow(args[1].str, countToken);
+            while(
+                (args[3].type == TypeEnum.integer && countToken.integer <= args[3].integer)
+                ||
+                (args[3].type == TypeEnum.decimal && countToken.integer <= cast(int)args[3].decimal)
+                ){
                 try{
                     result = stack.eval(args[5].block, c);
                 }catch(Exception e){
@@ -192,7 +194,7 @@ Token ffor(EvalStack stack, BindMap ctx){
             }else{
                 countToken.decimal = args[2].decimal;
             }
-            c.putNow(args[1].word.name, countToken);
+            c.putNow(args[1].str, countToken);
             Token temp;
             if(args[3].type == TypeEnum.integer){
                 while(countToken.decimal <= cast(double)args[3].integer){

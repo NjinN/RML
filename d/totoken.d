@@ -90,8 +90,8 @@ Token toToken(string s){
         return result;
     }
 
-    result = new Token(TypeEnum.word);
-    result.word.name = str;
+    result.type = TypeEnum.word;
+    result.str = str;
     return result;
 }
 

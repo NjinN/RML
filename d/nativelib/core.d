@@ -42,3 +42,17 @@ Token ddo(EvalStack stack, BindMap ctx){
     result.str = "Type Mismatch";
     return result;
 }
+
+Token copy(EvalStack stack, BindMap ctx){
+    Token *args = &stack.line[stack.startPos.last];
+    Token result = new Token(args[1].type);
+    if(args[1].type == TypeEnum.str){
+        result.str = args[1].str;
+        return result;
+    }else if(args[1].type == TypeEnum.block || args[1].type == TypeEnum.paren){
+        result.block = args[1].block.dup;
+        return result;
+    }
+    result.copy(args[1]);
+    return result;
+}

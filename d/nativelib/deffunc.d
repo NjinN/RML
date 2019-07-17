@@ -24,5 +24,7 @@ Token defFunc(EvalStack stack, BindMap ctx){
     }
     result.type = TypeEnum.func;
     result.func = new Func(args[1].block, args[2].block);
+    result.func.ctx = new BindMap(ctx);
     return result;
 }
+

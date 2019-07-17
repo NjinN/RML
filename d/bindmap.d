@@ -10,6 +10,7 @@ class BindMap {
 
     this(){}
     this(BindMap f){
+        map = f.map.dup;
         father = f;
     }
 
@@ -39,11 +40,11 @@ class BindMap {
         return tk;
     }
 
-    void putNow(string key, TK val){
+    void putNow(string key, Token val){
         map[key] = val;
     }
 
-    void put(string key, TK val){
+    void put(string key, Token val){
         BindMap ctx = this;
         Token tk = null;
         bool inserted = false;
@@ -67,7 +68,7 @@ class BindMap {
             }
         }
         if(!inserted){
-            map[key] = val;
+            map[key] = val.dup;
         }
     }
 

@@ -461,5 +461,34 @@ Token lteq(EvalStack stack, BindMap ctx){
     return result;
 }
 
+Token not(EvalStack stack, BindMap ctx){
+    Token *args = &stack.line[stack.startPos.last];
+    Token result = new Token(TypeEnum.logic);
+    result.logic = true;
+
+    switch(args[1].type){
+        case TypeEnum.none:
+            result.logic = true;
+            return result;
+        case TypeEnum.logic:
+            result.logic = !args[1].logic;
+            return result;
+        case TypeEnum.integer:
+            result.logic = args[1].integer == 0;
+            return result;
+        case TypeEnum.decimal:
+            result.logic = args[1].decimal == 0.0;
+            return result;
+        case TypeEnum.cchar:
+            result.logic = cast(int)args[1].cchar == 0;
+            return result;
+        case TypeEnum.str:
+            result.logic = args[1].str == "";
+            return result;
+        default:
+            return result;
+    }
+}
+
 
 

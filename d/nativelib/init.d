@@ -28,6 +28,10 @@ void initNative(BindMap ctx){
     doToken.exec = new Native("do", &ddo, 2);
     ctx.put("do", doToken);
 
+    Token copyToken = new Token(TypeEnum.native);
+    copyToken.exec = new Native("copy", &copy, 2);
+    ctx.put("copy", copyToken);
+
     Token addToken = new Token(TypeEnum.native);
     addToken.exec = new Native("add", &add, 3);
     ctx.put("add", addToken);
@@ -71,6 +75,10 @@ void initNative(BindMap ctx){
     Token lteqToken = new Token(TypeEnum.native);
     lteqToken.exec = new Native("lteq", &lteq, 3);
     ctx.put("lteq", lteqToken);
+
+    Token notToken = new Token(TypeEnum.native);
+    notToken.exec = new Native("not", &not, 2);
+    ctx.put("not", notToken);
 
     Token printToken = new Token(TypeEnum.native);
     printToken.exec = new Native("print", &print, 2);

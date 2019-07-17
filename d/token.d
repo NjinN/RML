@@ -10,12 +10,6 @@ import std.stdio;
 import std.conv;
 
 
-alias TK = Token;
-
-class Word {
-    string  name;
-    TK   val;
-}
 
 class Token {
     TypeEnum    type;
@@ -35,24 +29,15 @@ class Token {
         Native          exec;
         Func            func;
         byte[16]        all;
-        Word            word;
     }
     
     this(){}
     this(TypeEnum tp){
         type = tp;
-        if(tp == TypeEnum.word){
-            word = new Word();
-        }
     }
     this(TypeEnum tp, string s){
         type = tp;
-        if(tp == TypeEnum.word){
-            word = new Word();
-            word.name = s;
-        }else{
-            str = s;
-        }
+        str = s;
     }
 
     string toStr(){
@@ -93,8 +78,6 @@ class Token {
                 }
                 str = str ~ ")";
                 return str;
-            case TypeEnum.word:
-                return word.name;
             case TypeEnum.set_word:
                 return str ~ ":";
             case TypeEnum.native:
@@ -105,8 +88,8 @@ class Token {
                     str = str ~ func.args.get(i).toStr ~ " ";
                 }
                 str = str ~ "] [ ";
-                for(int i=0; i< func.code.len; i++){
-                    str = str ~ func.code.get(i).toStr ~ " ";
+                for(int i=0; i< func.codes.len; i++){
+                    str = str ~ func.codes.get(i).toStr ~ " ";
                 }
                 str = str ~ "]";
                 return str;
@@ -148,20 +131,16 @@ class Token {
         Token result;
         switch(this.type){
             case TypeEnum.word:
-                result = ctx.map.get(word.name, null);
+                result = ctx.map.get(str, null);
                 if(result){
-                    word.val = result;
                     return result;
-                }else if(word.val){
-                    return word.val;
                 }else{
-                    result = ctx.get(word.name);
-                    word.val = result;
+                    result = ctx.get(str);
                     return result;
                 }  
             case TypeEnum.lit_word:
                 result = new Token(TypeEnum.word);
-                result.word.name = str;
+                result.str = str;
                 return result;
             case TypeEnum.paren:
                 result = stack.eval(block, ctx);

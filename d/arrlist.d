@@ -117,6 +117,14 @@ class ArrList(T){
     void echo(){
         writeln(line[0..endIdx]);
     }
+
+    ArrList!T dup(){
+        ArrList!T result = new ArrList!T();
+        result.size = size;
+        result.endIdx = endIdx;
+        result.line = line.dup;
+        return result;
+    }
 }
 
 
