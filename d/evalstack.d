@@ -52,7 +52,10 @@ class EvalStack {
             Token nowToken = inp.get(i);
             Token nextToken;
             if(i < inp.len-1){
-                nextToken = inp.get(i + 1).getVal(ctx, this);
+                nextToken = inp.get(i + 1);
+                if(nextToken.type == TypeEnum.word){
+                    nextToken = nextToken.getVal(ctx, this);
+                }
             }
             
             if(nextToken && nextToken.type == TypeEnum.op && (startDeep == 0 || idx > endPos.get(startDeep - 1))){
