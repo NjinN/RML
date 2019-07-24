@@ -15,6 +15,7 @@ class EvalStack {
     Token[1024 * 1024]  line;
     uint                idx;
     BindMap             mainCtx;
+    BindMap             libCtx;
 
     this(){
         startPos = new ArrList!uint;
@@ -161,9 +162,5 @@ class EvalStack {
             endPos.pop;
         }
 
-    }
-
-
+    }    
 }
-
-

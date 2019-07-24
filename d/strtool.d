@@ -150,12 +150,12 @@ int isNumberStr(string s){
     if(s.length == 0){
         return -1;
     }
-    if(s[0] != '-' && !isNumber(s[0])){
+    if((s[0] != '-' && !isNumber(s[0])) || s == "-") {
         return -1;
     }
 
     int dot = 0;
-    for(int idx=0; idx<s.length; idx++){
+    for(int idx=1; idx<s.length; idx++){
         if(!isNumber(s[idx]) && s[idx] != '.'){
             return -1;
         }

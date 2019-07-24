@@ -13,6 +13,7 @@ import nativelib.deffunc;
 import nativelib.control;
 import nativelib.time;
 import nativelib.series;
+import nativelib.spawn;
 
 void initNative(BindMap ctx){
     Token quitToken = new Token(TypeEnum.native);
@@ -133,6 +134,14 @@ void initNative(BindMap ctx){
     Token appendToken = new Token(TypeEnum.native);
     appendToken.exec = new Native("append", &append, 3);
     ctx.put("append", appendToken);
+
+    Token spawnToken = new Token(TypeEnum.native);
+    spawnToken.exec = new Native("spawn", &sspawn, 3);
+    ctx.put("spawn", spawnToken);
+
+    Token multToken = new Token(TypeEnum.native);
+    multToken.exec = new Native("mult", &mult, 3);
+    ctx.put("mult", multToken);
 }
 
 

@@ -23,6 +23,7 @@ void main(string[] args) {
     userCtx.father = libCtx;
 
     EvalStack evalStack = new EvalStack();
+    evalStack.libCtx = libCtx;
     evalStack.mainCtx = userCtx;
 
     char[] inp;
@@ -32,7 +33,7 @@ void main(string[] args) {
         char[] temp;
         stdin.readln(temp);
         inp ~= temp;
-        if(inp[inp.length-2] == '~'){
+        if(inp.length >= 2 && inp[inp.length-2] == '~'){
             inp.length = inp.length - 2;
             continue;
         }
