@@ -45,7 +45,6 @@ func Copy(Es *EvalStack, ctx *BindMap) (*Token, error){
 
 func Pprint(Es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
-
 	if args[1].Tp == BLOCK {
 		for _, item := range args[2].Val.([]*Token){
 			fmt.Println(item.OutputStr())

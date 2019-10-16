@@ -153,7 +153,7 @@ func InitNative(ctx *BindMap){
 			"repeat",
 			4,
 			Repeat,
-			nil,
+			[]int{0, 1, 1},
 		},
 	}
 	ctx.PutNow("repeat", &repeatToken)
@@ -164,7 +164,7 @@ func InitNative(ctx *BindMap){
 			"for",
 			6,
 			Ffor,
-			nil,
+			[]int{0, 1, 1, 1, 1},
 		},
 	}
 	ctx.PutNow("for", &forToken)
@@ -201,5 +201,82 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("continue", &continueToken)
+
+	var defFuncToken = Token{
+		NATIVE,
+		Native{
+			"func",
+			3,
+			DefFunc,
+			nil,
+		},
+	}
+	ctx.PutNow("func", &defFuncToken)
+
+	var eqToken = Token{
+		NATIVE,
+		Native{
+			"eq",
+			3,
+			Eq,
+			nil,
+		},
+	}
+	ctx.PutNow("eq", &eqToken)
+
+	var gtToken = Token{
+		NATIVE,
+		Native{
+			"gt",
+			3,
+			Gt,
+			nil,
+		},
+	}
+	ctx.PutNow("gt", &gtToken)
+
+	var ltToken = Token{
+		NATIVE,
+		Native{
+			"lt",
+			3,
+			Lt,
+			nil,
+		},
+	}
+	ctx.PutNow("lt", &ltToken)
+
+	var geToken = Token{
+		NATIVE,
+		Native{
+			"ge",
+			3,
+			Ge,
+			nil,
+		},
+	}
+	ctx.PutNow("ge", &geToken)
+
+	var leToken = Token{
+		NATIVE,
+		Native{
+			"le",
+			3,
+			Le,
+			nil,
+		},
+	}
+	ctx.PutNow("le", &leToken)
+
+	var costToken = Token{
+		NATIVE,
+		Native{
+			"cost",
+			2,
+			Cost,
+			nil,
+		},
+	}
+	ctx.PutNow("cost", &costToken)
 
 }

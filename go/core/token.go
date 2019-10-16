@@ -2,6 +2,7 @@ package core
 
 import "strconv"
 import "bytes"
+import "fmt"
 
 type Token struct {
 	Tp 		int
@@ -15,7 +16,7 @@ func (t Token) ToString() string{
 	case NONE:
 		return "none"
 	case ERR:
-		return "err"
+		return "Err: " + t.Val.(string)
 	case LIT_WORD:
 		return t.Val.(string)
 	case GET_WORD:
@@ -34,7 +35,16 @@ func (t Token) ToString() string{
 		return "\"" + t.Val.(string) + "\""
 	case SET_WORD:
 		return t.Val.(string)
-	case PAREN, BLOCK:
+	case PAREN:
+		var buffer bytes.Buffer
+		buffer.WriteString("( ")
+		for _, item := range t.Val.([]*Token){
+			buffer.WriteString(item.ToString())
+			buffer.WriteString(" ")
+		}
+		buffer.WriteString(")")
+		return buffer.String()
+	case BLOCK:
 		var buffer bytes.Buffer
 		buffer.WriteString("[ ")
 		for _, item := range t.Val.([]*Token){
@@ -52,6 +62,7 @@ func (t Token) ToString() string{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
+		buffer.WriteString("] [")
 		for _, item := range t.Val.(Func).Codes{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
@@ -64,7 +75,7 @@ func (t Token) ToString() string{
 	}
 }
 
-func (t Token) OutputStr() string{
+func (t *Token) OutputStr() string{
 	if(t.Tp == STRING){
 		var str = t.ToString()
 		return str[1: len(str)-1]
@@ -72,6 +83,11 @@ func (t Token) OutputStr() string{
 		return t.ToString()
 	}
 }
+
+func (t Token) Echo(){
+	fmt.Println(t.OutputStr())
+}
+
 
 func (t *Token) Copy(source *Token){
 	t.Tp = source.Tp
@@ -85,17 +101,17 @@ func (t *Token) Clone() Token{
 
 
 func (t *Token) GetVal(ctx *BindMap, stack *EvalStack) *Token{
-	var result *Token
+	var result Token
 	switch t.Tp {
 	case WORD:
 		return ctx.Get(t.Val.(string))
 	case LIT_WORD:
 		result.Tp = WORD
 		result.Val = t.Val.(string)
-		return result
+		return &result
 	case PAREN:
-		result, _ := stack.Eval(t.Val.([]*Token), ctx)
-		return result
+		rs, _ := stack.Eval(t.Val.([]*Token), ctx)
+		return rs
 	default:
 		return t
 	}

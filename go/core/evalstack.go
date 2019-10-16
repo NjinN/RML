@@ -50,6 +50,12 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 		return result, nil
 	}
 
+	// fmt.Println("------  start eval -------")
+	// for _, item := range inp {
+	// 	fmt.Println(item.OutputStr())
+	// }
+	// fmt.Println("------  end eval -------")
+
 	var startIdx = es.Idx
 	var startDeep = len(es.EndPos)
 	
@@ -59,7 +65,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 		var nextToken *Token
 		if(i < len(inp) - 1){
 			nextToken = inp[i+1]
-			if(nextToken.Tp != WORD){
+			if(nextToken.Tp == WORD){
 				nextToken = nextToken.GetVal(ctx, es)
 			}
 		}
@@ -119,8 +125,8 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 				es.Push(nowToken);
 			}
 		}
-
-		for(len(es.EndPos) > startIdx && es.Idx == es.LastEndPos() + 1){
+		
+		for(len(es.EndPos) > startDeep && es.Idx == es.LastEndPos() + 1){
 			es.EvalExp(ctx)
 		}
 
@@ -135,6 +141,10 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 func (es *EvalStack) EvalExp(ctx *BindMap){
 	var temp *Token
 	var err error
+	// fmt.Println( es.Line[es.LastStartPos()].OutputStr())
+	// for i := es.LastStartPos(); i <= es.LastEndPos(); i++{
+	// 	fmt.Println(es.Line[i].OutputStr())
+	// }
 
 	switch es.Line[es.LastStartPos()].Tp {
 	case SET_WORD:

@@ -2,7 +2,6 @@ package nativelib
 
 import . "../core"
 import "errors"
-import "fmt"
 
 func Iif(Es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
@@ -25,11 +24,15 @@ func Iif(Es *EvalStack, ctx *BindMap) (*Token, error){
 		if args[1].Val.(string) != "" {
 			return Es.Eval(args[2].Val.([]*Token), ctx)
 		}
+	case NONE:
+		
+	default:
+		result.Tp = ERR
+		result.Val = "Type Mismatch"
+		return &result, nil
 	}
 
-	result.Tp = ERR
-	result.Val = "Type Mismatch"
-	return &result, nil
+	return nil, nil
 }
 
 func Either(Es *EvalStack, ctx *BindMap) (*Token, error){
@@ -77,7 +80,6 @@ func Loop(Es *EvalStack, ctx *BindMap) (*Token, error){
 		var rs *Token
 		var err error
 		for i := 0; i < args[1].Val.(int); i++ {
-			fmt.Println(i)
 			rs, err = Es.Eval(args[2].Val.([]*Token), ctx) 
 			if err != nil {
 				if err.Error() == "continue" {
@@ -89,9 +91,9 @@ func Loop(Es *EvalStack, ctx *BindMap) (*Token, error){
 				return rs, err
 			}
 		}
-		if rs != nil {
-			return rs, nil
-		}
+
+		return rs, nil
+
 	}
 
 	var result = Token{ERR, "Type Mismatch"}
@@ -101,15 +103,17 @@ func Loop(Es *EvalStack, ctx *BindMap) (*Token, error){
 
 func Repeat(Es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+	// args[1].Echo()
 
 	if(args[1].Tp == WORD && args[2].Tp == INTEGER && args[3].Tp == BLOCK){
 		 var c = BindMap{make(map[string]*Token, 8), ctx}
 		 var countToken = Token{INTEGER, 1}
+		 
 		 c.PutNow(args[1].Val.(string), &countToken)
 		 var rs *Token
 		 var err error
 		 for countToken.Val.(int) <= args[2].Val.(int) {
-			rs, err = Es.Eval(args[3].Val.([]*Token), ctx)
+			rs, err = Es.Eval(args[3].Val.([]*Token), &c)
 			countToken.Val = countToken.Val.(int) + 1
 			if err != nil {
 				if err.Error() == "continue" {
@@ -121,6 +125,7 @@ func Repeat(Es *EvalStack, ctx *BindMap) (*Token, error){
 				return rs, err
 			}
 		 }
+		 return nil, nil
 
 	}
 
@@ -142,7 +147,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 		if(args[2].Tp == INTEGER && args[4].Tp == INTEGER){
 			if args[3].Tp == INTEGER {
 				for countToken.Val.(int) <= args[3].Val.(int) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(int) + args[4].Val.(int)
 					if err != nil {
 						if err.Error() == "continue" {
@@ -156,7 +161,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 			}else{
 				for countToken.Val.(int) <= int(args[3].Val.(float64)) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(int) + args[4].Val.(int)
 					if err != nil {
 						if err.Error() == "continue" {
@@ -175,7 +180,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 			countToken.Val = float64(countToken.Val.(int))
 			if args[3].Tp == INTEGER {
 				for countToken.Val.(float64) <= float64(args[3].Val.(int)) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
 					if err != nil {
 						if err.Error() == "continue" {
@@ -189,7 +194,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 			}else{
 				for countToken.Val.(float64) <= args[3].Val.(float64) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
 					if err != nil {
 						if err.Error() == "continue" {
@@ -205,7 +210,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 		}else if(args[2].Tp == DECIMAL && args[4].Tp == INTEGER) {
 			if args[3].Tp == INTEGER {
 				for countToken.Val.(float64) <= float64(args[3].Val.(int)) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(float64) + float64(args[4].Val.(int))
 					if err != nil {
 						if err.Error() == "continue" {
@@ -219,7 +224,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 			}else{
 				for countToken.Val.(float64) <= args[3].Val.(float64) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(float64) + float64(args[4].Val.(int))
 					if err != nil {
 						if err.Error() == "continue" {
@@ -235,7 +240,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 		}else if(args[2].Tp == DECIMAL && args[4].Tp == DECIMAL) {
 			if args[3].Tp == INTEGER {
 				for countToken.Val.(float64) <= float64(args[3].Val.(int)) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
 					if err != nil {
 						if err.Error() == "continue" {
@@ -249,7 +254,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 			}else{
 				for countToken.Val.(float64) <= args[3].Val.(float64) {
-					rs, err = Es.Eval(args[5].Val.([]*Token), ctx)
+					rs, err = Es.Eval(args[5].Val.([]*Token), &c)
 					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
 					if err != nil {
 						if err.Error() == "continue" {
@@ -264,6 +269,7 @@ func Ffor(Es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 		}
 
+		return nil, nil
 	}
 
 	var result = Token{ERR, "Type Mismatch"}

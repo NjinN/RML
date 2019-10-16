@@ -49,4 +49,58 @@ func InitOp(ctx *BindMap){
 	}
 	ctx.PutNow("/", &divToken)
 
+	var eqToken = Token{
+		OP,
+		Native{
+			"=",
+			3,
+			Eq,
+			nil,
+		},
+	}
+	ctx.PutNow("=", &eqToken)
+
+	var gtToken = Token{
+		OP,
+		Native{
+			">",
+			3,
+			Gt,
+			nil,
+		},
+	}
+	ctx.PutNow(">", &gtToken)
+
+	var ltToken = Token{
+		OP,
+		Native{
+			"<",
+			3,
+			Lt,
+			nil,
+		},
+	}
+	ctx.PutNow("<", &ltToken)
+
+	var geToken = Token{
+		OP,
+		Native{
+			">=",
+			3,
+			Ge,
+			nil,
+		},
+	}
+	ctx.PutNow(">=", &geToken)
+
+	var leToken = Token{
+		OP,
+		Native{
+			"<=",
+			3,
+			Le,
+			nil,
+		},
+	}
+	ctx.PutNow("<=", &leToken)
 }

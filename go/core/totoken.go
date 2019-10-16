@@ -44,7 +44,7 @@ func ToToken(s string) *Token{
 	}
 
 	if(str[0] == '('){
-		result.Tp = BLOCK
+		result.Tp = PAREN
 		var endIdx int
 		for endIdx=len(str)-1; endIdx>=0; endIdx-- {
 			if(str[endIdx] == ')'){
