@@ -130,6 +130,7 @@ class EvalStack {
 
     void evalExp(BindMap ctx){
         Token temp;
+        bool isReturn = false;
         try{
             switch(line[startPos.last].type){
                 case TypeEnum.set_word:
@@ -151,15 +152,27 @@ class EvalStack {
         }catch(Exception e){
             if(e.msg == "break" || e.msg == "continue"){
                 throw e;
+            }else if(e.msg == "return"){
+                isReturn = true;
+                if(line[startPos.last].type == TypeEnum.func){
+                    line[startPos.last] = line[idx - 1];
+                    idx = startPos.last + 1;
+                }else{
+                    startPos.pop;
+                    endPos.pop;
+                    throw e;
+                }
             }else{
                 temp = new Token(TypeEnum.err);
                 temp.str = "Illegal grammar!!!";
             }
         }finally{
-            line[startPos.last] = temp;
-            idx = startPos.last + 1;
-            startPos.pop;
-            endPos.pop;
+            if(!isReturn){
+                line[startPos.last] = temp;
+                idx = startPos.last + 1;
+                startPos.pop;
+                endPos.pop;
+            }
         }
 
     }    

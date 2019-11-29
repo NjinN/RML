@@ -291,3 +291,8 @@ Token ccontinue(EvalStack stack, BindMap ctx){
     throw new Exception("continue");
     return new Token(TypeEnum.none);
 }
+
+Token rreturn(EvalStack stack, BindMap ctx){
+    throw new Exception("return");
+    return new Token(TypeEnum.none);
+}

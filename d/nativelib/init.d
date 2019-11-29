@@ -123,6 +123,10 @@ void initNative(BindMap ctx){
     continueToken.exec = new Native("continue", &ccontinue, 1);
     ctx.put("continue", continueToken);
 
+    Token returnToken = new Token(TypeEnum.native);
+    returnToken.exec = new Native("return", &rreturn, 2);
+    ctx.put("return", returnToken);
+
     Token costToken = new Token(TypeEnum.native);
     costToken.exec = new Native("cost", &cost, 2);
     ctx.put("cost", costToken);
