@@ -53,6 +53,7 @@ string[] strCut(string s){
             if(startIdx >= 0){
                 if(isWhite(nowChar)){
                     result ~= s[startIdx..nowIdx];
+                    break;
                 }else{
                     if(!isStr && !isParen && !isBlock){
                         result ~= s[startIdx..nowIdx+1];
