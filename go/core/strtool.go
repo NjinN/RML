@@ -1,7 +1,7 @@
 package core
 
 import "unicode"
-
+// import "fmt"
 
 func Trim(s string) string{
 	var str = []rune(s)
@@ -35,6 +35,7 @@ func IsWhite(ch byte) bool{
 
 
 func StrCut(s string) []string{
+	// fmt.Println(s)
 	var result []string
 
 	var str = Trim(s)
@@ -64,9 +65,11 @@ func StrCut(s string) []string{
 			if(startIdx >= 0){
 				if(IsWhite(nowChar)){
 					result = append(result, str[startIdx : nowIdx])
+					break
 				}else{
 					if(!isStr && !isParen && !isBlock){
 						result = append(result, str[startIdx : nowIdx+1])
+						break
 					}
 				}
 			}
@@ -138,7 +141,7 @@ func StrCut(s string) []string{
 				}
 				if(bFloor == 0){
 					result = append(result, str[startIdx : nowIdx+1])
-					isParen = false
+					isBlock = false
 					startIdx = -1
 					continue
 				}
