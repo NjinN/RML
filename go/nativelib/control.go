@@ -310,3 +310,8 @@ func Bbreak(Es *EvalStack, ctx *BindMap) (*Token, error){
 func Ccontinue(Es *EvalStack, ctx *BindMap) (*Token, error){
 	return nil, errors.New("continue")
 }
+
+func Rreturn(Es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+	return args[1], errors.New("return")
+}

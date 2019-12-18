@@ -100,20 +100,20 @@ func (t *Token) Clone() Token{
 }
 
 
-func (t *Token) GetVal(ctx *BindMap, stack *EvalStack) *Token{
+func (t *Token) GetVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 	var result Token
 	switch t.Tp {
 	case WORD:
-		return ctx.Get(t.Val.(string))
+		return ctx.Get(t.Val.(string)), nil
 	case LIT_WORD:
 		result.Tp = WORD
 		result.Val = t.Val.(string)
-		return &result
+		return &result, nil
 	case PAREN:
-		rs, _ := stack.Eval(t.Val.([]*Token), ctx)
-		return rs
+		rs, err := stack.Eval(t.Val.([]*Token), ctx)
+		return rs, err
 	default:
-		return t
+		return t, nil
 	}
 }
 

@@ -4,6 +4,7 @@ import "fmt"
 import . "./core"
 import . "./nativelib"
 import . "./oplib"
+import . "./extlib"
 import "os"
 import "bufio"
 import "strings"
@@ -17,6 +18,7 @@ func main() {
 	}
 	InitNative(&libCtx)
 	InitOp(&libCtx)
+	InitExt(&libCtx)
 
 	var userCtx = BindMap{
 		Table:  make(map[string]*Token, 6),

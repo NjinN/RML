@@ -202,6 +202,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("continue", &continueToken)
 
+	var returnToken = Token{
+		NATIVE,
+		Native{
+			"return",
+			2,
+			Rreturn,
+			nil,
+		},
+	}
+	ctx.PutNow("return", &returnToken)
+
 	var defFuncToken = Token{
 		NATIVE,
 		Native{
