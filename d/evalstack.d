@@ -157,6 +157,8 @@ class EvalStack {
                 if(line[startPos.last].type == TypeEnum.func){
                     line[startPos.last] = line[idx - 1];
                     idx = startPos.last + 1;
+                    startPos.pop;
+                    endPos.pop;
                 }else{
                     startPos.pop;
                     endPos.pop;
