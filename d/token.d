@@ -4,6 +4,7 @@ import bindmap;
 import evalstack;
 import native;
 import func;
+import tap;
 import arrlist;
 
 import std.stdio;
@@ -28,6 +29,7 @@ class Token {
         ArrList!Token   block;
         Native          exec;
         Func            func;
+        Tap             tap;
         byte[16]        all;
     }
     
@@ -95,6 +97,8 @@ class Token {
                 return str;
             case TypeEnum.op:
                 return "op: " ~ exec.str;
+            case TypeEnum.tap:
+                return "tap: " ~ tap.str; 
             default:
                 return str;
         }

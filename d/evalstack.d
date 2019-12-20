@@ -84,7 +84,7 @@ class EvalStack {
                     nowToken = nowToken.getVal(ctx, this);
                 }
                 
-                if(nowToken && nowToken.type == TypeEnum.err){
+                if(nowToken && (nowToken.type == TypeEnum.err || nowToken.type == TypeEnum.tap)){
                     return nowToken;
                 }else if(nowToken && nowToken.type == TypeEnum.op){
                     if(idx > startIdx){
@@ -115,8 +115,12 @@ class EvalStack {
                     push(nowToken);
                 }
             }
-            while(endPos.len > startDeep && idx == endPos.last + 1){
-                evalExp(ctx);
+            Token temp;
+            while((endPos.len > startDeep && idx == endPos.last + 1) || (temp && temp.type == TypeEnum.tap)){
+                temp = evalExp(ctx);
+                if(temp && temp.type == TypeEnum.tap){
+                    return temp;
+                }
             }
 
             i += 1;
@@ -128,7 +132,7 @@ class EvalStack {
     }
 
 
-    void evalExp(BindMap ctx){
+    Token evalExp(BindMap ctx){
         Token temp;
         bool isReturn = false;
         try{
@@ -149,33 +153,22 @@ class EvalStack {
                 default:
                     temp = new Token();
             }
-        }catch(Exception e){
-            if(e.msg == "break" || e.msg == "continue"){
-                throw e;
-            }else if(e.msg == "return"){
-                isReturn = true;
-                if(line[startPos.last].type == TypeEnum.func){
-                    line[startPos.last] = line[idx - 1];
-                    idx = startPos.last + 1;
-                    startPos.pop;
-                    endPos.pop;
+            if(temp && temp.type == TypeEnum.tap){
+                if(temp.tap && temp.tap.str == "return" && line[startPos.last].type == TypeEnum.func){
+                    temp = temp.tap.val;
                 }else{
-                    startPos.pop;
-                    endPos.pop;
-                    throw e;
+                    return temp;
                 }
-            }else{
-                temp = new Token(TypeEnum.err);
-                temp.str = "Illegal grammar!!!";
             }
+        }catch(Exception e){
+            temp = new Token(TypeEnum.err);
+            temp.str = "Illegal grammar!!!";
         }finally{
-            if(!isReturn){
-                line[startPos.last] = temp;
-                idx = startPos.last + 1;
-                startPos.pop;
-                endPos.pop;
-            }
+            line[startPos.last] = temp;
+            idx = startPos.last + 1;
+            startPos.pop;
+            endPos.pop;
         }
-
+        return null;
     }    
 }

@@ -2,6 +2,7 @@ module nativelib.control;
 
 import common;
 import token;
+import tap;
 import bindmap;
 import evalstack;
 import arrlist;
@@ -107,14 +108,15 @@ Token loop(EvalStack stack, BindMap ctx){
         for(int i=1; i <= args[1].integer; i++){
             try{
                 result = stack.eval(args[2].block, ctx);
-            }catch(Exception e){
-                if(e.msg == "continue"){
-                    continue;
-                }else if(e.msg == "break"){
-                    break;
-                }else{
-                    throw new Exception("Runtime Error!");
+                if(result && result.type == TypeEnum.tap){
+                    if(result.str == "break"){
+                        break;
+                    }else if(result.str == "continue"){
+                        continue;
+                    }
                 }
+            }catch(Exception e){
+                throw new Exception("Runtime Error!");
             }
         }
 
@@ -138,14 +140,15 @@ Token repeat(EvalStack stack, BindMap ctx){
         while(countToken.integer <= args[2].integer){
             try{
                 result = stack.eval(args[3].block, c);
-            }catch(Exception e){
-                if(e.msg == "continue"){
-                    continue;
-                }else if(e.msg == "break"){
-                    break;
-                }else{
-                    throw new Exception("Runtime Error!");
+                if(result && result.type == TypeEnum.tap){
+                    if(result.str == "break"){
+                        break;
+                    }else if(result.str == "continue"){
+                        continue;
+                    }
                 }
+            }catch(Exception e){
+                throw new Exception("Runtime Error!");
             }finally{
                 countToken.integer += 1;
             }
@@ -175,14 +178,15 @@ Token ffor(EvalStack stack, BindMap ctx){
                 ){
                 try{
                     result = stack.eval(args[5].block, c);
-                }catch(Exception e){
-                    if(e.msg == "continue"){
-                        continue;
-                    }else if(e.msg == "break"){
-                        break;
-                    }else{
-                        throw new Exception("Runtime Error!");
+                    if(result && result.type == TypeEnum.tap){
+                        if(result.str == "break"){
+                            break;
+                        }else if(result.str == "continue"){
+                            continue;
+                        }
                     }
+                }catch(Exception e){
+                    throw new Exception("Runtime Error!");
                 }finally{
                     countToken.integer += args[4].integer;
                 }
@@ -200,14 +204,15 @@ Token ffor(EvalStack stack, BindMap ctx){
                 while(countToken.decimal <= cast(double)args[3].integer){
                     try{
                         result = stack.eval(args[5].block, c);
-                    }catch(Exception e){
-                        if(e.msg == "continue"){
-                            continue;
-                        }else if(e.msg == "break"){
-                            break;
-                        }else{
-                            throw new Exception("Runtime Error!");
+                        if(result && result.type == TypeEnum.tap){
+                            if(result.str == "break"){
+                                break;
+                            }else if(result.str == "continue"){
+                                continue;
+                            }
                         }
+                    }catch(Exception e){
+                        throw new Exception("Runtime Error!");
                     }finally{
                         if(args[4].type == TypeEnum.integer){
                             countToken.decimal += cast(double)args[4].integer;
@@ -220,14 +225,15 @@ Token ffor(EvalStack stack, BindMap ctx){
                 while(countToken.decimal <= args[3].decimal){
                     try{
                         result = stack.eval(args[5].block, c);
-                    }catch(Exception e){
-                        if(e.msg == "continue"){
-                            continue;
-                        }else if(e.msg == "break"){
-                            break;
-                        }else{
-                            throw new Exception("Runtime Error!");
+                        if(result && result.type == TypeEnum.tap){
+                            if(result.str == "break"){
+                                break;
+                            }else if(result.str == "continue"){
+                                continue;
+                            }
                         }
+                    }catch(Exception e){
+                        throw new Exception("Runtime Error!");
                     }finally{
                         if(args[4].type == TypeEnum.integer){
                             countToken.decimal += cast(double)args[4].integer;
@@ -259,14 +265,15 @@ Token wwhile(EvalStack stack, BindMap ctx){
             }
             try{
                 result = stack.eval(args[2].block, c);
-            }catch(Exception e){
-                if(e.msg == "continue"){
-                    continue;
-                }else if(e.msg == "break"){
-                    break;
-                }else{
-                    throw new Exception("Runtime Error!");
+                if(result && result.type == TypeEnum.tap){
+                    if(result.str == "break"){
+                        break;
+                    }else if(result.str == "continue"){
+                        continue;
+                    }
                 }
+            }catch(Exception e){
+                throw new Exception("Runtime Error!");
             }finally{
                 b = stack.eval(args[1].block, c);
                 if(b.type != TypeEnum.logic){
@@ -283,16 +290,23 @@ Token wwhile(EvalStack stack, BindMap ctx){
 }
 
 Token bbreak(EvalStack stack, BindMap ctx){
-    throw new Exception("break");
-    return new Token(TypeEnum.none);
+    Token result = new Token();
+    result.type = TypeEnum.tap;
+    result.tap = new Tap("break", null);
+    return result;
 }
 
 Token ccontinue(EvalStack stack, BindMap ctx){
-    throw new Exception("continue");
-    return new Token(TypeEnum.none);
+    Token result = new Token();
+    result.type = TypeEnum.tap;
+    result.tap = new Tap("continue", null);
+    return result;
 }
 
 Token rreturn(EvalStack stack, BindMap ctx){
-    throw new Exception("return");
-    return new Token(TypeEnum.none);
+    Token *args = &stack.line[stack.startPos.last];
+    Token result = new Token();
+    result.type = TypeEnum.tap;
+    result.tap = new Tap("return", args[1]);
+    return result;
 }

@@ -19,7 +19,9 @@ enum TypeEnum {
     set_word,
     op,
     native,
-    func
+    func,
+
+    tap,
 }
 
 
