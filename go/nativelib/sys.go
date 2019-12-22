@@ -59,13 +59,9 @@ func Let(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	if args[1].Tp == BLOCK {
 		var orginSts = es.IsLocal
-		if !orginSts {
-			es.IsLocal = true
-		}
+		es.IsLocal = true
 		result, err := es.Eval(args[1].Val.([]*Token), ctx)
-		if !orginSts {
-			es.IsLocal = false
-		}
+		es.IsLocal = orginSts
 		return result, err
 	}
 	return &Token{ERR, "Type Mismatch"}, nil

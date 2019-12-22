@@ -4,7 +4,7 @@ import "strings"
 import "strconv"
 // import "fmt"
 
-func ToToken(s string) *Token{
+func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	var result Token
 	var str = Trim(s)
 	// fmt.Println(s)
@@ -53,7 +53,7 @@ func ToToken(s string) *Token{
 				break
 			}
 		}
-		result.Val = ToTokens(str[1 : endIdx])
+		result.Val = ToTokens(str[1 : endIdx], ctx, es)
 		return &result
 	}
 
@@ -65,7 +65,25 @@ func ToToken(s string) *Token{
 				break
 			}
 		}
-		result.Val = ToTokens(str[1 : endIdx])
+		result.Val = ToTokens(str[1 : endIdx], ctx, es)
+		return &result
+	}
+
+	if(str[0] == '{'){
+		result.Tp = OBJECT
+		var endIdx int
+		for endIdx=len(str)-1; endIdx>=0; endIdx-- {
+			if(str[endIdx] == '}'){
+				break
+			}
+		}
+		var blk = ToTokens(str[1 : endIdx], ctx, es)
+		var c = BindMap{make(map[string]*Token, 8), ctx, USR_CTX}
+		var orginSts = es.IsLocal
+		es.IsLocal = true
+		es.Eval(blk, &c)
+		es.IsLocal = orginSts
+		result.Val = &c
 		return &result
 	}
 
@@ -100,7 +118,7 @@ func ToToken(s string) *Token{
 
 	if(strings.IndexByte(str, '/') >= 0){
 		result.Tp = PATH
-		result.Val = PathToTokens(str)
+		result.Val = PathToTokens(str, ctx, es)
 		return &result
 	}
 
@@ -121,20 +139,20 @@ func ToToken(s string) *Token{
 	return &result
 }
 
-func ToTokens(str string) []*Token{
+func ToTokens(str string, ctx *BindMap, es *EvalStack) []*Token{
 	var result []*Token
 	var strs = StrCut(str)
 	for _, item := range strs {
-		result = append(result, ToToken(item))
+		result = append(result, ToToken(item, ctx, es))
 	}
 	return result
 }
 
-func PathToTokens(str string) []*Token{
+func PathToTokens(str string, ctx *BindMap, es *EvalStack) []*Token{
 	var result []*Token
 	var strs = PathCut(str)
 	for _, item := range strs {
-		result = append(result, ToToken(item))
+		result = append(result, ToToken(item, ctx, es))
 	}
 	return result
 }

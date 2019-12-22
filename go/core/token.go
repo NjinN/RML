@@ -57,6 +57,17 @@ func (t Token) ToString() string{
 		}
 		buffer.WriteString("]")
 		return buffer.String()
+	case OBJECT:
+		var buffer bytes.Buffer
+		buffer.WriteString("{ ")
+		for k, v := range t.Val.(*BindMap).Table {
+			buffer.WriteString(k)
+			buffer.WriteString(": ")
+			buffer.WriteString(v.ToString())
+			buffer.WriteString(" ")
+		}
+		buffer.WriteString("}")
+		return buffer.String()
 	case PATH:
 		var buffer bytes.Buffer
 		for _, item := range t.Val.([]*Token){
@@ -185,8 +196,11 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 	if err != nil {
 		return nil, err
 	}
-	
+	var curCtx = ctx
 	for idx := 1; idx < len(t.Val.([]*Token)); idx++ {
+		if result.Tp == OBJECT {
+			curCtx = result.Val.(*BindMap)
+		}
 		key := t.Val.([]*Token)[idx]
 		if key.Tp == PAREN || key.Tp == GET_WORD {
 			key, err = key.GetVal(ctx, stack)
@@ -220,9 +234,29 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 				continue
 			}
 			return &Token{ERR, "Error path!"}, nil
+		}else if result.Tp == OBJECT {
+			if key.Tp == WORD || key.Tp == STRING {
+				var found bool
+				result, found = result.Val.(*BindMap).Table[key.ToString()]
+				if idx == len(t.Val.([]*Token))-1 {
+					if !found {
+						return &Token{NONE, "none"}, nil
+					}
+					if result.Tp == FUNC {
+						temp := Token{PATH, make([]*Token, 0, 8)}
+						temp.Val = append(temp.Val.([]*Token), result)
+						temp.Val = append(temp.Val.([]*Token), &Token{OBJECT, curCtx})
+						return &temp, nil
+					}
+				}
+
+				continue
+			}
+			return &Token{ERR, "Error path!"}, nil
 		}else if result.Tp == FUNC {
 			temp := Token{PATH, make([]*Token, 0, 8)}
 			temp.Val = append(temp.Val.([]*Token), result)
+			temp.Val = append(temp.Val.([]*Token), &Token{OBJECT, curCtx})
 			for i:=idx; i<len(t.Val.([]*Token)); i++ {
 				temp.Val = append(temp.Val.([]*Token), t.Val.([]*Token)[i])
 			}
@@ -259,6 +293,9 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, e
 			} 
 
 			return &Token{ERR, "Error path!"}, nil
+		}else if holder.Tp == OBJECT {
+			holder.Val.(*BindMap).Table[key] = val
+			return val, nil
 		}else{
 			return &Token{ERR, "Error path!"}, nil
 		}

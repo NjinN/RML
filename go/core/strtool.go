@@ -48,8 +48,10 @@ func StrCut(s string) []string{
 	var isParen = false
 	var isStr = false
 	var isBlock = false
+	var isObject = false
 	var pFloor = 0
 	var bFloor = 0
+	var oFloor = 0
 	var nowChar byte
 	var isInnerStr = false
 
@@ -84,12 +86,15 @@ func StrCut(s string) []string{
 			}else if(nowChar == '['){
 				isBlock = true
 				bFloor = 1
+			}else if(nowChar == '{'){
+				isObject = true
+				oFloor = 1
 			}
 			startIdx = nowIdx
 			continue;
 		}
 
-		if(startIdx >= 0 && IsWhite(nowChar) && !isStr && !isParen && !isBlock){
+		if(startIdx >= 0 && IsWhite(nowChar) && !isStr && !isParen && !isBlock && !isObject){
 			result = append(result, str[startIdx : nowIdx])
 			startIdx = -1
 			continue
@@ -148,7 +153,29 @@ func StrCut(s string) []string{
 			}
 		}
 
-		if startIdx >= 0 && nowChar == '/' && nowIdx < len(str) && !isStr && !isBlock && !isParen {
+		if(startIdx >= 0 && isObject){
+			if(isInnerStr){
+				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+					isInnerStr = false
+				}
+			}else{
+				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+					isInnerStr = true
+				}else if(nowChar == '{'){
+					oFloor += 1
+				}else if(nowChar == '}'){
+					oFloor -= 1
+				}
+				if(oFloor == 0){
+					result = append(result, str[startIdx : nowIdx+1])
+					isObject = false
+					startIdx = -1
+					continue
+				}
+			}
+		}
+
+		if startIdx >= 0 && nowChar == '/' && nowIdx < len(str) && !isStr && !isBlock && !isParen && !isObject {
 			for startIdx >= 0 && nowChar == '/' && nowIdx < len(str)-1 {
 				nowIdx++
 				nowIdx += len(GetOneToken(str, nowIdx)) - 1

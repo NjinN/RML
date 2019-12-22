@@ -14,6 +14,7 @@ const (
 	STRING 		
 	PAREN 		
 	BLOCK
+	OBJECT
 	PROP
 	WORD
 	SET_WORD
@@ -52,6 +53,8 @@ func TypeStr(n int) string{
 		return "paren!"
 	case BLOCK:
 		return "block!"
+	case OBJECT:
+		return "object!"
 	case PROP:
 		return "prop!"
 	case PATH:

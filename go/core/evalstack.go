@@ -41,7 +41,7 @@ func (es *EvalStack) LastEndPos() int{
 }
 
 func (es *EvalStack) EvalStr(inpStr string, ctx *BindMap) (*Token, error){
-	return es.Eval(ToTokens(inpStr), ctx)
+	return es.Eval(ToTokens(inpStr, ctx, es), ctx)
 }
 
 func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
