@@ -2,8 +2,8 @@ package nativelib
 
 import . "../core"
 
-func Add(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Add(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -34,8 +34,8 @@ func Add(Es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
-func Sub(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Sub(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -66,8 +66,8 @@ func Sub(Es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
-func Mul(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Mul(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -97,8 +97,8 @@ func Mul(Es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
-func Div(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Div(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -129,8 +129,8 @@ func Div(Es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
-func Mod(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Mod(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
 	if args[1].Tp == INTEGER && args[2].Tp == INTEGER {

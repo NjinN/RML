@@ -4,13 +4,13 @@ import . "../core"
 import "os"
 import "fmt"
 
-func Quit(Es *EvalStack, ctx *BindMap) (*Token, error){
+func Quit(es *EvalStack, ctx *BindMap) (*Token, error){
 	os.Exit(0)
 	return nil, nil
 }
 
-func TypeOf(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result = Token{Tp: DATATYPE}
 	if args[1] != nil {
@@ -20,14 +20,14 @@ func TypeOf(Es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
-func Do(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Do(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	switch args[1].Tp{
 	case BLOCK:
-		return Es.Eval(args[1].Val.([]*Token), ctx)
+		return es.Eval(args[1].Val.([]*Token), ctx)
 	case STRING:
-		return Es.EvalStr(args[1].Val.(string), ctx)
+		return es.EvalStr(args[1].Val.(string), ctx)
 	default:
 		var result *Token
 		result.Tp = ERR
@@ -36,15 +36,15 @@ func Do(Es *EvalStack, ctx *BindMap) (*Token, error){
 	}
 }
 
-func Copy(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Copy(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result = Token{args[1].Tp, args[1].Val}
 	return &result, nil
 }
 
-func Pprint(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	if args[1].Tp == BLOCK {
 		for _, item := range args[2].Val.([]*Token){
 			fmt.Println(item.OutputStr())
@@ -54,3 +54,20 @@ func Pprint(Es *EvalStack, ctx *BindMap) (*Token, error){
 	}
 	return nil, nil
 }
+
+func Let(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	if args[1].Tp == BLOCK {
+		var orginSts = es.IsLocal
+		if !orginSts {
+			es.IsLocal = true
+		}
+		result, err := es.Eval(args[1].Val.([]*Token), ctx)
+		if !orginSts {
+			es.IsLocal = false
+		}
+		return result, err
+	}
+	return &Token{ERR, "Type Mismatch"}, nil
+}
+

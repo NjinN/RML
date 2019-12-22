@@ -13,9 +13,12 @@ const (
 	CHAR	  	
 	STRING 		
 	PAREN 		
-	BLOCK 		
-	WORD 		
-	SET_WORD 	
+	BLOCK
+	PROP
+	WORD
+	SET_WORD
+	PUT_WORD 		
+	PATH 			
 	OP 			
 	NATIVE 		
 	FUNC 		
@@ -49,10 +52,16 @@ func TypeStr(n int) string{
 		return "paren!"
 	case BLOCK:
 		return "block!"
+	case PROP:
+		return "prop!"
+	case PATH:
+		return "path!"
 	case WORD:
 		return "word!"
 	case SET_WORD:
 		return "set-word!"
+	case PUT_WORD:
+		return "put-word!"
 	case OP:
 		return "op!"
 	case NATIVE:

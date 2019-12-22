@@ -2,7 +2,11 @@ package nativelib
 
 import . "../core"
 
+
+
 func InitNative(ctx *BindMap){
+	/*******  sys  *******/
+
 	var quitToken = Token{
 		NATIVE,
 		Native{
@@ -59,6 +63,20 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("print", &printToken)
 
+	var letToken = Token{
+		NATIVE,
+		Native{
+			"let",
+			2,
+			Let,
+			nil,
+		},
+	}
+	ctx.PutNow("let", &letToken)
+
+
+	/*******  math  *******/
+
 	var addToken = Token{
 		NATIVE,
 		Native{
@@ -113,6 +131,9 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("mod", &modToken)
+
+
+	/*******  control  *******/
 
 	var ifToken = Token{
 		NATIVE,
@@ -213,6 +234,9 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("return", &returnToken)
 
+
+	/*******  deffunc  *******/
+
 	var defFuncToken = Token{
 		NATIVE,
 		Native{
@@ -223,6 +247,9 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("func", &defFuncToken)
+
+
+	/*******  compare  *******/
 
 	var eqToken = Token{
 		NATIVE,
@@ -278,6 +305,9 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("le", &leToken)
+
+
+	/*******  time  *******/
 
 	var costToken = Token{
 		NATIVE,

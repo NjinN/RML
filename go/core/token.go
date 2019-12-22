@@ -33,8 +33,12 @@ func (t Token) ToString() string{
 		return string(t.Val.(int))
 	case STRING:
 		return "\"" + t.Val.(string) + "\""
+	case PROP:
+		return "/" + t.Val.(string)
 	case SET_WORD:
-		return t.Val.(string)
+		return t.Val.(string) + ":"
+	case PUT_WORD:
+		return t.Val.(string) + ":="
 	case PAREN:
 		var buffer bytes.Buffer
 		buffer.WriteString("( ")
@@ -53,6 +57,14 @@ func (t Token) ToString() string{
 		}
 		buffer.WriteString("]")
 		return buffer.String()
+	case PATH:
+		var buffer bytes.Buffer
+		for _, item := range t.Val.([]*Token){
+			buffer.WriteString(item.ToString())
+			buffer.WriteString("/")
+		}
+		var temp = buffer.String()
+		return temp[0:len(temp)-1]
 	case NATIVE:
 		return "native: " + t.Val.(Native).Str
 	case FUNC:
@@ -61,6 +73,14 @@ func (t Token) ToString() string{
 		for _, item := range t.Val.(Func).Args{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
+		}
+		for i:=0; i<len(t.Val.(Func).Props); i+=2 {
+			buffer.WriteString(t.Val.(Func).Props[i].ToString())
+			buffer.WriteString(" ")
+			if t.Val.(Func).Props[i+1] != nil {
+				buffer.WriteString(t.Val.(Func).Props[i+1].ToString())
+				buffer.WriteString(" ")
+			}
 		}
 		buffer.WriteString("] [")
 		for _, item := range t.Val.(Func).Codes{
@@ -84,7 +104,7 @@ func (t *Token) OutputStr() string{
 	}
 }
 
-func (t Token) Echo(){
+func (t *Token) Echo(){
 	fmt.Println(t.OutputStr())
 }
 
@@ -94,9 +114,9 @@ func (t *Token) Copy(source *Token){
 	t.Val = source.Val
 }
 
-func (t *Token) Clone() Token{
+func (t *Token) Clone() *Token{
 	var result = Token{t.Tp, t.Val}
-	return result
+	return &result
 }
 
 
@@ -105,13 +125,16 @@ func (t *Token) GetVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 	switch t.Tp {
 	case WORD:
 		return ctx.Get(t.Val.(string)), nil
+	case GET_WORD:
+		return ctx.Get(t.Val.(string)), nil
 	case LIT_WORD:
 		result.Tp = WORD
 		result.Val = t.Val.(string)
 		return &result, nil
 	case PAREN:
-		rs, err := stack.Eval(t.Val.([]*Token), ctx)
-		return rs, err
+		return stack.Eval(t.Val.([]*Token), ctx)
+	case PATH:
+		return t.GetPathVal(ctx, stack)
 	default:
 		return t, nil
 	}
@@ -121,15 +144,148 @@ func (t Token) Explen() int{
 	switch t.Tp{
 	case SET_WORD:
 		return 2
+	case PUT_WORD:
+		return 2
 	case NATIVE:
 		return t.Val.(Native).Explen
 	case FUNC:
 		return len(t.Val.(Func).Args) + 1
 	case OP:
 		return 3
+	case PATH:
+		if t.IsGetPath() {
+			return 1
+		}else{
+			return 2
+		}
 	default:
 		return 1
 	}
+}
+
+func (t *Token) IsSetPath() bool{
+	if t.Tp != PATH || len(t.Val.([]*Token)) <= 0 {
+		return false
+	}else{
+		return t.Val.([]*Token)[len(t.Val.([]*Token))-1].Tp == SET_WORD 
+	}
+}
+
+func (t *Token) IsGetPath() bool{
+	if t.Tp != PATH || len(t.Val.([]*Token)) <= 0 {
+		return false
+	}else{
+		var lastTp = t.Val.([]*Token)[len(t.Val.([]*Token))-1].Tp
+		return lastTp != SET_WORD 
+	}
+}
+
+func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
+	result, err := t.Val.([]*Token)[0].GetVal(ctx, stack)
+	if err != nil {
+		return nil, err
+	}
+	
+	for idx := 1; idx < len(t.Val.([]*Token)); idx++ {
+		key := t.Val.([]*Token)[idx]
+		if key.Tp == PAREN || key.Tp == GET_WORD {
+			key, err = key.GetVal(ctx, stack)
+		}
+
+		if err != nil {
+			return nil, err
+		}
+		if result.Tp == BLOCK || result.Tp == PAREN {
+			if key.Tp == INTEGER {
+				if key.Val.(int) > 0 && key.Val.(int) - 1 < len(result.Val.([]*Token)) {
+					result = result.Val.([]*Token)[key.Val.(int)-1]
+					continue
+				}else{
+					return &Token{ERR, "Error path!"}, nil
+				}
+			}else if key.Tp == WORD || key.Tp == STRING {
+				var found = false
+				for idx := 0; idx < len(result.Val.([]*Token)) - 1; idx++ {
+					if (result.Val.([]*Token)[idx].Tp == WORD || result.Val.([]*Token)[idx].Tp == SET_WORD || result.Val.([]*Token)[idx].Tp == STRING) && 
+							result.Val.([]*Token)[idx].Val.(string) == key.Val.(string){
+						result = result.Val.([]*Token)[idx+1]
+						found = true
+						break
+					}
+				}
+				if found {
+					continue
+				}
+				result = &Token{NONE, nil}
+				continue
+			}
+			return &Token{ERR, "Error path!"}, nil
+		}else if result.Tp == FUNC {
+			temp := Token{PATH, make([]*Token, 0, 8)}
+			temp.Val = append(temp.Val.([]*Token), result)
+			for i:=idx; i<len(t.Val.([]*Token)); i++ {
+				temp.Val = append(temp.Val.([]*Token), t.Val.([]*Token)[i])
+			}
+			
+			return &temp, nil
+		}
+		return &Token{ERR, "Error path!"}, nil
+	}
+
+	return result, nil
+}
+
+func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, error){
+	var holderPath = t.Clone()
+	holderPath.Val = holderPath.Val.([]*Token)[0: len(holderPath.Val.([]*Token))-1]
+	holder, err := holderPath.GetPathVal(ctx, stack)
+	if err != nil {
+		return nil, err
+	}
+
+	var key = t.Val.([]*Token)[len(t.Val.([]*Token))-1].Val.(string)
+
+	if holder != nil {
+		if holder.Tp == BLOCK || holder.Tp == PAREN {
+			if IsNumberStr(key) == 0 {
+				idx, err := strconv.Atoi(key)
+				if err != nil {
+					panic(err)
+				}
+				if idx > 0 && idx < len(holder.Val.([]*Token)){
+					holder.Val.([]*Token)[idx-1] = val
+					return val, nil
+				}
+			} 
+
+			return &Token{ERR, "Error path!"}, nil
+		}else{
+			return &Token{ERR, "Error path!"}, nil
+		}
+
+	}
+	return &Token{ERR, "Error path!"}, nil
+}
+
+
+func (t *Token)GetPathExpLen() int{
+	var f = t.Val.([]*Token)[0]
+	if f.Tp != FUNC {
+		return 1
+	}
+
+	var length = len(f.Val.(Func).Args) + 1
+
+	for i:=1; i<len(t.Val.([]*Token)); i++ {
+		for j:=0; j<len(f.Val.(Func).Props); j+=2 {
+			if t.Val.([]*Token)[i].Val.(string) == f.Val.(Func).Props[j].Val.(string) && f.Val.(Func).Props[j +1] != nil {
+				length++
+			}
+		}
+	}
+
+	return length
+
 }
 
 

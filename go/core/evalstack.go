@@ -10,6 +10,7 @@ type EvalStack struct {
 	Idx 			int
 	MainCtx 		*BindMap
 	QuoteList		[]int
+	IsLocal 		bool
 }
 
 
@@ -107,11 +108,15 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 				}
 				es.QuoteList = es.QuoteList[1 : len(es.QuoteList)]
 			}else{
-				temp, err := nowToken.GetVal(ctx, es)
+				var temp *Token
+				var err error
+				if !(nowToken != nil && nowToken.Tp == PATH && nowToken.IsSetPath()){
+					temp, err = nowToken.GetVal(ctx, es)
+					nowToken = temp
+				}
 				if err != nil {
 					return temp, err
 				}
-				nowToken = temp
 			}
 
 			if(nowToken != nil && nowToken.Tp == ERR){
@@ -129,6 +134,10 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 				}
 			}else if(nowToken != nil && nowToken.Tp < SET_WORD){
 				es.Push(nowToken)
+			}else if nowToken.Tp == PATH && nowToken.Val.([]*Token)[0] != nil && nowToken.Val.([]*Token)[0].Tp == FUNC {
+				es.StartPos = append(es.StartPos, es.Idx)
+				es.EndPos = append(es.EndPos, es.Idx + nowToken.GetPathExpLen() - 1)
+				es.Push(nowToken);
 			}else{
 				if(nowToken.Tp == NATIVE){
 					if(len(nowToken.Val.(Native).QuoteList) > 0){
@@ -174,8 +183,22 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 
 	switch startToken.Tp {
 	case SET_WORD:
-		ctx.Put(es.Line[es.LastStartPos()].Val.(string), es.Line[es.LastEndPos()])
+		if es.IsLocal {
+			ctx.PutLocal(es.Line[es.LastStartPos()].Val.(string), es.Line[es.LastEndPos()])
+		}else{
+			ctx.Put(es.Line[es.LastStartPos()].Val.(string), es.Line[es.LastEndPos()])
+		}
 		temp = es.Line[es.LastEndPos()]
+	case PUT_WORD:
+		ctx.PutLocal(es.Line[es.LastStartPos()].Val.(string), es.Line[es.LastEndPos()])
+		temp = es.Line[es.LastEndPos()]
+	case PATH:
+		if startToken.Val.([]*Token)[0].Tp == FUNC {
+			startToken.Val.([]*Token)[0].Val.(Func).RunWithProps(es, ctx, startToken.Val.([]*Token))
+		}else{
+			startToken.SetPathVal(es.Line[es.LastEndPos()], ctx, es)
+			temp = es.Line[es.LastEndPos()]
+		}
 	case NATIVE, OP:
 		temp, err = es.Line[es.LastStartPos()].Val.(Native).Exec(es, ctx)
 	case FUNC:

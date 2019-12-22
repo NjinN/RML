@@ -3,8 +3,8 @@ package nativelib
 import . "../core"
 
 
-func Eq(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Eq(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -74,8 +74,8 @@ func Eq(Es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
-func Gt(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Gt(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -149,8 +149,8 @@ func Gt(Es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
-func Lt(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Lt(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -224,8 +224,8 @@ func Lt(Es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
-func Ge(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Ge(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -299,8 +299,8 @@ func Ge(Es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
-func Le(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Le(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {

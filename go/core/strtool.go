@@ -147,10 +147,79 @@ func StrCut(s string) []string{
 				}
 			}
 		}
+
+		if startIdx >= 0 && nowChar == '/' && nowIdx < len(str) && !isStr && !isBlock && !isParen {
+			for startIdx >= 0 && nowChar == '/' && nowIdx < len(str)-1 {
+				nowIdx++
+				nowIdx += len(GetOneToken(str, nowIdx)) - 1
+				if(nowIdx < len(str)-1){
+					nowChar = s[nowIdx + 1]
+				}
+			}
+			result = append(result, str[startIdx : nowIdx+1])
+			startIdx = -1
+		}
+		
+
 	}
 	return result
 }
 
+func GetOneToken(s string, startIdx int) string{
+	if s[startIdx] == '"' {
+		return GetSubStr(s, startIdx)
+	}else if s[startIdx] == '(' {
+		return GetSubParen(s, startIdx)
+	}else{
+		return getSubOne(s, startIdx)
+	}
+
+}
+
+func getSubOne(s string, startIdx int) string{
+	for idx := startIdx+1; idx < len(s); idx++ {
+		if s[idx] == '/' || IsWhite(s[idx]) {
+			return s[startIdx:idx]
+		}
+	}
+	return s[startIdx:]
+}
+
+func GetSubStr(s string, startIdx int) string{
+	for idx := startIdx+1; idx < len(s); idx++ {
+		if s[idx] == '"' && s[idx-1:idx+1] != "^\"" {
+			return s[startIdx:idx+1]
+		}
+	}
+	return s[startIdx:]
+}
+
+func GetSubParen(s string, startIdx int) string{
+	var pFloor = 1;
+	for idx := startIdx+1; idx < len(s); idx++ {
+		if s[idx] == '(' {
+			pFloor++
+		}else if s[idx] == '"' {
+			idx += len(GetSubStr(s, idx)) + 1
+		}else if s[idx] == ')' {
+			pFloor--
+		}
+		if pFloor == 0 {
+			return s[startIdx:idx+1]
+		}
+	}
+	return s[startIdx:]
+}
+
+func PathCut(s string) []string{
+	var result []string
+	for idx:=0; idx<len(s); idx++ {
+		var temp = GetOneToken(s, idx)
+		result = append(result, temp)
+		idx += len(temp)
+	}
+	return result
+}
 
 func IsNumber(c byte) bool{
 	if(c >= 48 && c <= 57){
@@ -179,6 +248,30 @@ func IsNumberStr(s string) int{
 	return dot
 }
 
+func StartWith(source string, target string) bool{
+	if len(source) == 0 {
+		return false
+	}
+	if len(target) == 0 {
+		return true
+	}
+	if len(target) > len(source){
+		return false
+	}
+	return source[0:len(target)] == target
+}
 
+func EndWith(source string, target string) bool{
+	if len(source) == 0 {
+		return false
+	}
+	if len(target) == 0 {
+		return true
+	}
+	if len(target) > len(source){
+		return false
+	}
+	return source[len(source) - len(target):] == target
+}
 
 

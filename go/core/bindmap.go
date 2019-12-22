@@ -1,9 +1,17 @@
 package core
 
+const (
+	SYS_CTX = iota
+	USR_CTX
+	TMP_CTX
+)
+	
+
 
 type BindMap struct{
 	Table 	map[string]*Token
 	Father 	*BindMap
+	Tp 		int
 }
 
 
@@ -33,7 +41,7 @@ func (bm *BindMap) Get(key string) *Token{
 	}
 	if(tk != nil && prev != nil && ctx.Father != nil){
 		var newOne = tk.Clone()
-		prev.Table[key] = &newOne
+		prev.Table[key] = newOne
 	}
 	if tk != nil {
 		return tk
@@ -66,7 +74,7 @@ func (bm *BindMap)Put(key string, val *Token){
 				tk, ok = ctx.Table[key]
 			}
 			if(ok){
-				bm.Table[key].Copy(val)
+				ctx.Table[key].Copy(val)
 				inserted = true
 			}
 			ctx = ctx.Father
@@ -75,6 +83,16 @@ func (bm *BindMap)Put(key string, val *Token){
 	if(!inserted){
 		bm.Table[key] = val
 	}
+}
 
+
+func (bm *BindMap)PutLocal(key string, val *Token){
+	var ctx = bm
+
+	for ctx.Tp != USR_CTX && ctx.Father != nil {
+		ctx = ctx.Father
+	}
+
+	ctx.Table[key] = val.Clone()
 }
 

@@ -10,8 +10,8 @@ func fibonacci(n int) int{
 	}
 }
 
-func Fib(Es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = Es.Line[Es.LastStartPos() : Es.LastEndPos() + 1]
+func Fib(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
 	if args[1].Tp == INTEGER {

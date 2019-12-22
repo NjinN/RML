@@ -12,9 +12,11 @@ import "io/ioutil"
 import "path/filepath"
 
 func main() {
+	// fmt.Println(ToTokens("b/:a")[0].Val.([]*Token)[1].OutputStr())
 
 	var libCtx = BindMap{
-		Table: make(map[string]*Token, 6),
+		Table: 	make(map[string]*Token, 6),
+		Tp:		SYS_CTX,
 	}
 	InitNative(&libCtx)
 	InitOp(&libCtx)
@@ -23,6 +25,7 @@ func main() {
 	var userCtx = BindMap{
 		Table:  make(map[string]*Token, 6),
 		Father: &libCtx,
+		Tp:		USR_CTX,
 	}
 
 	var Es = EvalStack{

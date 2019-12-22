@@ -2,10 +2,12 @@ package core
 
 import "strings"
 import "strconv"
+// import "fmt"
 
 func ToToken(s string) *Token{
 	var result Token
 	var str = Trim(s)
+	// fmt.Println(s)
 
 	if(strings.ToLower(str) == "true"){
 		result.Tp = LOGIC
@@ -22,6 +24,18 @@ func ToToken(s string) *Token{
 	if(len(str) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
 		result.Tp = CHAR
 		result.Val = str[2]
+		return &result
+	}
+
+	if(str[0] == ':'){
+		result.Tp = GET_WORD
+		result.Val = str[1 : len(str)]
+		return &result
+	}
+
+	if(str[0] == '/'){
+		result.Tp = PROP
+		result.Val = str[1 : len(str)]
 		return &result
 	}
 
@@ -78,15 +92,27 @@ func ToToken(s string) *Token{
 		return &result
 	}
 
+	if(str[0] == '\''){
+		result.Tp = LIT_WORD
+		result.Val = str[1 : len(str)]
+		return &result
+	}
+
+	if(strings.IndexByte(str, '/') >= 0){
+		result.Tp = PATH
+		result.Val = PathToTokens(str)
+		return &result
+	}
+
 	if(str[len(str)-1] == ':'){
 		result.Tp = SET_WORD
 		result.Val = str[0 : len(str)-1]
 		return &result
 	}
 
-	if(str[0] == '\''){
-		result.Tp = LIT_WORD
-		result.Val = str[1 : len(str)]
+	if EndWith(str, ":="){
+		result.Tp = PUT_WORD
+		result.Val = str[0 : len(str)-2]
 		return &result
 	}
 
@@ -95,11 +121,18 @@ func ToToken(s string) *Token{
 	return &result
 }
 
-
 func ToTokens(str string) []*Token{
 	var result []*Token
 	var strs = StrCut(str)
+	for _, item := range strs {
+		result = append(result, ToToken(item))
+	}
+	return result
+}
 
+func PathToTokens(str string) []*Token{
+	var result []*Token
+	var strs = PathCut(str)
 	for _, item := range strs {
 		result = append(result, ToToken(item))
 	}
