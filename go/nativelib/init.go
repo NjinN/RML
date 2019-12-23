@@ -132,6 +132,71 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("mod", &modToken)
 
+	var addSetToken = Token{
+		NATIVE,
+		Native{
+			"addSet",
+			3,
+			AddSet,
+			nil,
+		},
+	}
+	ctx.PutNow("addSet", &addSetToken)
+
+	var subSetToken = Token{
+		NATIVE,
+		Native{
+			"subSet",
+			3,
+			SubSet,
+			nil,
+		},
+	}
+	ctx.PutNow("subSet", &subSetToken)
+
+	var mulSetToken = Token{
+		NATIVE,
+		Native{
+			"mulSet",
+			3,
+			MulSet,
+			nil,
+		},
+	}
+	ctx.PutNow("mulSet", &mulSetToken)
+
+	var divSetToken = Token{
+		NATIVE,
+		Native{
+			"divSet",
+			3,
+			DivSet,
+			nil,
+		},
+	}
+	ctx.PutNow("divSet", &divSetToken)
+
+	var modSetToken = Token{
+		NATIVE,
+		Native{
+			"modSet",
+			3,
+			ModSet,
+			nil,
+		},
+	}
+	ctx.PutNow("modSet", &modSetToken)
+
+	var swapToken = Token{
+		NATIVE,
+		Native{
+			"swap",
+			3,
+			Swap,
+			nil,
+		},
+	}
+	ctx.PutNow("swap", &swapToken)
 
 	/*******  control  *******/
 

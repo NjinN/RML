@@ -3,6 +3,7 @@ package core
 import "strconv"
 import "bytes"
 import "fmt"
+import "strings"
 
 type Token struct {
 	Tp 		int
@@ -28,7 +29,11 @@ func (t Token) ToString() string{
 	case INTEGER:
 		return strconv.Itoa(t.Val.(int))
 	case DECIMAL:
-		return strconv.FormatFloat(t.Val.(float64), 'f', -1, 64)
+		var result = strconv.FormatFloat(t.Val.(float64), 'f', -1, 64)
+		if strings.IndexByte(result, '.') < 0 {
+			result += ".0"
+		}
+		return result
 	case CHAR:
 		return string(t.Val.(int))
 	case STRING:

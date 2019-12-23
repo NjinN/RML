@@ -49,6 +49,83 @@ func InitOp(ctx *BindMap){
 	}
 	ctx.PutNow("/", &divToken)
 
+	var modToken = Token{
+		OP,
+		Native{
+			"%",
+			3,
+			Mod,
+			nil,
+		},
+	}
+	ctx.PutNow("%", &modToken)
+
+	var addSetToken = Token{
+		OP,
+		Native{
+			"+=",
+			3,
+			AddSet,
+			nil,
+		},
+	}
+	ctx.PutNow("+=", &addSetToken)
+
+	var subSetToken = Token{
+		OP,
+		Native{
+			"-=",
+			3,
+			SubSet,
+			nil,
+		},
+	}
+	ctx.PutNow("-=", &subSetToken)
+
+	var mulSetToken = Token{
+		OP,
+		Native{
+			"*=",
+			3,
+			MulSet,
+			nil,
+		},
+	}
+	ctx.PutNow("*=", &mulSetToken)
+
+	var divSetToken = Token{
+		OP,
+		Native{
+			"/=",
+			3,
+			DivSet,
+			nil,
+		},
+	}
+	ctx.PutNow("/=", &divSetToken)
+
+	var modSetToken = Token{
+		OP,
+		Native{
+			"%=",
+			3,
+			ModSet,
+			nil,
+		},
+	}
+	ctx.PutNow("%=", &modSetToken)
+
+	var swapToken = Token{
+		OP,
+		Native{
+			"><",
+			3,
+			Swap,
+			nil,
+		},
+	}
+	ctx.PutNow("><", &swapToken)
+
 	var eqToken = Token{
 		OP,
 		Native{

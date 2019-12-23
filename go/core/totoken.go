@@ -33,7 +33,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
-	if(str[0] == '/'){
+	if(str[0] == '/' && str != "/" && str != "/="){
 		result.Tp = PROP
 		result.Val = str[1 : len(str)]
 		return &result
@@ -116,7 +116,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
-	if(strings.IndexByte(str, '/') >= 0){
+	if(strings.IndexByte(str, '/') >= 0 && str != "/" && str != "/="){
 		result.Tp = PATH
 		result.Val = PathToTokens(str, ctx, es)
 		return &result
