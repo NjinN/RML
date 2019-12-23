@@ -17,7 +17,6 @@ type BindMap struct{
 
 func (bm *BindMap) Get(key string) *Token{
 	var ctx = bm
-	var prev *BindMap
 
 	var tk *Token
 	var ok bool
@@ -28,26 +27,18 @@ func (bm *BindMap) Get(key string) *Token{
 		}
 	}
 
-	for tk == nil && ctx.Father != nil {
-		prev = ctx
+	for !ok && ctx.Father != nil {
 		ctx = ctx.Father
 
 		if(ctx.Table != nil){
 			tk, ok = ctx.Table[key]
-			if(!ok){
-				tk = nil
-			}
 		}
 	}
-	if(tk != nil && prev != nil && ctx.Father != nil){
-		var newOne = tk.Clone()
-		prev.Table[key] = newOne
-	}
+
 	if tk != nil {
 		return tk
 	}else{
-		var noneTk = Token{Tp: NONE}
-		return &noneTk
+		return &Token{Tp: NONE}
 	}
 }
 
@@ -59,19 +50,20 @@ func (bm *BindMap)PutNow(key string, val *Token){
 
 func (bm *BindMap)Put(key string, val *Token){
 	var ctx = bm
-	var tk *Token
 	var inserted = false
 	var ok = false
+
 	if(ctx.Table != nil){
-		tk, ok = ctx.Table[key]
+		_, ok = ctx.Table[key]
 	}
+
 	if(ok){
 		bm.Table[key].Copy(val)
 		inserted = true
 	}else{
-		for !inserted && tk == nil && ctx.Father != nil {
+		for !inserted && !ok && ctx.Father != nil {
 			if(ctx.Table != nil){
-				tk, ok = ctx.Table[key]
+				_, ok = ctx.Table[key]
 			}
 			if(ok){
 				ctx.Table[key].Copy(val)
