@@ -25,8 +25,14 @@ func Do(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	switch args[1].Tp{
 	case BLOCK:
+		if args[2].Tp == OBJECT {
+			return es.Eval(args[1].Val.([]*Token), args[2].Val.(*BindMap))
+		}
 		return es.Eval(args[1].Val.([]*Token), ctx)
 	case STRING:
+		if args[2].Tp == OBJECT {
+			return es.EvalStr(args[1].Val.(string), args[2].Val.(*BindMap))
+		}
 		return es.EvalStr(args[1].Val.(string), ctx)
 	default:
 		var result *Token
@@ -41,8 +47,14 @@ func Reduce(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	switch args[1].Tp{
 	case BLOCK:
+		if args[2].Tp == OBJECT {
+			return es.Eval(args[1].Val.([]*Token), args[2].Val.(*BindMap), 1)
+		}
 		return es.Eval(args[1].Val.([]*Token), ctx, 1)
 	case STRING:
+		if args[2].Tp == OBJECT {
+			return es.EvalStr(args[1].Val.(string), args[2].Val.(*BindMap), 1)
+		}
 		return es.EvalStr(args[1].Val.(string), ctx, 1)
 	default:
 		var result *Token

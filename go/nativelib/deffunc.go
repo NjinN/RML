@@ -42,8 +42,6 @@ func DefFunc(es *EvalStack, ctx *BindMap) (*Token, error){
 		}
 	}
 
-	// fmt.Println(p)
-
 	result.Val = Func{
 		Args: 	a,
 		Codes: 	args[2].Val.([]*Token)[0:],

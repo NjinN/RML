@@ -120,7 +120,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					return temp, err
 				}
 			}
-
+			
 			if(nowToken != nil && nowToken.Tp == ERR){
 				return nowToken, nil
 			}else if(nowToken != nil && nowToken.Tp == OP){

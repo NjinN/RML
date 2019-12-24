@@ -5,6 +5,7 @@ import . "./core"
 import . "./nativelib"
 import . "./oplib"
 import . "./extlib"
+import "./script"
 import "os"
 import "bufio"
 import "strings"
@@ -14,24 +15,33 @@ import "path/filepath"
 func main() {
 	// fmt.Println(ToTokens("b/:a")[0].Val.([]*Token)[1].OutputStr())
 
+	/** 创建lib语境 **/
 	var libCtx = BindMap{
 		Table: 	make(map[string]*Token, 6),
 		Tp:		SYS_CTX,
 	}
+	/** 初始化lib语境，加载原生函数、拓展函数 **/
 	InitNative(&libCtx)
 	InitOp(&libCtx)
 	InitExt(&libCtx)
 
+	var Es = EvalStack{
+		MainCtx: &libCtx,
+	}
+
+	/** 初始化执行栈，执行初始化脚本 **/
+	Es.Init()
+	Es.EvalStr(script.InitScript, Es.MainCtx)
+
+	/** 创建user语境 **/
 	var userCtx = BindMap{
 		Table:  make(map[string]*Token, 6),
 		Father: &libCtx,
 		Tp:		USR_CTX,
 	}
+	Es.MainCtx = &userCtx
 
-	var Es = EvalStack{
-		MainCtx: &userCtx,
-	}
-
+	/** 命令行参数不为空时，执行传入的脚本文件 **/
 	if len(os.Args) > 1 {
 
 		scriptPath, err := filepath.Abs(os.Args[1])
@@ -60,19 +70,31 @@ func main() {
 
 	}
 
+	/** 获取控制台输入并执行 **/
 	var reader = bufio.NewReader(os.Stdin)
-
+	var inp string
 	for {
 		fmt.Print(">> ")
 
-		inp, _ := reader.ReadString('\n')
-		inp = strings.Replace(inp, "\r\n", "", -1)
-		inp = Trim(inp)
-		inp = strings.ToLower(inp)
-		if inp == "" {
+		temp, _ := reader.ReadString('\n')
+		temp = strings.Replace(temp, "\r\n", "", -1)
+		temp = strings.ToLower(temp)
+		if temp == "" {
 			continue
 		}
-
+		
+		if temp[len(temp) - 1] == '~' {
+			inp += temp[0:len(temp)-1]
+			continue
+		}else{
+			if len(inp) > 0 {
+				inp += temp
+			}else{
+				inp = temp
+			}
+		}
+		
+		inp = Trim(inp)
 		Es.Init()
 
 		t, err := Es.EvalStr(inp, Es.MainCtx)
@@ -86,6 +108,7 @@ func main() {
 			panic(err)
 		}
 
+		inp = ""
 	}
 
 }

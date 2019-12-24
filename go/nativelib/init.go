@@ -33,24 +33,24 @@ func InitNative(ctx *BindMap){
 	var doToken = Token{
 		NATIVE,
 		Native{
-			"do",
-			2,
+			"_do",
+			3,
 			Do,
 			nil,
 		},
 	}
-	ctx.PutNow("do", &doToken)
+	ctx.PutNow("_do", &doToken)
 
 	var reduceToken = Token{
 		NATIVE,
 		Native{
-			"reduce",
-			2,
+			"_reduce",
+			3,
 			Reduce,
 			nil,
 		},
 	}
-	ctx.PutNow("reduce", &reduceToken)
+	ctx.PutNow("_reduce", &reduceToken)
 
 	var copyToken = Token{
 		NATIVE,

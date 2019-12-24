@@ -58,15 +58,15 @@ func (f Func) RunWithProps(es *EvalStack, ctx *BindMap, ps []*Token) (*Token, er
 			}
 		}else{
 			var set = false
-			for i:=1; i<len(ps); i++ {
+			for i:=2; i<len(ps); i++ {
 				if ps[i].Val.(string) == f.Props[j].Val.(string) {
-					c.PutNow(f.Props[j].Val.(string), es.Line[int(es.LastStartPos()) + len(f.Args) + i])
+					c.PutNow(f.Props[j+1].Val.(string), es.Line[int(es.LastStartPos()) + len(f.Args) + i - 1])
 					set = true
 					break
 				}
 			}
 			if !set {
-				c.PutNow(f.Props[j].Val.(string), &Token{NONE, "none"})
+				c.PutNow(f.Props[j+1].Val.(string), &Token{NONE, "none"})
 			}
 		}
 	}

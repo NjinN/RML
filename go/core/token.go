@@ -10,7 +10,10 @@ type Token struct {
 	Val 	interface{}
 }
 
-func (t Token) ToString() string{
+func (t *Token) ToString() string{
+	if t == nil {
+		return "nil"
+	}
 	switch t.Tp {
 	case NIL:
 		return "null"
@@ -121,7 +124,16 @@ func (t *Token) OutputStr() string{
 }
 
 func (t *Token) Echo(){
-	fmt.Println(t.OutputStr())
+	fmt.Println(t.ToString())
+}
+
+func EchoTokens(ts []*Token){
+	var str = "[ "
+	for _, item := range(ts){
+		str += item.ToString() + " "
+	}
+	str += "]"
+	fmt.Println(str)
 }
 
 
@@ -265,7 +277,6 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 			for i:=idx; i<len(t.Val.([]*Token)); i++ {
 				temp.Val = append(temp.Val.([]*Token), t.Val.([]*Token)[i])
 			}
-			
 			return &temp, nil
 		}
 		return &Token{ERR, "Error path!"}, nil
@@ -318,7 +329,7 @@ func (t *Token)GetPathExpLen() int{
 
 	var length = len(f.Val.(Func).Args) + 1
 
-	for i:=1; i<len(t.Val.([]*Token)); i++ {
+	for i:=2; i<len(t.Val.([]*Token)); i++ {
 		for j:=0; j<len(f.Val.(Func).Props); j+=2 {
 			if t.Val.([]*Token)[i].Val.(string) == f.Val.(Func).Props[j].Val.(string) && f.Val.(Func).Props[j +1] != nil {
 				length++
