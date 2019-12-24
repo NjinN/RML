@@ -101,7 +101,11 @@ func StrCut(s string) []string{
 		}
 
 		if(startIdx >= 0 && isStr){
-			if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+			if nowChar == '^' {
+				nowIdx++
+				continue
+			}
+			if(nowChar == '"'){
 				result = append(result, str[startIdx : nowIdx+1])
 				isStr = false
 				startIdx = -1
@@ -111,7 +115,11 @@ func StrCut(s string) []string{
 
 		if(startIdx >= 0 && isParen){
 			if(isInnerStr){
-				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+				if nowChar == '^' {
+					nowIdx++
+					continue
+				}
+				if(nowChar == '"'){
 					isInnerStr = false
 				}
 			}else{
@@ -133,7 +141,11 @@ func StrCut(s string) []string{
 
 		if(startIdx >= 0 && isBlock){
 			if(isInnerStr){
-				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+				if nowChar == '^' {
+					nowIdx++
+					continue
+				}
+				if(nowChar == '"'){
 					isInnerStr = false
 				}
 			}else{
@@ -155,7 +167,11 @@ func StrCut(s string) []string{
 
 		if(startIdx >= 0 && isObject){
 			if(isInnerStr){
-				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+				if nowChar == '^' {
+					nowIdx++
+					continue
+				}
+				if(nowChar == '"'){
 					isInnerStr = false
 				}
 			}else{
