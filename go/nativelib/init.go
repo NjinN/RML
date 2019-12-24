@@ -41,6 +41,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("do", &doToken)
 
+	var reduceToken = Token{
+		NATIVE,
+		Native{
+			"reduce",
+			2,
+			Reduce,
+			nil,
+		},
+	}
+	ctx.PutNow("reduce", &reduceToken)
+
 	var copyToken = Token{
 		NATIVE,
 		Native{

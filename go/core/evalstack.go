@@ -40,16 +40,18 @@ func (es *EvalStack) LastEndPos() int{
 	return es.EndPos[len(es.EndPos) - 1]
 }
 
-func (es *EvalStack) EvalStr(inpStr string, ctx *BindMap) (*Token, error){
-	return es.Eval(ToTokens(inpStr, ctx, es), ctx)
+func (es *EvalStack) EvalStr(inpStr string, ctx *BindMap, args ...int) (*Token, error){
+	return es.Eval(ToTokens(inpStr, ctx, es), ctx, args...)
 }
 
-func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
+func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, error){
 	var result *Token
+	var resultBlk []*Token
 
 	if(len(inp) == 0){
 		return result, nil
 	}
+
 
 	// fmt.Println("------  start eval -------")
 	// for _, item := range inp {
@@ -134,6 +136,9 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 				}
 			}else if(nowToken != nil && nowToken.Tp < SET_WORD){
 				es.Push(nowToken)
+				if len(args) > 0 && args[0] == 1 && (len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP) {
+					resultBlk = append(resultBlk, nowToken)
+				}
 			}else if nowToken.Tp == PATH && nowToken.Val.([]*Token)[0] != nil && nowToken.Val.([]*Token)[0].Tp == FUNC {
 				es.StartPos = append(es.StartPos, es.Idx)
 				es.EndPos = append(es.EndPos, es.Idx + nowToken.GetPathExpLen() - 1)
@@ -160,12 +165,20 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap) (*Token, error){
 			if err != nil {
 				return temp, err
 			}
+			if len(args) > 0 && args[0] == 1 {
+				resultBlk = append(resultBlk, temp)
+			}
 		}
 
 		i += 1
 	}
 	result = es.Line[es.Idx - 1]
 	es.Idx = startIdx
+
+	if len(args) > 0 && args[0] == 1 {
+		return &Token{BLOCK, resultBlk}, nil
+	}
+
 	return result, nil
 
 }

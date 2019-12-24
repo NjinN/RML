@@ -36,6 +36,22 @@ func Do(es *EvalStack, ctx *BindMap) (*Token, error){
 	}
 }
 
+func Reduce(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+
+	switch args[1].Tp{
+	case BLOCK:
+		return es.Eval(args[1].Val.([]*Token), ctx, 1)
+	case STRING:
+		return es.EvalStr(args[1].Val.(string), ctx, 1)
+	default:
+		var result *Token
+		result.Tp = ERR
+		result.Val = "Type Mismatch"
+		return result, nil
+	}
+}
+
 func Copy(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
