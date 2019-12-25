@@ -99,7 +99,7 @@ func main() {
 
 		t, err := Es.EvalStr(inp, Es.MainCtx)
 		if t != nil && t.Tp != NIL {
-			fmt.Println(t.OutputStr())
+			fmt.Println(t.ToString())
 		} else {
 			fmt.Println("")
 		}

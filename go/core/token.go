@@ -40,7 +40,13 @@ func (t *Token) ToString() string{
 	case CHAR:
 		return string(t.Val.(int))
 	case STRING:
-		return "\"" + t.Val.(string) + "\""
+		temp := t.Val.(string)
+		temp = strings.ReplaceAll(temp, "^", "^^")
+		temp = strings.ReplaceAll(temp, "\"", "^\"")
+		for k, v := range(charToCaretMap) {
+			temp = strings.ReplaceAll(temp, string(k), v)
+		}
+		return "\"" + temp + "\""
 	case PROP:
 		return "/" + t.Val.(string)
 	case SET_WORD:
@@ -116,46 +122,7 @@ func (t *Token) ToString() string{
 
 func (t *Token) OutputStr() string{
 	if(t.Tp == STRING){
-		var str = t.ToString()
-		str = str[1: len(str)-1]
-		str = strings.Replace(str, "^^", "^", -1)
-		str = strings.Replace(str, "^@", string(0x00), -1)
-		str = strings.Replace(str, "^A", string(0x01), -1)
-		str = strings.Replace(str, "^B", string(0x02), -1)
-		str = strings.Replace(str, "^C", string(0x03), -1)
-		str = strings.Replace(str, "^D", string(0x04), -1)
-		str = strings.Replace(str, "^E", string(0x05), -1)
-		str = strings.Replace(str, "^F", string(0x06), -1)
-		str = strings.Replace(str, "^G", string(0x07), -1)
-		str = strings.Replace(str, "^H", string(0x08), -1)
-		str = strings.Replace(str, "^I", string(0x09), -1)
-		str = strings.Replace(str, "^-", string(0x09), -1)
-		str = strings.Replace(str, "^J", string(0x0A), -1)
-		str = strings.Replace(str, "^/", string(0x0A), -1)
-		str = strings.Replace(str, "^K", string(0x0B), -1)
-		str = strings.Replace(str, "^L", string(0x0C), -1)
-		str = strings.Replace(str, "^M", string(0x0D), -1)
-		str = strings.Replace(str, "^N", string(0x0E), -1)
-		str = strings.Replace(str, "^O", string(0x0F), -1)
-		str = strings.Replace(str, "^P", string(0x10), -1)
-		str = strings.Replace(str, "^Q", string(0x11), -1)
-		str = strings.Replace(str, "^R", string(0x12), -1)
-		str = strings.Replace(str, "^S", string(0x13), -1)
-		str = strings.Replace(str, "^T", string(0x14), -1)
-		str = strings.Replace(str, "^U", string(0x15), -1)
-		str = strings.Replace(str, "^V", string(0x16), -1)
-		str = strings.Replace(str, "^W", string(0x17), -1)
-		str = strings.Replace(str, "^X", string(0x18), -1)
-		str = strings.Replace(str, "^Y", string(0x19), -1)
-		str = strings.Replace(str, "^Z", string(0x1A), -1)
-		str = strings.Replace(str, "^[", string(0x1B), -1)
-		str = strings.Replace(str, "^\\", string(0x1C), -1)
-		str = strings.Replace(str, "^]", string(0x1D), -1)
-		str = strings.Replace(str, "^!", string(0x1E), -1)
-		str = strings.Replace(str, "^_", string(0x1F), -1)
-		str = strings.Replace(str, "^~", string(0x7F), -1)
-
-		return str
+		return t.Val.(string)
 	}else{
 		return t.ToString()
 	}

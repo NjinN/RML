@@ -41,7 +41,13 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 	if(str[0] == '"'){
 		result.Tp = STRING
-		result.Val = str[1 : len(str)-1]
+		temp := str[1 : len(str)-1]
+		for k, v := range(caretToCharMap) {
+			temp = strings.ReplaceAll(temp, string(k), v)
+		}
+		temp = strings.ReplaceAll(temp, "^^", "^")
+		temp = strings.ReplaceAll(temp, `^"`, `"`)
+		result.Val = temp
 		return &result
 	}
 
