@@ -207,7 +207,7 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 		temp = es.Line[es.LastEndPos()]
 	case PATH:
 		if startToken.Val.([]*Token)[0].Tp == FUNC {
-			startToken.Val.([]*Token)[0].Val.(Func).RunWithProps(es, ctx, startToken.Val.([]*Token))
+			temp, err = startToken.Val.([]*Token)[0].Val.(Func).RunWithProps(es, ctx, startToken.Val.([]*Token))
 		}else{
 			startToken.SetPathVal(es.Line[es.LastEndPos()], ctx, es)
 			temp = es.Line[es.LastEndPos()]

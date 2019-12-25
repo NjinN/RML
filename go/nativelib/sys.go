@@ -66,9 +66,13 @@ func Reduce(es *EvalStack, ctx *BindMap) (*Token, error){
 
 func Copy(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
-
-	var result = Token{args[1].Tp, args[1].Val}
-	return &result, nil
+	var result *Token
+	if args[2] != nil && args[2].Tp == LOGIC && args[2].Val.(bool) {
+		result = args[1].CloneDeep()
+	}else{
+		result = args[1].Clone()
+	}
+	return result, nil
 }
 
 func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){

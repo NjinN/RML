@@ -55,32 +55,32 @@ func (t *Token) ToString() string{
 		return t.Val.(string) + ":="
 	case PAREN:
 		var buffer bytes.Buffer
-		buffer.WriteString("( ")
+		buffer.WriteString("(")
 		for _, item := range t.Val.([]*Token){
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.WriteString(")")
+		buffer.Bytes()[len(buffer.Bytes())-1] = ')'
 		return buffer.String()
 	case BLOCK:
 		var buffer bytes.Buffer
-		buffer.WriteString("[ ")
+		buffer.WriteString("[")
 		for _, item := range t.Val.([]*Token){
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.WriteString("]")
+		buffer.Bytes()[len(buffer.Bytes())-1] = ']'
 		return buffer.String()
 	case OBJECT:
 		var buffer bytes.Buffer
-		buffer.WriteString("{ ")
+		buffer.WriteString("{")
 		for k, v := range t.Val.(*BindMap).Table {
 			buffer.WriteString(k)
 			buffer.WriteString(": ")
 			buffer.WriteString(v.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.WriteString("}")
+		buffer.Bytes()[len(buffer.Bytes())-1] = '}'
 		return buffer.String()
 	case PATH:
 		var buffer bytes.Buffer
@@ -107,12 +107,13 @@ func (t *Token) ToString() string{
 				buffer.WriteString(" ")
 			}
 		}
-		buffer.WriteString("] [")
+		buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		buffer.WriteString(" [")
 		for _, item := range t.Val.(Func).Codes{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.WriteString("]")
+		buffer.Bytes()[len(buffer.Bytes())-1] = ']'
 		return buffer.String()
 	default:
 		return t.Val.(string)
@@ -150,6 +151,26 @@ func (t *Token) Copy(source *Token){
 func (t *Token) Clone() *Token{
 	var result = Token{t.Tp, t.Val}
 	return &result
+}
+
+func (t *Token) CloneDeep() *Token{
+	var result = &Token{t.Tp, t.Val}
+	switch t.Tp {
+	case BLOCK, PAREN, PATH:
+		result.Val = make([]*Token, 0)
+		for _, item := range(t.Val.([]*Token)){
+			result.Val = append(result.Val.([]*Token), item.CloneDeep())
+		}
+		return result
+	case OBJECT:
+		result.Val = &BindMap{make(map[string]*Token), t.Val.(*BindMap).Father, t.Val.(*BindMap).Tp}
+		for k, v := range(t.Val.(*BindMap).Table) {
+			result.Val.(*BindMap).Table[k] = v.CloneDeep()
+		}
+		return result
+	default:
+		return result
+	}
 }
 
 

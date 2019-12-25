@@ -12,6 +12,11 @@ reduce: func [code /with with] [
 	_reduce code with
 ]
 
+copy: func [source /deep] [
+	_copy source deep
+]
+
+
 
 
 

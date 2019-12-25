@@ -55,13 +55,13 @@ func InitNative(ctx *BindMap){
 	var copyToken = Token{
 		NATIVE,
 		Native{
-			"copy",
-			2,
+			"_copy",
+			3,
 			Copy,
 			nil,
 		},
 	}
-	ctx.PutNow("copy", &copyToken)
+	ctx.PutNow("_copy", &copyToken)
 
 	var printToken = Token{
 		NATIVE,
