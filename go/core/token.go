@@ -38,7 +38,7 @@ func (t *Token) ToString() string{
 		}
 		return result
 	case CHAR:
-		return string(t.Val.(int))
+		return "#'" + string(t.Val.(uint8)) + "'"
 	case STRING:
 		temp := t.Val.(string)
 		temp = strings.ReplaceAll(temp, "^", "^^")
@@ -60,7 +60,11 @@ func (t *Token) ToString() string{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.Bytes()[len(buffer.Bytes())-1] = ')'
+		if len(buffer.Bytes()) > 1 {
+			buffer.Bytes()[len(buffer.Bytes())-1] = ')'
+		}else{
+			buffer.WriteString(")")
+		}
 		return buffer.String()
 	case BLOCK:
 		var buffer bytes.Buffer
@@ -69,7 +73,11 @@ func (t *Token) ToString() string{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		if len(buffer.Bytes()) > 1 {
+			buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		}else{
+			buffer.WriteString("]")
+		}
 		return buffer.String()
 	case OBJECT:
 		var buffer bytes.Buffer
@@ -80,7 +88,11 @@ func (t *Token) ToString() string{
 			buffer.WriteString(v.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.Bytes()[len(buffer.Bytes())-1] = '}'
+		if len(buffer.Bytes()) > 1 {
+			buffer.Bytes()[len(buffer.Bytes())-1] = '}'
+		}else{
+			buffer.WriteString("}")
+		}
 		return buffer.String()
 	case PATH:
 		var buffer bytes.Buffer
@@ -107,13 +119,21 @@ func (t *Token) ToString() string{
 				buffer.WriteString(" ")
 			}
 		}
-		buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		if buffer.Bytes()[len(buffer.Bytes())-1] != '[' {
+			buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		}else{
+			buffer.WriteString("]")
+		}
 		buffer.WriteString(" [")
 		for _, item := range t.Val.(Func).Codes{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
-		buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		if buffer.Bytes()[len(buffer.Bytes())-1] != '[' {
+			buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		}else{
+			buffer.WriteString("]")
+		}
 		return buffer.String()
 	default:
 		return t.Val.(string)

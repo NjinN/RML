@@ -396,4 +396,42 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("cost", &costToken)
 
+
+	/*******  collect  *******/
+
+	var lenToken = Token{
+		NATIVE,
+		Native{
+			"len?",
+			2,
+			Length,
+			nil,
+		},
+	}
+	ctx.PutNow("len?", &lenToken)
+
+	var appendToken = Token{
+		NATIVE,
+		Native{
+			"_append",
+			3,
+			Append,
+			nil,
+		},
+	}
+	ctx.PutNow("_append", &appendToken)
+
+	var takeToken = Token{
+		NATIVE,
+		Native{
+			"_take",
+			5,
+			Take,
+			nil,
+		},
+	}
+	ctx.PutNow("_take", &takeToken)
+
+
+
 }
