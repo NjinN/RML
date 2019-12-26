@@ -425,11 +425,22 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("len?", &lenToken)
 
+	var insertToken = Token{
+		NATIVE,
+		Native{
+			"_insert",
+			5,
+			Insert,
+			nil,
+		},
+	}
+	ctx.PutNow("_insert", &insertToken)
+
 	var appendToken = Token{
 		NATIVE,
 		Native{
 			"_append",
-			3,
+			4,
 			Append,
 			nil,
 		},

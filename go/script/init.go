@@ -16,12 +16,24 @@ copy: func [source /deep] [
 	_copy source deep
 ]
 
-append*: func [collect item] [
-	_append collect item
+insert*: func [collect item /at at /only] [
+	idx:= 1
+	if at [idx: at]
+	_insert collect item idx only
 ]
 
-append: func [collect item] [
-	_append copy/deep collect item
+insert: func [collect item /at at /only] [
+	idx:= 1
+	if at [idx: at]
+	_insert copy/deep collect item idx only
+]
+
+append*: func [collect item /only] [
+	_append collect item only
+]
+
+append: func [collect item /only] [
+	_append copy/deep collect item only
 ]
 
 take*: func [serial /at idx /part len /last] [
