@@ -21,15 +21,21 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
-	if(len(str) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
-		result.Tp = CHAR
-		result.Val = str[2]
-		return &result
-	}
-
 	if(str[0] == ':'){
 		result.Tp = GET_WORD
 		result.Val = str[1 : len(str)]
+		return &result
+	}
+	
+	if(str[len(str)-1] == ':' && strings.IndexByte(str, '/') < 0){
+		result.Tp = SET_WORD
+		result.Val = str[0 : len(str)-1]
+		return &result
+	}
+
+	if(len(str) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
+		result.Tp = CHAR
+		result.Val = str[2]
 		return &result
 	}
 
@@ -125,12 +131,6 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	if(strings.IndexByte(str, '/') >= 0 && str != "/" && str != "/="){
 		result.Tp = PATH
 		result.Val = PathToTokens(str, ctx, es)
-		return &result
-	}
-
-	if(str[len(str)-1] == ':'){
-		result.Tp = SET_WORD
-		result.Val = str[0 : len(str)-1]
 		return &result
 	}
 

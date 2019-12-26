@@ -85,6 +85,6 @@ func (bm *BindMap)PutLocal(key string, val *Token){
 		ctx = ctx.Father
 	}
 
-	ctx.Table[key] = val.Clone()
+	ctx.Table[key] = val.Dup()
 }
 

@@ -139,7 +139,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	if(args[1].Tp == WORD && args[5].Tp == BLOCK && (args[2].Tp == INTEGER || args[2].Tp == DECIMAL) && (args[3].Tp == INTEGER || args[3].Tp == DECIMAL) && (args[4].Tp == INTEGER || args[4].Tp == DECIMAL)){
 		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-		var countToken = args[2].Clone()
+		var countToken = args[2].Dup()
 		c.PutNow(args[1].Val.(string), countToken)
 		var rs *Token
 		var err error

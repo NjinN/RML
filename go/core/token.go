@@ -168,9 +168,28 @@ func (t *Token) Copy(source *Token){
 	t.Val = source.Val
 }
 
+func (t *Token) Dup() *Token{
+	return &Token{t.Tp, t.Val}
+}
+
 func (t *Token) Clone() *Token{
-	var result = Token{t.Tp, t.Val}
-	return &result
+	var result = &Token{t.Tp, t.Val}
+	switch t.Tp {
+	case BLOCK, PAREN, PATH:
+		result.Val = make([]*Token, 0)
+		for _, item := range(t.Val.([]*Token)){
+			result.Val = append(result.Val.([]*Token), item.Dup())
+		}
+		return result
+	case OBJECT:
+		result.Val = &BindMap{make(map[string]*Token), t.Val.(*BindMap).Father, t.Val.(*BindMap).Tp}
+		for k, v := range(t.Val.(*BindMap).Table) {
+			result.Val.(*BindMap).Table[k] = v.Clone()
+		}
+		return result
+	default:
+		return result
+	}
 }
 
 func (t *Token) CloneDeep() *Token{
@@ -332,7 +351,7 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 }
 
 func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, error){
-	var holderPath = t.Clone()
+	var holderPath = t.Dup()
 	holderPath.Val = holderPath.Val.([]*Token)[0: len(holderPath.Val.([]*Token))-1]
 	holder, err := holderPath.GetPathVal(ctx, stack)
 	if err != nil {
@@ -348,7 +367,7 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, e
 				if err != nil {
 					panic(err)
 				}
-				if idx > 0 && idx < len(holder.Val.([]*Token)){
+				if idx > 0 && idx <= len(holder.Val.([]*Token)){
 					holder.Val.([]*Token)[idx-1] = val
 					return val, nil
 				}
