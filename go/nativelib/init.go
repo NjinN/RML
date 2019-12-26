@@ -210,7 +210,7 @@ func InitNative(ctx *BindMap){
 	ctx.PutNow("swap", &swapToken)
 
 
-	/*******  control  *******/
+	/*******  logic  *******/
 	
 	var notToken = Token{
 		NATIVE,

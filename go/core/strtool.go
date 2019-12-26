@@ -94,6 +94,12 @@ func StrCut(s string) []string{
 			continue;
 		}
 
+		if startIdx >= 0 && str[startIdx] == '!' && nowChar == '{' {
+			isObject = true
+			oFloor = 1
+			continue
+		}
+
 		if(startIdx >= 0 && IsWhite(nowChar) && !isStr && !isParen && !isBlock && !isObject){
 			result = append(result, str[startIdx : nowIdx])
 			startIdx = -1

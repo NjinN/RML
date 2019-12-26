@@ -106,7 +106,7 @@ func (t *Token) ToString() string{
 		return "native: " + t.Val.(Native).Str
 	case FUNC:
 		var buffer bytes.Buffer
-		buffer.WriteString("func [")
+		buffer.WriteString("!func{[")
 		for _, item := range t.Val.(Func).Args{
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
@@ -134,6 +134,7 @@ func (t *Token) ToString() string{
 		}else{
 			buffer.WriteString("]")
 		}
+		buffer.WriteString("}")
 		return buffer.String()
 	default:
 		return t.Val.(string)
