@@ -7,65 +7,38 @@ func Iif(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
-	switch args[1].Tp {
-	case LOGIC:
-		if args[1].Val.(bool) {
+	if args[1].ToBool(){
+		if args[2].Tp == BLOCK {
 			return es.Eval(args[2].Val.([]*Token), ctx)
+		}else if args[2].Tp == STRING {
+			return es.EvalStr(args[2].Val.(string), ctx)
 		}
-	case INTEGER:
-		if args[1].Val.(int) != 0 {
-			return es.Eval(args[2].Val.([]*Token), ctx)
-		}
-	case DECIMAL:
-		if args[1].Val.(float64) != 0.0 {
-			return es.Eval(args[2].Val.([]*Token), ctx)
-		}
-	case STRING:
-		if args[1].Val.(string) != "" {
-			return es.Eval(args[2].Val.([]*Token), ctx)
-		}
-	case NONE:
-		
-	default:
-		result.Tp = ERR
-		result.Val = "Type Mismatch"
-		return &result, nil
+	}else{
+		return nil, nil
 	}
 
-	return nil, nil
+	result.Tp = ERR
+	result.Val = "Type Mismatch"
+	return &result, nil
+
 }
 
 func Either(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	var result Token
-	switch args[1].Tp {
-	case LOGIC:
-		if args[1].Val.(bool) {
+	if args[1].ToBool(){
+		if args[2].Tp == BLOCK {
 			return es.Eval(args[2].Val.([]*Token), ctx)
-		}else{
-			return es.Eval(args[3].Val.([]*Token), ctx)
+		}else if args[2].Tp == STRING {
+			return es.EvalStr(args[2].Val.(string), ctx)
 		}
-	case INTEGER:
-		if args[1].Val.(int) != 0 {
-			return es.Eval(args[2].Val.([]*Token), ctx)
-		}else{
+	}else{
+		if args[3].Tp == BLOCK {
 			return es.Eval(args[3].Val.([]*Token), ctx)
+		}else if args[3].Tp == STRING {
+			return es.EvalStr(args[3].Val.(string), ctx)
 		}
-	case DECIMAL:
-		if args[1].Val.(float64) != 0.0 {
-			return es.Eval(args[2].Val.([]*Token), ctx)
-		}else{
-			return es.Eval(args[3].Val.([]*Token), ctx)
-		}
-	case STRING:
-		if args[1].Val.(string) != "" {
-			return es.Eval(args[2].Val.([]*Token), ctx)
-		}else{
-			return es.Eval(args[3].Val.([]*Token), ctx)
-		}
-	case NONE:
-		return es.Eval(args[3].Val.([]*Token), ctx)
 	}
 
 	result.Tp = ERR

@@ -180,4 +180,31 @@ func InitOp(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("<=", &leToken)
+
+
+	/*******  logic  *******/
+
+	var andToken = Token{
+		OP,
+		Native{
+			"and",
+			3,
+			And,
+			nil,
+		},
+	}
+	ctx.PutNow("and", &andToken)
+
+	var orToken = Token{
+		OP,
+		Native{
+			"or",
+			3,
+			Or,
+			nil,
+		},
+	}
+	ctx.PutNow("or", &orToken)
+
+	
 }

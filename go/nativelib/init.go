@@ -209,6 +209,21 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("swap", &swapToken)
 
+
+	/*******  control  *******/
+	
+	var notToken = Token{
+		NATIVE,
+		Native{
+			"not",
+			2,
+			Not,
+			nil,
+		},
+	}
+	ctx.PutNow("not", &notToken)
+
+
 	/*******  control  *******/
 
 	var ifToken = Token{

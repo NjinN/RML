@@ -407,3 +407,33 @@ func (t *Token)GetPathExpLen() int{
 }
 
 
+func (t *Token)ToBool() bool {
+	if t == nil {
+		return false
+	}
+	switch t.Tp {
+	case LOGIC:
+		return t.Val.(bool)
+	case INTEGER:
+		return t.Val.(int) != 0
+	case DECIMAL:
+		return t.Val.(float64) != 0.0
+	case CHAR:
+		return t.Val.(byte) != 0
+	case STRING:
+		return t.Val.(string) != ""
+	case BLOCK, PAREN, PATH:
+		return len(t.Val.([]*Token)) > 0
+	case OBJECT:
+		return t.Val.(*BindMap) != nil
+	default:
+		return false
+	}
+}
+
+
+
+
+
+
+
