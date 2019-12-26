@@ -66,6 +66,12 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 	for i < len(inp){
 		var nowToken = inp[i]
 		var nextToken *Token
+		
+		var skip = false
+		if nowToken.Tp == GET_WORD {
+			skip = true
+		}
+
 		if(i < len(inp) - 1){
 			nextToken = inp[i+1]
 			if(nextToken.Tp == WORD){
@@ -154,8 +160,11 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					}
 				}
 
-				es.StartPos = append(es.StartPos, es.Idx)
-				es.EndPos = append(es.EndPos, es.Idx + nowToken.Explen() - 1)
+				if !skip {
+					es.StartPos = append(es.StartPos, es.Idx)
+					es.EndPos = append(es.EndPos, es.Idx + nowToken.Explen() - 1)
+				}
+				
 				es.Push(nowToken);
 			}
 		}
