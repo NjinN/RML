@@ -458,6 +458,16 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_take", &takeToken)
 
+	var replaceToken = Token{
+		NATIVE,
+		Native{
+			"_replace",
+			6,
+			Replace,
+			nil,
+		},
+	}
+	ctx.PutNow("_replace", &replaceToken)
 
 
 }

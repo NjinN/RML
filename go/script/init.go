@@ -16,55 +16,62 @@ copy: func [source /deep] [
 	_copy source deep
 ]
 
-insert*: func [collect item /at at /only] [
-	idx:= 1
-	if at [idx: at]
-	_insert collect item idx only
+insert*: func [serial item /at at /only] [
+	if not at [at: 1]
+	_insert serial item at only
 ]
 
-insert: func [collect item /at at /only] [
-	idx:= 1
-	if at [idx: at]
-	_insert copy/deep collect item idx only
+insert: func [serial item /at at /only] [
+	if not at [at: 1]
+	_insert copy/deep serial item at only
 ]
 
-append*: func [collect item /only] [
-	_append collect item only
+append*: func [serial item /only] [
+	_append serial item only
 ]
 
-append: func [collect item /only] [
-	_append copy/deep collect item only
+append: func [serial item /only] [
+	_append copy/deep serial item only
 ]
 
 take*: func [serial /at idx /part len /last] [
-	starIdx:= 1
-	partLen:= 1
-	
-	if idx [starIdx: idx]
-	if len [partLen: len]
+	if not at [at: 1]
+	if not part [part: 1] 
 
 	if last [
-		starIdx: len? serial
-		partLen: 1
+		at: len? serial
+		part: 1
 	]
 
 	_take serial starIdx partLen true
 ]
 
-take: func [serial /at idx /part len /last] [
-	starIdx:= 1
-	partLen:= 1
-	
-	if idx [starIdx: idx]
-	if len [partLen: len]
+take: func [serial /at at /part part /last] [
+	if not at [at: 1]
+	if not part [part: 1] 
 
 	if last [
-		starIdx: len? serial
-		partLen: 1
+		at: len? serial
+		part: 1
 	]
 
-	_take serial starIdx partLen false
+	_take copy/deep serial at part false
 ]
+
+replace*: func [serial old new /at at /amount amount] [
+	if not at [at: 1]
+	if not amount [amount: 1]
+	if all [amount: -1]
+	_replace serial old new at amount
+]
+
+replace: func [serial old new /at at /amount amount /all] [
+	if not at [at: 1]
+	if not amount [amount: 1]
+	if all [amount: -1]
+	_replace copy/deep serial old new at amount
+]
+
 
 
 

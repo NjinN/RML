@@ -97,6 +97,9 @@ func Repeat(es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 				return rs, err
 			}
+			if rs.Tp == ERR {
+				return rs, err
+			}
 		 }
 		 return nil, nil
 
@@ -131,6 +134,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
+					if rs.Tp == ERR {
+						return rs, err
+					}
 				}
 			}else{
 				for countToken.Val.(int) <= int(args[3].Val.(float64)) {
@@ -143,6 +149,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						if err.Error() == "break" {
 							break
 						}
+						return rs, err
+					}
+					if rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -164,6 +173,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
+					if rs.Tp == ERR {
+						return rs, err
+					}
 				}
 			}else{
 				for countToken.Val.(float64) <= args[3].Val.(float64) {
@@ -176,6 +188,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						if err.Error() == "break" {
 							break
 						}
+						return rs, err
+					}
+					if rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -194,6 +209,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
+					if rs.Tp == ERR {
+						return rs, err
+					}
 				}
 			}else{
 				for countToken.Val.(float64) <= args[3].Val.(float64) {
@@ -206,6 +224,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						if err.Error() == "break" {
 							break
 						}
+						return rs, err
+					}
+					if rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -224,6 +245,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
+					if rs.Tp == ERR {
+						return rs, err
+					}
 				}
 			}else{
 				for countToken.Val.(float64) <= args[3].Val.(float64) {
@@ -236,6 +260,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						if err.Error() == "break" {
 							break
 						}
+						return rs, err
+					}
+					if rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -265,8 +292,14 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error){
 			if err != nil {
 				return rs, err
 			}
+			if rs.Tp == ERR {
+				return rs, err
+			}
 			b, err = es.Eval(args[1].Val.([]*Token), &c)
 			if err != nil {
+				return rs, err
+			}
+			if b.Tp == ERR {
 				return rs, err
 			}
 		}
