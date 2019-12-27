@@ -15,8 +15,8 @@ type EvalStack struct {
 
 
 func (es *EvalStack) Init(){
-	// es.StartPos = make([]int, 8)
-	// es.EndPos = make([]int, 8)
+	es.StartPos = make([]int, 8)
+	es.EndPos = make([]int, 8)
 	es.Line = make([]*Token, 1024*1024)
 	es.Idx = 0
 }
@@ -43,6 +43,7 @@ func (es *EvalStack) LastEndPos() int{
 func (es *EvalStack) EvalStr(inpStr string, ctx *BindMap, args ...int) (*Token, error){
 	return es.Eval(ToTokens(inpStr, ctx, es), ctx, args...)
 }
+  
 
 func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, error){
 	var result *Token
@@ -72,8 +73,12 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			skip = true
 		}
 
+		var nextSkip = false
 		if(i < len(inp) - 1){
 			nextToken = inp[i+1]
+			if nextToken.Tp == GET_WORD {
+				nextSkip = true
+			}
 			if(nextToken.Tp == WORD){
 				temp, err := nextToken.GetVal(ctx, es)
 				if err != nil {
@@ -83,7 +88,8 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			}
 		}
 
-		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx > es.EndPos[startDeep - 1])){
+
+		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx > es.EndPos[startDeep - 1]) && !nextSkip){
 			if(len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP){
 				es.StartPos = append(es.StartPos, es.Idx)
 				es.Push(nextToken)
@@ -129,7 +135,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			
 			if(nowToken != nil && nowToken.Tp == ERR){
 				return nowToken, nil
-			}else if(nowToken != nil && nowToken.Tp == OP){
+			}else if(nowToken != nil && nowToken.Tp == OP && !skip && es.Idx >= 1){
 				if(es.Idx > startIdx){
 					es.StartPos = append(es.StartPos, es.Idx - 1)
 					es.Push(es.Line[es.Idx - 1])

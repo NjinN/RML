@@ -14,7 +14,7 @@ import "path/filepath"
 
 func main() {
 	// fmt.Println(ToTokens("b/:a")[0].Val.([]*Token)[1].OutputStr())
-	
+
 
 	/** 创建lib语境 **/
 	var libCtx = BindMap{

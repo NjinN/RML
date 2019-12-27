@@ -33,6 +33,12 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
+	if EndWith(str, ":="){
+		result.Tp = PUT_WORD
+		result.Val = str[0 : len(str)-2]
+		return &result
+	}
+
 	if(len(str) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
 		result.Tp = CHAR
 		result.Val = str[2]
@@ -131,12 +137,6 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	if(strings.IndexByte(str, '/') >= 0 && str != "/" && str != "/="){
 		result.Tp = PATH
 		result.Val = PathToTokens(str, ctx, es)
-		return &result
-	}
-
-	if EndWith(str, ":="){
-		result.Tp = PUT_WORD
-		result.Val = str[0 : len(str)-2]
 		return &result
 	}
 

@@ -104,6 +104,8 @@ func (t *Token) ToString() string{
 		return temp[0:len(temp)-1]
 	case NATIVE:
 		return "native: " + t.Val.(Native).Str
+	case OP:
+		return "op: " + t.Val.(Native).Str
 	case FUNC:
 		var buffer bytes.Buffer
 		buffer.WriteString("!func{[")
