@@ -44,6 +44,8 @@ func StrCut(s string) []string{
 		return result
 	}
 
+	var runes = []rune(str)
+
 	var startIdx = -1
 	var isParen = false
 	var isStr = false
@@ -52,41 +54,41 @@ func StrCut(s string) []string{
 	var pFloor = 0
 	var bFloor = 0
 	var oFloor = 0
-	var nowChar byte
+	var nowRune rune
 	var isInnerStr = false
 
-	for nowIdx := 0; nowIdx < len(str); nowIdx++ {
-		nowChar = str[nowIdx]
+	for nowIdx := 0; nowIdx < len(runes); nowIdx++ {
+		nowRune= runes[nowIdx]
 
-		if(nowIdx == len(str)-1){
-			if(startIdx < 0 && !IsWhite(nowChar)){
-				result = append(result, string(nowChar))
+		if(nowIdx == len(runes)-1){
+			if(startIdx < 0 && !unicode.IsSpace(runes[nowIdx])){
+				result = append(result, string(nowRune))
 				break
 			}
 
 			if(startIdx >= 0){
-				if(IsWhite(nowChar)){
-					result = append(result, str[startIdx : nowIdx])
+				if(unicode.IsSpace(nowRune)){
+					result = append(result, string(runes[startIdx : nowIdx]))
 					break
 				}else{
 					if(!isStr && !isParen && !isBlock){
-						result = append(result, str[startIdx : nowIdx+1])
+						result = append(result, string(runes[startIdx : nowIdx+1]))
 						break
 					}
 				}
 			}
 		}
 
-		if(startIdx < 0 && !IsWhite(nowChar)){
-			if(nowChar == '"'){
+		if(startIdx < 0 && !unicode.IsSpace(nowRune)){
+			if(nowRune == rune('"')){
 				isStr = true
-			}else if(nowChar == '('){
+			}else if(nowRune == rune('(')){
 				isParen = true
 				pFloor = 1
-			}else if(nowChar == '['){
+			}else if(nowRune == rune('[')){
 				isBlock = true
 				bFloor = 1
-			}else if(nowChar == '{'){
+			}else if(nowRune == rune('{')){
 				isObject = true
 				oFloor = 1
 			}
@@ -94,25 +96,25 @@ func StrCut(s string) []string{
 			continue;
 		}
 
-		if startIdx >= 0 && str[startIdx] == '!' && nowChar == '{' {
+		if startIdx >= 0 && runes[startIdx] == rune('!') && nowRune == rune('{') {
 			isObject = true
 			oFloor = 1
 			continue
 		}
 
-		if(startIdx >= 0 && IsWhite(nowChar) && !isStr && !isParen && !isBlock && !isObject){
-			result = append(result, str[startIdx : nowIdx])
+		if(startIdx >= 0 && unicode.IsSpace(nowRune) && !isStr && !isParen && !isBlock && !isObject){
+			result = append(result, string(runes[startIdx : nowIdx]))
 			startIdx = -1
 			continue
 		}
 
 		if(startIdx >= 0 && isStr){
-			if nowChar == '^' {
+			if nowRune == rune('^') {
 				nowIdx++
 				continue
 			}
-			if(nowChar == '"'){
-				result = append(result, str[startIdx : nowIdx+1])
+			if nowRune == rune('"'){
+				result = append(result, string(runes[startIdx : nowIdx+1]))
 				isStr = false
 				startIdx = -1
 				continue
@@ -121,23 +123,23 @@ func StrCut(s string) []string{
 
 		if(startIdx >= 0 && isParen){
 			if(isInnerStr){
-				if nowChar == '^' {
+				if nowRune == rune('^') {
 					nowIdx++
 					continue
 				}
-				if(nowChar == '"'){
+				if nowRune == rune('"'){
 					isInnerStr = false
 				}
 			}else{
-				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+				if nowRune == '"' && !(string(runes[nowIdx-1 : nowIdx+1]) == "^\"") {
 					isInnerStr = true
-				}else if(nowChar == '('){
+				}else if nowRune == rune('('){
 					pFloor += 1
-				}else if(nowChar == ')'){
+				}else if nowRune == rune(')'){
 					pFloor -= 1
 				}
 				if(pFloor == 0){
-					result = append(result, str[startIdx : nowIdx+1])
+					result = append(result, string(runes[startIdx : nowIdx+1]))
 					isParen = false
 					startIdx = -1
 					continue
@@ -147,23 +149,23 @@ func StrCut(s string) []string{
 
 		if(startIdx >= 0 && isBlock){
 			if(isInnerStr){
-				if nowChar == '^' {
+				if nowRune == rune('^') {
 					nowIdx++
 					continue
 				}
-				if(nowChar == '"'){
+				if nowRune == rune('"'){
 					isInnerStr = false
 				}
 			}else{
-				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+				if nowRune == '"' && !(string(runes[nowIdx-1 : nowIdx+1]) == "^\""){
 					isInnerStr = true
-				}else if(nowChar == '['){
+				}else if nowRune == rune('['){
 					bFloor += 1
-				}else if(nowChar == ']'){
+				}else if nowRune == rune(']'){
 					bFloor -= 1
 				}
 				if(bFloor == 0){
-					result = append(result, str[startIdx : nowIdx+1])
+					result = append(result, string(runes[startIdx : nowIdx+1]))
 					isBlock = false
 					startIdx = -1
 					continue
@@ -173,23 +175,23 @@ func StrCut(s string) []string{
 
 		if(startIdx >= 0 && isObject){
 			if(isInnerStr){
-				if nowChar == '^' {
+				if nowRune == rune('^') {
 					nowIdx++
 					continue
 				}
-				if(nowChar == '"'){
+				if nowRune == rune('"'){
 					isInnerStr = false
 				}
 			}else{
-				if(nowChar == '"' && !(str[nowIdx-1 : nowIdx+1] == "^\"")){
+				if nowRune == rune('"') && !(string(runes[nowIdx-1 : nowIdx+1]) == "^\"") {
 					isInnerStr = true
-				}else if(nowChar == '{'){
+				}else if nowRune == rune('{'){
 					oFloor += 1
-				}else if(nowChar == '}'){
+				}else if nowRune == rune('}'){
 					oFloor -= 1
 				}
 				if(oFloor == 0){
-					result = append(result, str[startIdx : nowIdx+1])
+					result = append(result, string(runes[startIdx : nowIdx+1]))
 					isObject = false
 					startIdx = -1
 					continue
@@ -197,15 +199,15 @@ func StrCut(s string) []string{
 			}
 		}
 
-		if startIdx >= 0 && nowChar == '/' && nowIdx < len(str) && !isStr && !isBlock && !isParen && !isObject {
-			for startIdx >= 0 && nowChar == '/' && nowIdx < len(str)-1 {
+		if startIdx >= 0 && nowRune == rune('/') && nowIdx < len(runes) && !isStr && !isBlock && !isParen && !isObject {
+			for startIdx >= 0 && nowRune == rune('/') && nowIdx < len(runes)-1 {
 				nowIdx++
-				nowIdx += len(GetOneToken(str, nowIdx)) - 1
-				if(nowIdx < len(str)-1){
-					nowChar = s[nowIdx + 1]
+				nowIdx += len(GetOneToken(runes, nowIdx)) - 1
+				if(nowIdx < len(runes)-1){
+					nowRune = runes[nowIdx + 1]
 				}
 			}
-			result = append(result, str[startIdx : nowIdx+1])
+			result = append(result, string(runes[startIdx : nowIdx+1]))
 			startIdx = -1
 		}
 		
@@ -214,57 +216,59 @@ func StrCut(s string) []string{
 	return result
 }
 
-func GetOneToken(s string, startIdx int) string{
-	if s[startIdx] == '"' {
-		return GetSubStr(s, startIdx)
-	}else if s[startIdx] == '(' {
-		return GetSubParen(s, startIdx)
+func GetOneToken(rs []rune, startIdx int) []rune{
+	
+	if rs[startIdx] == rune('"') {
+		return GetSubStr(rs, startIdx)
+	}else if rs[startIdx] == rune('(') {
+		return GetSubParen(rs, startIdx)
 	}else{
-		return getSubOne(s, startIdx)
+		return getSubOne(rs, startIdx)
 	}
 
 }
 
-func getSubOne(s string, startIdx int) string{
-	for idx := startIdx+1; idx < len(s); idx++ {
-		if s[idx] == '/' || IsWhite(s[idx]) {
-			return s[startIdx:idx]
+func getSubOne(rs []rune, startIdx int) []rune {
+	for idx := startIdx+1; idx < len(rs); idx++ {
+		if rs[idx] == rune('/') || unicode.IsSpace(rs[idx]) {
+			return rs[startIdx:idx]
 		}
 	}
-	return s[startIdx:]
+	return rs[startIdx:]
 }
 
-func GetSubStr(s string, startIdx int) string{
-	for idx := startIdx+1; idx < len(s); idx++ {
-		if s[idx] == '"' && s[idx-1:idx+1] != "^\"" {
-			return s[startIdx:idx+1]
+func GetSubStr(rs []rune, startIdx int) []rune{
+	for idx := startIdx+1; idx < len(rs); idx++ {
+		if rs[idx] == rune('"') && string(rs[idx-1:idx+1]) != "^\"" {
+			return rs[startIdx:idx+1]
 		}
 	}
-	return s[startIdx:]
+	return rs[startIdx:]
 }
 
-func GetSubParen(s string, startIdx int) string{
+func GetSubParen(rs []rune, startIdx int) []rune{
 	var pFloor = 1;
-	for idx := startIdx+1; idx < len(s); idx++ {
-		if s[idx] == '(' {
+	for idx := startIdx+1; idx < len(rs); idx++ {
+		if rs[idx] == rune('(') {
 			pFloor++
-		}else if s[idx] == '"' {
-			idx += len(GetSubStr(s, idx)) + 1
-		}else if s[idx] == ')' {
+		}else if rs[idx] == rune('"') {
+			idx += len(GetSubStr(rs, idx)) + 1
+		}else if rs[idx] == rune(')') {
 			pFloor--
 		}
 		if pFloor == 0 {
-			return s[startIdx:idx+1]
+			return rs[startIdx:idx+1]
 		}
 	}
-	return s[startIdx:]
+	return rs[startIdx:]
 }
 
 func PathCut(s string) []string{
 	var result []string
-	for idx:=0; idx<len(s); idx++ {
-		var temp = GetOneToken(s, idx)
-		result = append(result, temp)
+	var rs = []rune(s)
+	for idx:=0; idx<len(rs); idx++ {
+		var temp = GetOneToken(rs, idx)
+		result = append(result, string(temp))
 		idx += len(temp)
 	}
 	return result
