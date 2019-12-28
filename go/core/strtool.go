@@ -91,9 +91,15 @@ func StrCut(s string) []string{
 			}else if(nowRune == rune('{')){
 				isObject = true
 				oFloor = 1
+			}else if(nowRune == rune(';')){
+				for nowRune != rune('\n') && nowIdx < len(runes)-1 {
+					nowIdx++
+					nowRune = runes[nowIdx]
+				}
+				continue
 			}
 			startIdx = nowIdx
-			continue;
+			continue
 		}
 
 		if startIdx >= 0 && runes[startIdx] == rune('!') && nowRune == rune('{') {
