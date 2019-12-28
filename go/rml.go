@@ -32,7 +32,9 @@ func main() {
 
 	/** 初始化执行栈，执行初始化脚本 **/
 	Es.Init()
+	Es.EvalStr(script.ZHScript, Es.MainCtx)
 	Es.EvalStr(script.InitScript, Es.MainCtx)
+	
 
 	/** 创建user语境 **/
 	var userCtx = BindMap{

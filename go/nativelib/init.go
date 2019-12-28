@@ -146,24 +146,24 @@ func InitNative(ctx *BindMap){
 	var addSetToken = Token{
 		NATIVE,
 		Native{
-			"addSet",
+			"addset",
 			3,
 			AddSet,
 			nil,
 		},
 	}
-	ctx.PutNow("addSet", &addSetToken)
+	ctx.PutNow("addset", &addSetToken)
 
 	var subSetToken = Token{
 		NATIVE,
 		Native{
-			"subSet",
+			"subset",
 			3,
 			SubSet,
 			nil,
 		},
 	}
-	ctx.PutNow("subSet", &subSetToken)
+	ctx.PutNow("subset", &subSetToken)
 
 	var mulSetToken = Token{
 		NATIVE,
@@ -174,29 +174,29 @@ func InitNative(ctx *BindMap){
 			nil,
 		},
 	}
-	ctx.PutNow("mulSet", &mulSetToken)
+	ctx.PutNow("mulset", &mulSetToken)
 
 	var divSetToken = Token{
 		NATIVE,
 		Native{
-			"divSet",
+			"divset",
 			3,
 			DivSet,
 			nil,
 		},
 	}
-	ctx.PutNow("divSet", &divSetToken)
+	ctx.PutNow("divset", &divSetToken)
 
 	var modSetToken = Token{
 		NATIVE,
 		Native{
-			"modSet",
+			"modset",
 			3,
 			ModSet,
 			nil,
 		},
 	}
-	ctx.PutNow("modSet", &modSetToken)
+	ctx.PutNow("modset", &modSetToken)
 
 	var swapToken = Token{
 		NATIVE,

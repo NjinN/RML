@@ -97,7 +97,7 @@ func Repeat(es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 				return rs, err
 			}
-			if rs.Tp == ERR {
+			if rs != nil && rs.Tp == ERR {
 				return rs, err
 			}
 		 }
@@ -134,7 +134,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -151,7 +151,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -173,7 +173,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -190,7 +190,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -209,7 +209,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -226,7 +226,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -245,7 +245,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -262,7 +262,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 						}
 						return rs, err
 					}
-					if rs.Tp == ERR {
+					if rs != nil && rs.Tp == ERR {
 						return rs, err
 					}
 				}
@@ -292,7 +292,7 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error){
 			if err != nil {
 				return rs, err
 			}
-			if rs.Tp == ERR {
+			if rs != nil && rs.Tp == ERR {
 				return rs, err
 			}
 			b, err = es.Eval(args[1].Val.([]*Token), &c)

@@ -58,7 +58,7 @@ func (bm *BindMap)Put(key string, val *Token){
 	}
 
 	if(ok){
-		bm.Table[key].Copy(val)
+		bm.Table[key] = val.Clone()
 		inserted = true
 	}else{
 		for !inserted && !ok && ctx.Father != nil {
@@ -66,7 +66,7 @@ func (bm *BindMap)Put(key string, val *Token){
 				_, ok = ctx.Table[key]
 			}
 			if(ok){
-				ctx.Table[key].Copy(val)
+				ctx.Table[key] = val.Clone()
 				inserted = true
 			}
 			ctx = ctx.Father

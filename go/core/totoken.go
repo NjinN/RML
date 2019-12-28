@@ -39,6 +39,18 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
+	if EndWith(str, "设为"){
+		result.Tp = PUT_WORD
+		result.Val = str[0 : len(str)-6]
+		return &result
+	}
+
+	if EndWith(str, "为") && strings.IndexByte(str, '/') < 0 {
+		result.Tp = SET_WORD
+		result.Val = str[0 : len(str)-3]
+		return &result
+	}
+
 	if(len(str) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
 		result.Tp = CHAR
 		result.Val = str[2]

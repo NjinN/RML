@@ -15,8 +15,8 @@ type EvalStack struct {
 
 
 func (es *EvalStack) Init(){
-	es.StartPos = make([]int, 8)
-	es.EndPos = make([]int, 8)
+	es.StartPos = make([]int, 0)
+	es.EndPos = make([]int, 0)
 	es.Line = make([]*Token, 1024*1024)
 	es.Idx = 0
 }
@@ -92,13 +92,13 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx > es.EndPos[startDeep - 1]) && !nextSkip){
 			if(len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP){
 				es.StartPos = append(es.StartPos, es.Idx)
+				es.EndPos = append(es.EndPos, es.Idx + 2)
 				es.Push(nextToken)
 				temp, err := nowToken.GetVal(ctx, es)
 				if err != nil {
 					return temp, err
 				}
 				es.Push(temp)
-				es.EndPos = append(es.EndPos, es.Idx)
 			}else if(len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp == OP){
 				temp, err := nowToken.GetVal(ctx, es)
 				if err != nil {
@@ -108,11 +108,13 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				es.EvalExp(ctx)
 				es.Push(es.Line[es.Idx - 1])
 				es.Line[es.Idx - 2] = nextToken
-				es.StartPos = append(es.StartPos, es.Idx)
+				es.StartPos = append(es.StartPos, es.Idx - 2)
+				es.EndPos = append(es.EndPos, es.Idx)
 			}
 			i += 1
 		}else{
-			if(len(es.QuoteList) > 0){
+			if len(es.QuoteList) > 0 {
+				
 				if(es.QuoteList[0] > 0){
 					temp, err := nowToken.GetVal(ctx, es)
 					if err != nil {
@@ -120,7 +122,10 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					}
 					nowToken = temp
 				}
-				es.QuoteList = es.QuoteList[1 : len(es.QuoteList)]
+
+				if len(es.QuoteList) > 0 { //todo I don't know why
+					es.QuoteList = es.QuoteList[1 :]
+				}
 			}else{
 				var temp *Token
 				var err error
@@ -138,9 +143,9 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			}else if(nowToken != nil && nowToken.Tp == OP && !skip && es.Idx >= 1){
 				if(es.Idx > startIdx){
 					es.StartPos = append(es.StartPos, es.Idx - 1)
+					es.EndPos = append(es.EndPos, es.Idx + 1)
 					es.Push(es.Line[es.Idx - 1])
 					es.Line[es.Idx - 2] = nowToken
-					es.EndPos = append(es.EndPos, es.Idx)
 				}else{
 					result.Tp = ERR
 					result.Val = "Illegal grammar!!!"
