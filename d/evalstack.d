@@ -62,9 +62,10 @@ class EvalStack {
             if(nextToken && nextToken.type == TypeEnum.op && (startDeep == 0 || idx > endPos.get(startDeep - 1))){
                 if(startPos.len == 0 || line[startPos.last].type != TypeEnum.op){
                     startPos.add(idx);
+                    endPos.add(idx + 2);
                     push(nextToken);
                     push(nowToken.getVal(ctx, this));
-                    endPos.add(idx);
+                    
                 }else if(startPos.len == 0 || line[startPos.last].type == TypeEnum.op){
                     push(nowToken.getVal(ctx, this));
                     evalExp(ctx);
