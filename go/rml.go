@@ -1,16 +1,20 @@
 package main
 
 import "fmt"
-import . "./core"
-import . "./nativelib"
-import . "./oplib"
-import . "./extlib"
-import "./script"
 import "os"
 import "bufio"
 import "strings"
 import "io/ioutil"
 import "path/filepath"
+import "math/rand"
+import "time"
+
+import . "./core"
+import . "./nativelib"
+import . "./oplib"
+import . "./extlib"
+import "./script"
+
 
 func main() {
 	// fmt.Println(ToTokens("b/:a")[0].Val.([]*Token)[1].OutputStr())
@@ -34,7 +38,7 @@ func main() {
 	Es.Init()
 	Es.EvalStr(script.ZHScript, Es.MainCtx)
 	Es.EvalStr(script.InitScript, Es.MainCtx)
-	
+
 
 	/** 创建user语境 **/
 	var userCtx = BindMap{
@@ -71,6 +75,10 @@ func main() {
 			}
 		}
 
+	}else{
+		rand.Seed(time.Now().UnixNano())
+		fmt.Println("如梦令 -- " + Cis[rand.Intn(len(Cis))])
+		fmt.Println("RML no-version;\tGratitude to Carl!")
 	}
 
 	/** 获取控制台输入并执行 **/
