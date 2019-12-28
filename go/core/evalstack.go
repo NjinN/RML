@@ -92,12 +92,12 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx > es.EndPos[startDeep - 1]) && !nextSkip){
 			if(len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP){
 				es.StartPos = append(es.StartPos, es.Idx)
-				es.EndPos = append(es.EndPos, es.Idx + 2)
 				es.Push(nextToken)
 				temp, err := nowToken.GetVal(ctx, es)
 				if err != nil {
 					return temp, err
 				}
+				es.EndPos = append(es.EndPos, es.Idx + 1)
 				es.Push(temp)
 			}else if(len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp == OP){
 				temp, err := nowToken.GetVal(ctx, es)
