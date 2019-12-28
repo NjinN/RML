@@ -371,10 +371,17 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, e
 					panic(err)
 				}
 				if idx > 0 && idx <= len(holder.Val.([]*Token)){
-					holder.Val.([]*Token)[idx-1] = val
-					return val, nil
+					holder.Val.([]*Token)[idx-1] = val.Clone()
+					return holder.Val.([]*Token)[idx-1], nil
 				}
-			} 
+			} else {
+				for i:=0; i<len(holder.Val.([]*Token))-1; i+=2{
+					if holder.Val.([]*Token)[i].OutputStr() == key {
+						holder.Val.([]*Token)[i+1] = val.Clone()
+						return holder.Val.([]*Token)[i+1], nil
+					}
+				}
+			}
 
 			return &Token{ERR, "Error path!"}, nil
 		}else if holder.Tp == OBJECT {
