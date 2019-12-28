@@ -14,7 +14,7 @@ func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	var result = Token{Tp: DATATYPE}
 	if args[1] != nil {
-		result.Val = string(TypeStr(args[1].Tp))
+		result.Val = args[1].Tp
 	}
 
 	return &result, nil

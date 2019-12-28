@@ -26,7 +26,7 @@ func (t *Token) ToString() string{
 	case GET_WORD:
 		return t.Val.(string)
 	case DATATYPE:
-		return t.Val.(string)
+		return TypeToStr(t.Val.(int))
 	case LOGIC:
 		return strconv.FormatBool(t.Val.(bool))
 	case INTEGER:

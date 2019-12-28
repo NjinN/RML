@@ -51,6 +51,12 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
+	if(str[len(str)-1] == '!'){
+		result.Tp = DATATYPE
+		result.Val = StrToType(str)
+		return &result
+	}
+
 	if(len(str) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
 		result.Tp = CHAR
 		result.Val = str[2]
