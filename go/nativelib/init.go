@@ -77,13 +77,13 @@ func InitNative(ctx *BindMap){
 	var printToken = Token{
 		NATIVE,
 		Native{
-			"print",
-			2,
+			"_print",
+			3,
 			Pprint,
 			nil,
 		},
 	}
-	ctx.PutNow("print", &printToken)
+	ctx.PutNow("_print", &printToken)
 
 	var letToken = Token{
 		NATIVE,

@@ -77,7 +77,7 @@ func Copy(es *EvalStack, ctx *BindMap) (*Token, error){
 
 func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
-	if args[1].Tp == BLOCK {
+	if args[1].Tp == BLOCK && args[2].Tp == LOGIC {
 		fmt.Print("[ ")
 		for _, item := range args[1].Val.([]*Token){
 			temp, err := item.GetVal(ctx, es)
@@ -86,9 +86,17 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 			fmt.Print(temp.OutputStr() + " ")
 		}
-		fmt.Println("]")
+		if args[2].Val.(bool){
+			fmt.Print("]")
+		}else{
+			fmt.Println("]")
+		}
 	}else{
-		fmt.Println(args[1].OutputStr())
+		if args[2].Val.(bool){
+			fmt.Print(args[1].OutputStr())
+		}else{
+			fmt.Println(args[1].OutputStr())
+		}
 	}
 	return nil, nil
 }

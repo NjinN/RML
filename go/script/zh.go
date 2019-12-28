@@ -60,7 +60,7 @@ const ZHScript =
 _执行为	:_do
 _收敛为	:_reduce
 _复制为	:_copy
-打印为	:print
+_打印为	:_print
 令为	:let
 
 加法为	:add
