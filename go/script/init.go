@@ -141,6 +141,49 @@ replace: func [serial old new /at at /amount amount /all] [
 ]
 
 
+to-lit-word: func [a] [to lit-word! a]
+转成原字为 术 [甲] [转成 原字类型 甲]
+
+to-get-word: func [a] [to get-word! a]
+转成取字为 术 [甲] [转成 取字类型 甲]
+
+to-datatype: func [a] [to datatype! a]
+转成类型为 术 [甲] [转成 类型类型 甲]
+
+to-logic: func [a] [to logic! a]
+转成逻辑为 术 [甲] [转成 逻辑类型 甲]
+
+to-integer: func [a] [to integer! a]
+转成整数为 术 [甲] [转成 整数类型 甲]
+
+to-decimal: func [a] [to decimal! a]
+转成小数为 术 [甲] [转成 小数类型 甲]
+
+to-char: func [a] [to char! a]
+转成字符为 术 [甲] [转成 字符类型 甲]
+
+to-string: func [a] [to string! a]
+转成字符串为 术 [甲] [转成 字符串类型 甲]
+
+to-paren: func [a] [to paren! a]
+转成圆块为 术 [甲] [转成 圆块类型 甲]
+
+to-block: func [a] [to block! a]
+转成方块为 术 [甲] [转成 方块类型 甲]
+
+to-word: func [a] [to word! a]
+转成单字为 术 [甲] [转成 单字类型 甲]
+
+to-set-word: func [a] [to set-word! a]
+转成设字为 术 [甲] [转成 设字类型 甲]
+
+to-put-word: func [a] [to put-word! a]
+转成置字为 术 [甲] [转成 置字类型 甲]
+
+to-path: func [a] [to path! a]
+转成路径为 术 [甲] [转成 路径类型 甲]
+
+
 
 
 `

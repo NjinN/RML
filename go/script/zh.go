@@ -2,6 +2,30 @@ package script
 
 const ZHScript = 
 `
+无类型为	nil!	
+空类型为	none!	
+错误类型为	err!	
+原字类型为	lit-word!	
+取字类型为	get-word!
+类型类型为	datatype!	
+逻辑类型为	logic!	
+整数类型为	integer!	
+小数类型为	decimal!	
+字符类型为	char!	
+字符串类型为	string!	
+圆块类型为	paren!	
+方块类型为	block!	
+对象类型为	object!	
+修饰字类型为	prop!	
+单字类型为	word!	
+设字类型为	set-word!
+置字类型为	put-word!
+路径类型为	path!
+中缀类型为	op!
+原生函数类型为	native!
+函数类型为	func!
+
+
 
 加为	:+
 减为	:-
@@ -32,6 +56,7 @@ const ZHScript =
 
 退出为 	:q	
 类型?为	:type?
+转成为	:to
 _执行为	:_do
 _收敛为	:_reduce
 _复制为	:_copy

@@ -30,6 +30,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("type?", &typeOfToken)
 
+	var toToken = Token{
+		NATIVE,
+		Native{
+			"to",
+			3,
+			To,
+			nil,
+		},
+	}
+	ctx.PutNow("to", &toToken)
+
 	var doToken = Token{
 		NATIVE,
 		Native{
