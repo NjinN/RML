@@ -229,8 +229,7 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 		if startToken.Tks()[0].Tp == FUNC {
 			temp, err = startToken.Tks()[0].Val.(Func).RunWithProps(es, ctx, startToken.Tks())
 		}else{
-			startToken.SetPathVal(es.Line[es.LastEndPos()], ctx, es)
-			temp = es.Line[es.LastEndPos()]
+			temp, err = startToken.SetPathVal(es.Line[es.LastEndPos()], ctx, es)
 		}
 	case NATIVE, OP:
 		temp, err = es.Line[es.LastStartPos()].Val.(Native).Exec(es, ctx)

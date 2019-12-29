@@ -310,6 +310,7 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error){
 				return rs, err
 			}
 		}
+		return nil, nil
 	}
 	var result = Token{ERR, "Type Mismatch"}
 	return &result, nil

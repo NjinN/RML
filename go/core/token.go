@@ -58,7 +58,7 @@ func (t *Token) ToString() string{
 		}
 		return result
 	case CHAR:
-		return "#'" + string(t.Val.(uint8)) + "'"
+		return "#'" + string(t.Val.(rune)) + "'"
 	case STRING:
 		temp := t.Str()
 		temp = strings.ReplaceAll(temp, "^", "^^")
@@ -301,6 +301,7 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 	if err != nil {
 		return nil, err
 	}
+	
 	var curCtx = ctx
 	for idx := 1; idx < len(t.Tks()); idx++ {
 		if result.Tp == OBJECT {
@@ -366,6 +367,13 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 				temp.Val = append(temp.Tks(), t.Tks()[i])
 			}
 			return &temp, nil
+		}else if result.Tp == STRING && key.Tp == INTEGER {
+			runes := []rune(result.Str())
+			if key.Int() > 0 && key.Int() <= len(runes) {
+				result = &Token{CHAR, runes[key.Int() - 1]}
+				continue
+			}
+
 		}
 		return &Token{ERR, "Error path!"}, nil
 	}
@@ -392,13 +400,13 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, e
 				}
 				if idx > 0 && idx <= len(holder.Tks()){
 					holder.Tks()[idx-1] = val.Clone()
-					return holder.Tks()[idx-1], nil
+					return holder, nil
 				}
 			} else {
 				for i:=0; i<len(holder.Tks())-1; i+=2{
 					if holder.Tks()[i].OutputStr() == key {
 						holder.Tks()[i+1] = val.Clone()
-						return holder.Tks()[i+1], nil
+						return holder, nil
 					}
 				}
 			}
@@ -406,7 +414,30 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, e
 			return &Token{ERR, "Error path!"}, nil
 		}else if holder.Tp == OBJECT {
 			holder.Ctx().Table[key] = val
-			return val, nil
+			return holder, nil
+		}else if holder.Tp == STRING {
+			if IsNumberStr(key) == 0 {
+				idx, err := strconv.Atoi(key)
+				if err != nil {
+					panic(err)
+				}
+				runes := []rune(holder.Val.(string))
+				length := len(runes)
+				if idx > 0 && idx <= length {
+					idx--
+					if val.Tp == STRING {
+						holder.Val = string(runes[0:idx]) + val.Str() + string(runes[idx+1:length])
+						return holder, nil
+					}else if val.Tp == CHAR {
+						var temp = runes[0:idx]
+						temp = append(temp, val.Val.(rune))
+						temp = append(temp, runes[idx+1:]...)
+						holder.Val = string(temp)
+						return holder, nil
+					}
+				}
+			}
+
 		}else{
 			return &Token{ERR, "Error path!"}, nil
 		}

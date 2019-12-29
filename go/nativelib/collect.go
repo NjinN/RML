@@ -15,7 +15,7 @@ func Length(es *EvalStack, ctx *BindMap) (*Token, error){
 		return &result, nil
 	}else if args[1].Tp == STRING {
 		result.Tp = INTEGER
-		result.Val = len(args[1].Str())
+		result.Val = len([]rune(args[1].Str()))
 		return &result, nil
 	}
 

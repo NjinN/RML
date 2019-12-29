@@ -57,12 +57,6 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
-	if(len(str) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
-		result.Tp = CHAR
-		result.Val = str[2]
-		return &result
-	}
-
 	if(str[0] == '/' && str != "/" && str != "/="){
 		result.Tp = PROP
 		result.Val = str[1 : len(str)]
@@ -120,6 +114,12 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		es.Eval(blk, &c)
 		es.IsLocal = orginSts
 		result.Val = &c
+		return &result
+	}
+
+	if(len([]rune(str)) == 4 && str[0 : 2] == "#'" && str[3] == '\''){
+		result.Tp = CHAR
+		result.Val = []rune(str)[2]
 		return &result
 	}
 
