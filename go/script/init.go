@@ -238,6 +238,14 @@ write: func [path data /append] [
 	_写出 路径 数据 添加
 ]
 
+cmd: func [c /no-wait /output output] [
+	_cmd c no-wait output
+]
+
+命令为 术 [令 /不等待 /输出 输出] [
+	_命令 令 不等待 输出
+]
+
 
 
 `

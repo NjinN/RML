@@ -118,7 +118,16 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("let", &letToken)
 
-	
+	var cmdToken = Token{
+		NATIVE,
+		Native{
+			"_cmd",
+			4,
+			CallCmd,
+			nil,
+		},
+	}
+	ctx.PutNow("_cmd", &cmdToken)
 
 
 	/*******  file  *******/
@@ -133,6 +142,17 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("now-dir", &nowDirToken)
+
+	var absPathToken = Token{
+		NATIVE,
+		Native{
+			"abs-path",
+			2,
+			AbsFilePath,
+			nil,
+		},
+	}
+	ctx.PutNow("abs-path", &absPathToken)
 
 	var chDirToken = Token{
 		NATIVE,

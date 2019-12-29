@@ -3,6 +3,7 @@ package nativelib
 import . "../core"
 import "os"
 import "os/exec"
+import "bytes"
 import "fmt"
 
 func Quit(es *EvalStack, ctx *BindMap) (*Token, error){
@@ -142,5 +143,28 @@ func Let(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
+func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	if args[1].Tp == STRING && args[2].Tp == LOGIC {
+		cmd := exec.Command("cmd", "/c", args[1].Str())
+		if args[3] != nil && args[3].Tp != NONE {
+			var output bytes.Buffer
+			cmd.Stdout = &output
+			cmd.Run()
+			args[3].Tp = BIN
+			args[3].Val = append(make([]byte, 0), output.Bytes()...)
+			return args[3], nil
+		}else if args[2].ToBool() {
+			cmd.Stdout = os.Stdout
+			cmd.Start()
+		}else{
+			cmd.Stdout = os.Stdout
+			cmd.Run()
+		}	
+		return nil, nil
+	}
+
+	return &Token{ERR, "Type Mismatch"}, nil
+}
 
 

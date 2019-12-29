@@ -65,10 +65,13 @@ _收敛为	:_reduce
 _复制为	:_copy
 _打印为	:_print
 令为	:let
+_命令为	:_cmd
+
 加载为	:load	
 _读取为	:_read
 存在?为	:exist?
 当前目录为	:now-dir
+绝对目录为	:abs-path
 变更目录为	:cd
 _列出目录为	:_ls
 重命名为	:rename

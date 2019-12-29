@@ -18,15 +18,40 @@ func NowDir(es *EvalStack, ctx *BindMap) (*Token, error){
 func ChangeDir(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	
-	filePath, err := filepath.Abs(strings.ReplaceAll(args[1].Str(), `"`, ``))
-	if err != nil {
-		return &Token{ERR, err.Error()}, nil
+	if args[1].Tp == FILE {
+		filePath, err := filepath.Abs(strings.ReplaceAll(args[1].Str(), `"`, ``))
+		if err != nil {
+			return &Token{ERR, err.Error()}, nil
+		}
+		e := os.Chdir(filePath)
+		if e != nil {
+			return &Token{ERR, err.Error()}, nil
+		}
+		return &Token{LOGIC, true}, nil
 	}
-	e := os.Chdir(filePath)
-	if e != nil {
-		return &Token{ERR, err.Error()}, nil
+	return &Token{ERR, "Type Mismatch"}, nil
+}
+
+func AbsFilePath(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	
+	if args[1].Tp == FILE {
+		filePath, err := filepath.Abs(strings.ReplaceAll(args[1].Str(), `"`, ``))
+		if err != nil {
+			return &Token{ERR, err.Error()}, nil
+		}
+		fi, err := os.Stat(filePath)
+		if err != nil {
+			return &Token{ERR, err.Error()}, nil
+		}
+		if fi.IsDir() {
+			filePath += "/"
+		}
+
+		args[1].Val = filePath
+		return args[1], nil
 	}
-	return &Token{LOGIC, true}, nil
+	return &Token{ERR, "Type Mismatch"}, nil
 }
 
 func LsDir(es *EvalStack, ctx *BindMap) (*Token, error){
