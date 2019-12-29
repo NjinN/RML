@@ -13,6 +13,8 @@ const ZHScript =
 小数类型为	decimal!	
 字符类型为	char!	
 字符串类型为	string!	
+文件类型为	file!
+二元类型为	bin!
 圆块类型为	paren!	
 方块类型为	block!	
 对象类型为	object!	
@@ -62,6 +64,8 @@ _收敛为	:_reduce
 _复制为	:_copy
 _打印为	:_print
 令为	:let
+加载为	:load	
+读取为	:_read
 
 加法为	:add
 减法为	:sub

@@ -192,6 +192,19 @@ to-path: func [a] [to path! a]
 转成路径为 术 [甲] [转成 路径类型 甲]
 
 
+read: func [target /bin /string] [
+	type:= string!
+	if bin [type: bin!]
+	if string [type: string!]
+	_read target type
+]
+
+读取为 术 [目标 /二元 /字符串] [
+	类型设为 字符串类型
+	若 二元 [类型为 二元类型]
+	若 字符串 [类型为 字符串类型]
+	_读取 目标 类型
+]
 
 
 `

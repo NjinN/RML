@@ -2,6 +2,7 @@ package nativelib
 
 import "math"
 import "strconv"
+// import "encoding/hex"
 // import "fmt"
 
 import . "../core"
@@ -120,6 +121,11 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 
 		case STRING:
+			if args[2].Tp == BIN {
+				result.Val = string(args[2].Val.([]byte))
+				return &result, nil
+			}
+
 			result.Val = args[2].OutputStr()
 			return &result, nil
 
@@ -150,6 +156,12 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 		case FILE:
 			if args[2].Tp == STRING {
 				result.Val = args[2].Val
+				return &result, nil
+			}
+
+		case BIN:
+			if args[2].Tp == STRING {
+				result.Val = []byte(args[2].Str())
 				return &result, nil
 			}
 

@@ -2,6 +2,7 @@ package core
 
 import "strings"
 import "strconv"
+import "encoding/hex"
 // import "fmt"
 
 func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
@@ -60,6 +61,18 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	if(str[0] == '%'){
 		result.Tp = FILE
 		result.Val = str[1:]
+		return &result
+	}
+
+	if len(str) > 3 && StartWith(str, "#{") && str[len(str)-1] == '}' {
+		bin, err := hex.DecodeString(str[2:len(str)-1])
+		if err != nil {
+			result.Tp = ERR
+			result.Val = "Error bin format"
+		}else{
+			result.Tp = BIN
+			result.Val = bin
+		}
 		return &result
 	}
 

@@ -12,7 +12,8 @@ const (
 	DECIMAL 	
 	CHAR	  	
 	STRING
-	FILE 		
+	FILE
+	BIN 		
 	PAREN 		
 	BLOCK
 	OBJECT
@@ -54,6 +55,8 @@ func TypeToStr(n int) string{
 		return "string!"
 	case FILE:
 		return "file!"
+	case BIN:
+		return "bin!"
 	case PAREN:
 		return "paren!"
 	case BLOCK:
@@ -108,6 +111,8 @@ func StrToType(s string) int{
 		return STRING
 	case "file!":
 		return FILE
+	case "bin!":
+		return BIN
 	case "paren!":
 		return PAREN
 	case "block!":

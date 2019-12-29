@@ -3,9 +3,6 @@ package nativelib
 import . "../core"
 import "os"
 import "fmt"
-import "strings"
-import "io/ioutil"
-import "path/filepath"
 
 func Quit(es *EvalStack, ctx *BindMap) (*Token, error){
 	os.Exit(0)
@@ -65,6 +62,14 @@ func Reduce(es *EvalStack, ctx *BindMap) (*Token, error){
 		result.Val = "Type Mismatch"
 		return result, nil
 	}
+}
+
+func Format(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	var result Token
+	result.Tp = STRING
+	result.Val = args[1].ToString()
+	return &result, nil
 }
 
 func Copy(es *EvalStack, ctx *BindMap) (*Token, error){
@@ -129,33 +134,5 @@ func Let(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-func Load(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
-	var result Token
 
-	if args[1] != nil && args[1].Tp == FILE {
-		var path = args[1].Str()
-		if strings.IndexByte(path, '"') >=0 {
-			path = strings.ReplaceAll(path, `"`, ``)
-		}
-		filePath, err := filepath.Abs(path)
-		if err != nil {
-			return &Token{ERR, "Error File Path!"}, nil
-		}
-		fileData, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			return &Token{ERR, "Error when reading the file"}, nil
-		}
-
-		result.Tp = BLOCK
-		result.Val = ToTokens(string(fileData), ctx, es)
-		
-		return &result, nil
-
-	}
-
-	result.Tp = ERR
-	result.Val = "Type Mismatch"
-	return &result, nil
-}
 

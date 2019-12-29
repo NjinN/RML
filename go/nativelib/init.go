@@ -63,6 +63,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_reduce", &reduceToken)
 
+	var formatToken = Token{
+		NATIVE,
+		Native{
+			"format",
+			2,
+			Format,
+			nil,
+		},
+	}
+	ctx.PutNow("format", &formatToken)
+
 	var copyToken = Token{
 		NATIVE,
 		Native{
@@ -106,6 +117,17 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("load", &loadToken)
+
+	var readToken = Token{
+		NATIVE,
+		Native{
+			"_read",
+			3,
+			Read,
+			nil,
+		},
+	}
+	ctx.PutNow("_read", &readToken)
 
 
 	/*******  math  *******/

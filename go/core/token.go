@@ -4,6 +4,7 @@ import "strconv"
 import "bytes"
 import "fmt"
 import "strings"
+import "encoding/hex"
 
 type Token struct {
 	Tp 		int
@@ -71,6 +72,8 @@ func (t *Token) ToString() string{
 		return "/" + t.Str()
 	case FILE:
 		return "%" + t.Str()
+	case BIN:
+		return "#{" + hex.EncodeToString(t.Val.([]byte)) + "}"
 	case SET_WORD:
 		return t.Str() + ":"
 	case PUT_WORD:
