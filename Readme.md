@@ -116,6 +116,20 @@ either 1 > 2 [print 1] [print 2]    ;打印2
 ```
 目前RML提供了 `if` 和 `either` 函数，根据其后的第一个参数，确定要执行的代码。<br/>
 由于RML只支持定长的表达式，所以不支持主流语言的连续使用 `if` 和 `else if` 不断拓展表达式的功能。
+### 多线程
+RML在Go语言的基础上提供了多线程并行的功能。
+```
+fork [fib 40]                   ;启动一个Goroutine进行计算，不等待
+
+res: 0
+fork/result [fib 40] res        ;通过修饰字，指定分支线程返回值的接收者
+```
+另外还支持同时启动多个Goroutine，并决定是否等待。
+```
+spawn [ [print fib 40] [print fib 40] ]             ;启动两个Goroutine进行计算，不等待
+spawn/wait [ [print fib 40] [print fib 40] ]        ;启动两个Goroutine进行计算，并等待其全部执行完毕
+```
+
 ## 中文支持
 RML使用遍历UTF8字符的方式来解析代码，因此可以完全支持中文。目前RML原生提供了中文编程支持，其中以 `为` 字结尾的Token，等同于以 `:` 结尾的设字，另外主要的函数都提供了对应的中文绑定。
 ```
