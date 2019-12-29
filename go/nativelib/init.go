@@ -336,6 +336,16 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("return", &returnToken)
 
+	var foreachToken = Token{
+		NATIVE,
+		Native{
+			"foreach",
+			4,
+			Fforeach,
+			[]int{0, 1, 1},
+		},
+	}
+	ctx.PutNow("foreach", &foreachToken)
 
 	/*******  deffunc  *******/
 

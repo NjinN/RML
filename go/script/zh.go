@@ -84,6 +84,7 @@ _打印为	:_print
 跳出为	:break
 继续为	:continue
 返回为	:return
+遍历为	:foreach
 
 术为	:func
 
