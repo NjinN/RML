@@ -246,6 +246,23 @@ cmd: func [c /no-wait /output output] [
 	_命令 令 不等待 输出
 ]
 
+fork: func [code /result result] [
+	_fork code result
+]
+
+分支为 术 [代码 /结果 结果] [
+	_分支 代码 结果
+]
+
+spawn: func [codes /wait] [
+	_spawn codes wait
+]
+
+并行为 术 [代码集 /等待] [
+	_并行 代码集 等待
+]
+
+
 
 
 `

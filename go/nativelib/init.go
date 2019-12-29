@@ -648,4 +648,30 @@ func InitNative(ctx *BindMap){
 	ctx.PutNow("_replace", &replaceToken)
 
 
+	/*******  fork  *******/
+	var forkToken = Token{
+		NATIVE,
+		Native{
+			"_fork",
+			3,
+			Fork,
+			nil,
+		},
+	}
+	ctx.PutNow("_fork", &forkToken)
+
+	var spawnToken = Token{
+		NATIVE,
+		Native{
+			"_spawn",
+			3,
+			Spawn,
+			nil,
+		},
+	}
+	ctx.PutNow("_spawn", &spawnToken)
+
+
+
+
 }

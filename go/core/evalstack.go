@@ -19,6 +19,8 @@ func (es *EvalStack) Init(){
 	es.EndPos = make([]int, 0)
 	es.Line = make([]*Token, 1024*1024)
 	es.Idx = 0
+	es.QuoteList = make([]int, 0)
+	es.IsLocal = false
 }
 
 func (es *EvalStack) Push(t *Token){
