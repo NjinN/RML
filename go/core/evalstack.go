@@ -156,7 +156,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				if len(args) > 0 && args[0] == 1 && (len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP) {
 					resultBlk = append(resultBlk, nowToken)
 				}
-			}else if nowToken.Tp == PATH && nowToken.Val.([]*Token)[0] != nil && nowToken.Val.([]*Token)[0].Tp == FUNC {
+			}else if nowToken.Tp == PATH && nowToken.Tks()[0] != nil && nowToken.Tks()[0].Tp == FUNC {
 				es.StartPos = append(es.StartPos, es.Idx)
 				es.EndPos = append(es.EndPos, es.Idx + nowToken.GetPathExpLen() - 1)
 				es.Push(nowToken);
@@ -217,17 +217,17 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 	switch startToken.Tp {
 	case SET_WORD:
 		if es.IsLocal {
-			ctx.PutLocal(es.Line[es.LastStartPos()].Val.(string), es.Line[es.LastEndPos()])
+			ctx.PutLocal(es.Line[es.LastStartPos()].Str(), es.Line[es.LastEndPos()])
 		}else{
-			ctx.Put(es.Line[es.LastStartPos()].Val.(string), es.Line[es.LastEndPos()])
+			ctx.Put(es.Line[es.LastStartPos()].Str(), es.Line[es.LastEndPos()])
 		}
 		temp = es.Line[es.LastEndPos()]
 	case PUT_WORD:
-		ctx.PutLocal(es.Line[es.LastStartPos()].Val.(string), es.Line[es.LastEndPos()])
+		ctx.PutLocal(es.Line[es.LastStartPos()].Str(), es.Line[es.LastEndPos()])
 		temp = es.Line[es.LastEndPos()]
 	case PATH:
-		if startToken.Val.([]*Token)[0].Tp == FUNC {
-			temp, err = startToken.Val.([]*Token)[0].Val.(Func).RunWithProps(es, ctx, startToken.Val.([]*Token))
+		if startToken.Tks()[0].Tp == FUNC {
+			temp, err = startToken.Tks()[0].Val.(Func).RunWithProps(es, ctx, startToken.Tks())
 		}else{
 			startToken.SetPathVal(es.Line[es.LastEndPos()], ctx, es)
 			temp = es.Line[es.LastEndPos()]

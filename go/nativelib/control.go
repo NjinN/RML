@@ -10,9 +10,9 @@ func Iif(es *EvalStack, ctx *BindMap) (*Token, error){
 	var result Token
 	if args[1].ToBool(){
 		if args[2].Tp == BLOCK {
-			return es.Eval(args[2].Val.([]*Token), ctx)
+			return es.Eval(args[2].Tks(), ctx)
 		}else if args[2].Tp == STRING {
-			return es.EvalStr(args[2].Val.(string), ctx)
+			return es.EvalStr(args[2].Str(), ctx)
 		}
 	}else{
 		return nil, nil
@@ -30,15 +30,15 @@ func Either(es *EvalStack, ctx *BindMap) (*Token, error){
 	var result Token
 	if args[1].ToBool(){
 		if args[2].Tp == BLOCK {
-			return es.Eval(args[2].Val.([]*Token), ctx)
+			return es.Eval(args[2].Tks(), ctx)
 		}else if args[2].Tp == STRING {
-			return es.EvalStr(args[2].Val.(string), ctx)
+			return es.EvalStr(args[2].Str(), ctx)
 		}
 	}else{
 		if args[3].Tp == BLOCK {
-			return es.Eval(args[3].Val.([]*Token), ctx)
+			return es.Eval(args[3].Tks(), ctx)
 		}else if args[3].Tp == STRING {
-			return es.EvalStr(args[3].Val.(string), ctx)
+			return es.EvalStr(args[3].Str(), ctx)
 		}
 	}
 
@@ -53,8 +53,8 @@ func Loop(es *EvalStack, ctx *BindMap) (*Token, error){
 	if(args[1].Tp == INTEGER && args[2].Tp == BLOCK){
 		var rs *Token
 		var err error
-		for i := 0; i < args[1].Val.(int); i++ {
-			rs, err = es.Eval(args[2].Val.([]*Token), ctx) 
+		for i := 0; i < args[1].Int(); i++ {
+			rs, err = es.Eval(args[2].Tks(), ctx) 
 			if err != nil {
 				if err.Error() == "continue" {
 					continue
@@ -83,12 +83,12 @@ func Repeat(es *EvalStack, ctx *BindMap) (*Token, error){
 		 var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
 		 var countToken = Token{INTEGER, 1}
 		 
-		 c.PutNow(args[1].Val.(string), &countToken)
+		 c.PutNow(args[1].Str(), &countToken)
 		 var rs *Token
 		 var err error
-		 for countToken.Val.(int) <= args[2].Val.(int) {
-			rs, err = es.Eval(args[3].Val.([]*Token), &c)
-			countToken.Val = countToken.Val.(int) + 1
+		 for countToken.Int() <= args[2].Int() {
+			rs, err = es.Eval(args[3].Tks(), &c)
+			countToken.Val = countToken.Int() + 1
 			if err != nil {
 				if err.Error() == "continue" {
 					continue
@@ -117,15 +117,15 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 	if(args[1].Tp == WORD && args[5].Tp == BLOCK && (args[2].Tp == INTEGER || args[2].Tp == DECIMAL) && (args[3].Tp == INTEGER || args[3].Tp == DECIMAL) && (args[4].Tp == INTEGER || args[4].Tp == DECIMAL)){
 		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
 		var countToken = args[2].Dup()
-		c.PutNow(args[1].Val.(string), countToken)
+		c.PutNow(args[1].Str(), countToken)
 		var rs *Token
 		var err error
 
 		if(args[2].Tp == INTEGER && args[4].Tp == INTEGER){
 			if args[3].Tp == INTEGER {
-				for countToken.Val.(int) <= args[3].Val.(int) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(int) + args[4].Val.(int)
+				for countToken.Int() <= args[3].Int() {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Int() + args[4].Int()
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -140,9 +140,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 					}
 				}
 			}else{
-				for countToken.Val.(int) <= int(args[3].Val.(float64)) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(int) + args[4].Val.(int)
+				for countToken.Int() <= int(args[3].Float()) {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Int() + args[4].Int()
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -160,11 +160,11 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 
 		}else if(args[2].Tp == INTEGER && args[4].Tp == DECIMAL) {
 			countToken.Tp = DECIMAL
-			countToken.Val = float64(countToken.Val.(int))
+			countToken.Val = float64(countToken.Int())
 			if args[3].Tp == INTEGER {
-				for countToken.Val.(float64) <= float64(args[3].Val.(int)) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
+				for countToken.Float() <= float64(args[3].Int()) {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Float() + args[4].Float()
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -179,9 +179,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 					}
 				}
 			}else{
-				for countToken.Val.(float64) <= args[3].Val.(float64) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
+				for countToken.Float() <= args[3].Float() {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Float() + args[4].Float()
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -198,9 +198,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 		}else if(args[2].Tp == DECIMAL && args[4].Tp == INTEGER) {
 			if args[3].Tp == INTEGER {
-				for countToken.Val.(float64) <= float64(args[3].Val.(int)) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(float64) + float64(args[4].Val.(int))
+				for countToken.Float() <= float64(args[3].Int()) {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Float() + float64(args[4].Int())
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -215,9 +215,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 					}
 				}
 			}else{
-				for countToken.Val.(float64) <= args[3].Val.(float64) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(float64) + float64(args[4].Val.(int))
+				for countToken.Float() <= args[3].Float() {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Float() + float64(args[4].Int())
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -234,9 +234,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 		}else if(args[2].Tp == DECIMAL && args[4].Tp == DECIMAL) {
 			if args[3].Tp == INTEGER {
-				for countToken.Val.(float64) <= float64(args[3].Val.(int)) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
+				for countToken.Float() <= float64(args[3].Int()) {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Float() + args[4].Float()
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -251,9 +251,9 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 					}
 				}
 			}else{
-				for countToken.Val.(float64) <= args[3].Val.(float64) {
-					rs, err = es.Eval(args[5].Val.([]*Token), &c)
-					countToken.Val = countToken.Val.(float64) + args[4].Val.(float64)
+				for countToken.Float() <= args[3].Float() {
+					rs, err = es.Eval(args[5].Tks(), &c)
+					countToken.Val = countToken.Float() + args[4].Float()
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -282,14 +282,14 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	if(args[1].Tp == BLOCK && args[2].Tp == BLOCK){
 		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-		b, e1 := es.Eval(args[1].Val.([]*Token), &c)
+		b, e1 := es.Eval(args[1].Tks(), &c)
 		if e1 != nil {
 			return nil, e1
 		}
 		var rs *Token
 		var err error
 		for b.Val.(bool) {
-			rs, err = es.Eval(args[2].Val.([]*Token), &c)
+			rs, err = es.Eval(args[2].Tks(), &c)
 			if err != nil {
 				if err.Error() == "continue" {
 					continue
@@ -302,7 +302,7 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error){
 			if rs != nil && rs.Tp == ERR {
 				return rs, err
 			}
-			b, err = es.Eval(args[1].Val.([]*Token), &c)
+			b, err = es.Eval(args[1].Tks(), &c)
 			if err != nil {
 				return rs, err
 			}
@@ -339,10 +339,10 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 	if args[1].Tp == WORD {
 		if args[2].Tp == BLOCK || args[2].Tp == PAREN || args[2].Tp == PATH {
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-			for i:=0; i<len(args[2].Val.([]*Token)); i++ {
-				c.PutNow(args[1].Val.(string), args[2].Val.([]*Token)[i])
+			for i:=0; i<len(args[2].Tks()); i++ {
+				c.PutNow(args[1].Str(), args[2].Tks()[i])
 				if args[3].Tp == BLOCK {
-					temp, err := es.Eval(args[3].Val.([]*Token), &c)
+					temp, err := es.Eval(args[3].Tks(), &c)
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -357,7 +357,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 					}
 
 				}else if args[3].Tp == STRING {
-					temp, err := es.EvalStr(args[3].Val.(string), &c)
+					temp, err := es.EvalStr(args[3].Str(), &c)
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -377,10 +377,10 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 
 		}else if args[2].Tp == OBJECT {
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-			for k, v := range(args[2].Val.(*BindMap).Table){
-				c.PutNow(args[1].Val.(string), &Token{BLOCK, []*Token{&Token{WORD, k}, v}})
+			for k, v := range(args[2].Ctx().Table){
+				c.PutNow(args[1].Str(), &Token{BLOCK, []*Token{&Token{WORD, k}, v}})
 				if args[3].Tp == BLOCK {
-					temp, err := es.Eval(args[3].Val.([]*Token), &c)
+					temp, err := es.Eval(args[3].Tks(), &c)
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -395,7 +395,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 					}
 
 				}else if args[3].Tp == STRING {
-					temp, err := es.EvalStr(args[3].Val.(string), &c)
+					temp, err := es.EvalStr(args[3].Str(), &c)
 					if err != nil {
 						if err.Error() == "continue" {
 							continue
@@ -414,7 +414,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 		}
 
 	}else if args[1].Tp == BLOCK {
-		for _, item := range(args[1].Val.([]*Token)) {
+		for _, item := range(args[1].Tks()) {
 			if item.Tp != WORD {
 				var result = Token{ERR, "Type Mismatch"}
 				return &result, nil
@@ -423,15 +423,15 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 
 		if args[2].Tp == BLOCK {
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-			for i:=0; i<len(args[2].Val.([]*Token)); i+=len(args[1].Val.([]*Token)){
-				for j:=0; j<len(args[1].Val.([]*Token)); j++ {
-					if i+j < len(args[2].Val.([]*Token)) {
-						c.PutNow(args[1].Val.([]*Token)[j].Val.(string), args[2].Val.([]*Token)[i+j])
+			for i:=0; i<len(args[2].Tks()); i+=len(args[1].Tks()){
+				for j:=0; j<len(args[1].Tks()); j++ {
+					if i+j < len(args[2].Tks()) {
+						c.PutNow(args[1].Tks()[j].Str(), args[2].Tks()[i+j])
 					}else{
-						c.PutNow(args[1].Val.([]*Token)[j].Val.(string), &Token{NONE, "none"})
+						c.PutNow(args[1].Tks()[j].Str(), &Token{NONE, "none"})
 					}
 				}
-				temp, err := es.Eval(args[3].Val.([]*Token), &c)
+				temp, err := es.Eval(args[3].Tks(), &c)
 				if err != nil {
 					if err.Error() == "continue" {
 						continue
@@ -448,15 +448,15 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 			
 			return nil, nil
 		}else if args[2].Tp == OBJECT {
-			if len(args[1].Val.([]*Token)) < 2 || args[1].Val.([]*Token)[0].Tp != WORD || args[1].Val.([]*Token)[1].Tp != WORD {
+			if len(args[1].Tks()) < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
 				var result = Token{ERR, "Type Mismatch"}
 				return &result, nil
 			}
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-			for k, v := range(args[2].Val.(*BindMap).Table){
-				c.PutNow(args[1].Val.([]*Token)[0].Val.(string), &Token{WORD, k})
-				c.PutNow(args[1].Val.([]*Token)[1].Val.(string), v)
-				temp, err := es.Eval(args[3].Val.([]*Token), &c)
+			for k, v := range(args[2].Ctx().Table){
+				c.PutNow(args[1].Tks()[0].Str(), &Token{WORD, k})
+				c.PutNow(args[1].Tks()[1].Str(), v)
+				temp, err := es.Eval(args[3].Tks(), &c)
 				if err != nil {
 					if err.Error() == "continue" {
 						continue

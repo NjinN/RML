@@ -16,7 +16,7 @@ func Fib(es *EvalStack, ctx *BindMap) (*Token, error){
 	var result Token
 	if args[1].Tp == INTEGER {
 		result.Tp = INTEGER
-		result.Val = fibonacci(args[1].Val.(int)) 
+		result.Val = fibonacci(args[1].Int()) 
 		return &result, nil
 	}
 

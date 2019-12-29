@@ -11,12 +11,12 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 	var result Token
 
 	if args[1].Tp == DATATYPE && args[2] != nil {
-		if args[1].Val.(int) == args[2].Tp {
+		if args[1].Int() == args[2].Tp {
 			return args[2].CloneDeep(), nil
 		}
 
 
-		result.Tp = args[1].Val.(int)
+		result.Tp = args[1].Int()
 
 		switch args[1].Val {
 		case ERR:
@@ -50,7 +50,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				return &result, nil
 
 			case DECIMAL:
-				result.Val = int(math.Round(args[2].Val.(float64)))
+				result.Val = int(math.Round(args[2].Float()))
 				return &result, nil
 
 			case CHAR:
@@ -58,7 +58,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				return &result, nil
 
 			case STRING:
-				i, err := strconv.Atoi(args[2].Val.(string))
+				i, err := strconv.Atoi(args[2].Str())
 				if err != nil {
 					result.Val = 0
 				}else{
@@ -82,7 +82,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				return &result, nil
 
 			case INTEGER:
-				result.Val = float64(args[2].Val.(int))
+				result.Val = float64(args[2].Int())
 				return &result, nil
 
 			case CHAR:
@@ -90,7 +90,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				return &result, nil
 
 			case STRING:
-				f, err := strconv.ParseFloat(args[2].Val.(string), 64)
+				f, err := strconv.ParseFloat(args[2].Str(), 64)
 				if err != nil {
 					result.Val = 0.0
 				}else{
@@ -107,11 +107,11 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 		case CHAR:
 			switch args[2].Tp {
 			case INTEGER:
-				result.Val = byte(args[2].Val.(int) % 256)
+				result.Val = byte(args[2].Int() % 256)
 				return &result, nil
 
 			case DECIMAL:
-				result.Val = byte(args[2].Val.(float64))
+				result.Val = byte(args[2].Float())
 				return &result, nil
 				
 			default:
@@ -131,7 +131,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 
 			default:
 				result.Val = make([]*Token, 1)
-				result.Val.([]*Token)[0] = args[2].CloneDeep()
+				result.Tks()[0] = args[2].CloneDeep()
 				return &result, nil
 			}
 

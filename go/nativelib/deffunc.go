@@ -13,8 +13,8 @@ func DefFunc(es *EvalStack, ctx *BindMap) (*Token, error){
 		return &result, nil
 	}
 
-	for i:=0; i < len(args[1].Val.([]*Token)); i++ {
-		if(args[1].Val.([]*Token)[i].Tp != WORD && args[1].Val.([]*Token)[i].Tp != PROP){
+	for i:=0; i < len(args[1].Tks()); i++ {
+		if(args[1].Tks()[i].Tp != WORD && args[1].Tks()[i].Tp != PROP){
 			result.Tp = ERR
 			result.Val = "Type Mismatch"
 			return &result, nil
@@ -26,17 +26,17 @@ func DefFunc(es *EvalStack, ctx *BindMap) (*Token, error){
 	var a 	[]*Token
 	var p	[]*Token
 
-	for i:=0; i < len(args[1].Val.([]*Token)); i++ {
+	for i:=0; i < len(args[1].Tks()); i++ {
 		
-		if args[1].Val.([]*Token)[i].Tp == WORD {
-			a = append(a, args[1].Val.([]*Token)[i])
+		if args[1].Tks()[i].Tp == WORD {
+			a = append(a, args[1].Tks()[i])
 		}else{
-			if i == len(args[1].Val.([]*Token))-1 || args[1].Val.([]*Token)[i+1].Tp != WORD {
-				p = append(p, args[1].Val.([]*Token)[i])
+			if i == len(args[1].Tks())-1 || args[1].Tks()[i+1].Tp != WORD {
+				p = append(p, args[1].Tks()[i])
 				p = append(p, nil)
 			}else{
-				p = append(p, args[1].Val.([]*Token)[i])
-				p = append(p, args[1].Val.([]*Token)[i+1])
+				p = append(p, args[1].Tks()[i])
+				p = append(p, args[1].Tks()[i+1])
 				i++
 			}
 		}
@@ -44,7 +44,7 @@ func DefFunc(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	result.Val = Func{
 		Args: 	a,
-		Codes: 	args[2].Val.([]*Token)[0:],
+		Codes: 	args[2].Tks()[0:],
 		Props: 	p,
 	}
 

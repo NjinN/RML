@@ -26,14 +26,14 @@ func Do(es *EvalStack, ctx *BindMap) (*Token, error){
 	switch args[1].Tp{
 	case BLOCK:
 		if args[2].Tp == OBJECT {
-			return es.Eval(args[1].Val.([]*Token), args[2].Val.(*BindMap))
+			return es.Eval(args[1].Tks(), args[2].Ctx())
 		}
-		return es.Eval(args[1].Val.([]*Token), ctx)
+		return es.Eval(args[1].Tks(), ctx)
 	case STRING:
 		if args[2].Tp == OBJECT {
-			return es.EvalStr(args[1].Val.(string), args[2].Val.(*BindMap))
+			return es.EvalStr(args[1].Str(), args[2].Ctx())
 		}
-		return es.EvalStr(args[1].Val.(string), ctx)
+		return es.EvalStr(args[1].Str(), ctx)
 	default:
 		var result *Token
 		result.Tp = ERR
@@ -48,14 +48,14 @@ func Reduce(es *EvalStack, ctx *BindMap) (*Token, error){
 	switch args[1].Tp{
 	case BLOCK:
 		if args[2].Tp == OBJECT {
-			return es.Eval(args[1].Val.([]*Token), args[2].Val.(*BindMap), 1)
+			return es.Eval(args[1].Tks(), args[2].Ctx(), 1)
 		}
-		return es.Eval(args[1].Val.([]*Token), ctx, 1)
+		return es.Eval(args[1].Tks(), ctx, 1)
 	case STRING:
 		if args[2].Tp == OBJECT {
-			return es.EvalStr(args[1].Val.(string), args[2].Val.(*BindMap), 1)
+			return es.EvalStr(args[1].Str(), args[2].Ctx(), 1)
 		}
-		return es.EvalStr(args[1].Val.(string), ctx, 1)
+		return es.EvalStr(args[1].Str(), ctx, 1)
 	default:
 		var result *Token
 		result.Tp = ERR
@@ -79,9 +79,9 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	if args[1].Tp == BLOCK && args[2].Tp == LOGIC {
 		fmt.Print("[")
-		for idx, item := range args[1].Val.([]*Token){
+		for idx, item := range args[1].Tks(){
 			if args[3].ToBool(){
-				if idx == len(args[1].Val.([]*Token)) - 1 {
+				if idx == len(args[1].Tks()) - 1 {
 					fmt.Print(item.OutputStr())
 				}else{
 					fmt.Print(item.OutputStr() + " ")
@@ -91,7 +91,7 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 				if err != nil {
 					return nil, err
 				}
-				if idx == len(args[1].Val.([]*Token)) - 1 {
+				if idx == len(args[1].Tks()) - 1 {
 					fmt.Print(temp.OutputStr())
 				}else{
 					fmt.Print(temp.OutputStr() + " ")
@@ -119,7 +119,7 @@ func Let(es *EvalStack, ctx *BindMap) (*Token, error){
 	if args[1].Tp == BLOCK {
 		var orginSts = es.IsLocal
 		es.IsLocal = true
-		result, err := es.Eval(args[1].Val.([]*Token), ctx)
+		result, err := es.Eval(args[1].Tks(), ctx)
 		es.IsLocal = orginSts
 		return result, err
 	}

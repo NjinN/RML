@@ -16,7 +16,7 @@ func Cost(es *EvalStack, ctx *BindMap) (*Token, error){
 	}
 
 	var start = time.Now()
-	es.Eval(args[1].Val.([]*Token), ctx)
+	es.Eval(args[1].Tks(), ctx)
 	var end = time.Now()
 	fmt.Printf("cost time: %s\n", end.Sub(start))
 

@@ -19,36 +19,36 @@ func Eq(es *EvalStack, ctx *BindMap) (*Token, error){
 	case INTEGER:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(int) == args[2].Val.(int)
+			result.Val = args[1].Int() == args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(int)) == args[2].Val.(float64)
+			result.Val = float64(args[1].Int()) == args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(int) == int(args[2].Val.(byte))
+			result.Val = args[1].Int() == int(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case DECIMAL:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(float64) == float64(args[2].Val.(int))
+			result.Val = args[1].Float() == float64(args[2].Int())
 			return &result, nil
 		case DECIMAL:
-			result.Val = args[1].Val.(float64) == args[2].Val.(float64)
+			result.Val = args[1].Float() == args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(float64) == float64(args[2].Val.(byte))
+			result.Val = args[1].Float() == float64(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case CHAR:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = int(args[1].Val.(byte)) == args[2].Val.(int)
+			result.Val = int(args[1].Val.(byte)) == args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(byte)) == args[2].Val.(float64)
+			result.Val = float64(args[1].Val.(byte)) == args[2].Float()
 			return &result, nil
 		case CHAR:
 			result.Val = args[1].Val.(byte) == args[2].Val.(byte)
@@ -57,12 +57,12 @@ func Eq(es *EvalStack, ctx *BindMap) (*Token, error){
 		}	
 	case STRING:
 		if args[2].Tp == STRING {
-			result.Val = args[1].Val.(string) == args[2].Val.(string)
+			result.Val = args[1].Str() == args[2].Str()
 			return &result, nil
 		}
 	case WORD:
 		if args[2].Tp == WORD {
-			result.Val = args[1].Val.(string) == args[2].Val.(string)
+			result.Val = args[1].Str() == args[2].Str()
 			return &result, nil
 		}
 	default:
@@ -94,36 +94,36 @@ func Gt(es *EvalStack, ctx *BindMap) (*Token, error){
 	case INTEGER:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(int) > args[2].Val.(int)
+			result.Val = args[1].Int() > args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(int)) > args[2].Val.(float64)
+			result.Val = float64(args[1].Int()) > args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(int) > int(args[2].Val.(byte))
+			result.Val = args[1].Int() > int(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case DECIMAL:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(float64) > float64(args[2].Val.(int))
+			result.Val = args[1].Float() > float64(args[2].Int())
 			return &result, nil
 		case DECIMAL:
-			result.Val = args[1].Val.(float64) > args[2].Val.(float64)
+			result.Val = args[1].Float() > args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(float64) > float64(args[2].Val.(byte))
+			result.Val = args[1].Float() > float64(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case CHAR:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = int(args[1].Val.(byte)) > args[2].Val.(int)
+			result.Val = int(args[1].Val.(byte)) > args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(byte)) > args[2].Val.(float64)
+			result.Val = float64(args[1].Val.(byte)) > args[2].Float()
 			return &result, nil
 		case CHAR:
 			result.Val = args[1].Val.(byte) > args[2].Val.(byte)
@@ -132,12 +132,12 @@ func Gt(es *EvalStack, ctx *BindMap) (*Token, error){
 		}	
 	case STRING:
 		if args[2].Tp == STRING {
-			result.Val = args[1].Val.(string) > args[2].Val.(string)
+			result.Val = args[1].Str() > args[2].Str()
 			return &result, nil
 		}
 	case WORD:
 		if args[2].Tp == WORD {
-			result.Val = args[1].Val.(string) > args[2].Val.(string)
+			result.Val = args[1].Str() > args[2].Str()
 			return &result, nil
 		}
 	default:
@@ -169,36 +169,36 @@ func Lt(es *EvalStack, ctx *BindMap) (*Token, error){
 	case INTEGER:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(int) < args[2].Val.(int)
+			result.Val = args[1].Int() < args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(int)) < args[2].Val.(float64)
+			result.Val = float64(args[1].Int()) < args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(int) < int(args[2].Val.(byte))
+			result.Val = args[1].Int() < int(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case DECIMAL:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(float64) < float64(args[2].Val.(int))
+			result.Val = args[1].Float() < float64(args[2].Int())
 			return &result, nil
 		case DECIMAL:
-			result.Val = args[1].Val.(float64) < args[2].Val.(float64)
+			result.Val = args[1].Float() < args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(float64) < float64(args[2].Val.(byte))
+			result.Val = args[1].Float() < float64(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case CHAR:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = int(args[1].Val.(byte)) < args[2].Val.(int)
+			result.Val = int(args[1].Val.(byte)) < args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(byte)) < args[2].Val.(float64)
+			result.Val = float64(args[1].Val.(byte)) < args[2].Float()
 			return &result, nil
 		case CHAR:
 			result.Val = args[1].Val.(byte) < args[2].Val.(byte)
@@ -207,12 +207,12 @@ func Lt(es *EvalStack, ctx *BindMap) (*Token, error){
 		}	
 	case STRING:
 		if args[2].Tp == STRING {
-			result.Val = args[1].Val.(string) < args[2].Val.(string)
+			result.Val = args[1].Str() < args[2].Str()
 			return &result, nil
 		}
 	case WORD:
 		if args[2].Tp == WORD {
-			result.Val = args[1].Val.(string) < args[2].Val.(string)
+			result.Val = args[1].Str() < args[2].Str()
 			return &result, nil
 		}
 	default:
@@ -244,36 +244,36 @@ func Ge(es *EvalStack, ctx *BindMap) (*Token, error){
 	case INTEGER:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(int) >= args[2].Val.(int)
+			result.Val = args[1].Int() >= args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(int)) >= args[2].Val.(float64)
+			result.Val = float64(args[1].Int()) >= args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(int) >= int(args[2].Val.(byte))
+			result.Val = args[1].Int() >= int(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case DECIMAL:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(float64) >= float64(args[2].Val.(int))
+			result.Val = args[1].Float() >= float64(args[2].Int())
 			return &result, nil
 		case DECIMAL:
-			result.Val = args[1].Val.(float64) >= args[2].Val.(float64)
+			result.Val = args[1].Float() >= args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(float64) >= float64(args[2].Val.(byte))
+			result.Val = args[1].Float() >= float64(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case CHAR:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = int(args[1].Val.(byte)) >= args[2].Val.(int)
+			result.Val = int(args[1].Val.(byte)) >= args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(byte)) >= args[2].Val.(float64)
+			result.Val = float64(args[1].Val.(byte)) >= args[2].Float()
 			return &result, nil
 		case CHAR:
 			result.Val = args[1].Val.(byte) >= args[2].Val.(byte)
@@ -282,12 +282,12 @@ func Ge(es *EvalStack, ctx *BindMap) (*Token, error){
 		}	
 	case STRING:
 		if args[2].Tp == STRING {
-			result.Val = args[1].Val.(string) >= args[2].Val.(string)
+			result.Val = args[1].Str() >= args[2].Str()
 			return &result, nil
 		}
 	case WORD:
 		if args[2].Tp == WORD {
-			result.Val = args[1].Val.(string) >= args[2].Val.(string)
+			result.Val = args[1].Str() >= args[2].Str()
 			return &result, nil
 		}
 	default:
@@ -319,36 +319,36 @@ func Le(es *EvalStack, ctx *BindMap) (*Token, error){
 	case INTEGER:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(int) <= args[2].Val.(int)
+			result.Val = args[1].Int() <= args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(int)) <= args[2].Val.(float64)
+			result.Val = float64(args[1].Int()) <= args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(int) <= int(args[2].Val.(byte))
+			result.Val = args[1].Int() <= int(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case DECIMAL:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = args[1].Val.(float64) <= float64(args[2].Val.(int))
+			result.Val = args[1].Float() <= float64(args[2].Int())
 			return &result, nil
 		case DECIMAL:
-			result.Val = args[1].Val.(float64) <= args[2].Val.(float64)
+			result.Val = args[1].Float() <= args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(float64) <= float64(args[2].Val.(byte))
+			result.Val = args[1].Float() <= float64(args[2].Val.(byte))
 			return &result, nil
 		default:
 		}
 	case CHAR:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = int(args[1].Val.(byte)) <= args[2].Val.(int)
+			result.Val = int(args[1].Val.(byte)) <= args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(byte)) <= args[2].Val.(float64)
+			result.Val = float64(args[1].Val.(byte)) <= args[2].Float()
 			return &result, nil
 		case CHAR:
 			result.Val = args[1].Val.(byte) <= args[2].Val.(byte)
@@ -357,12 +357,12 @@ func Le(es *EvalStack, ctx *BindMap) (*Token, error){
 		}	
 	case STRING:
 		if args[2].Tp == STRING {
-			result.Val = args[1].Val.(string) <= args[2].Val.(string)
+			result.Val = args[1].Str() <= args[2].Str()
 			return &result, nil
 		}
 	case WORD:
 		if args[2].Tp == WORD {
-			result.Val = args[1].Val.(string) <= args[2].Val.(string)
+			result.Val = args[1].Str() <= args[2].Str()
 			return &result, nil
 		}
 	default:
