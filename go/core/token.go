@@ -69,6 +69,8 @@ func (t *Token) ToString() string{
 		return "\"" + temp + "\""
 	case PROP:
 		return "/" + t.Str()
+	case FILE:
+		return "%" + t.Str()
 	case SET_WORD:
 		return t.Str() + ":"
 	case PUT_WORD:

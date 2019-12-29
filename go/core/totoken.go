@@ -23,7 +23,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 	if(str[0] == ':'){
 		result.Tp = GET_WORD
-		result.Val = str[1 : len(str)]
+		result.Val = str[1 :]
 		return &result
 	}
 	
@@ -57,9 +57,15 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
+	if(str[0] == '%'){
+		result.Tp = FILE
+		result.Val = str[1:]
+		return &result
+	}
+
 	if(str[0] == '/' && str != "/" && str != "/="){
 		result.Tp = PROP
-		result.Val = str[1 : len(str)]
+		result.Val = str[1 :]
 		return &result
 	}
 
@@ -148,7 +154,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 	if(str[0] == '\''){
 		result.Tp = LIT_WORD
-		result.Val = str[1 : len(str)]
+		result.Val = str[1 : ]
 		return &result
 	}
 

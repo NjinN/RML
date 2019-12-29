@@ -96,6 +96,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("let", &letToken)
 
+	var loadToken = Token{
+		NATIVE,
+		Native{
+			"load",
+			2,
+			Load,
+			nil,
+		},
+	}
+	ctx.PutNow("load", &loadToken)
+
 
 	/*******  math  *******/
 

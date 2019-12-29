@@ -147,6 +147,12 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 			result.Val = args[2].OutputStr() + ":="
 			return &result, nil
 
+		case FILE:
+			if args[2].Tp == STRING {
+				result.Val = args[2].Val
+				return &result, nil
+			}
+
 		default:
 
 		}

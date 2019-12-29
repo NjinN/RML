@@ -51,6 +51,7 @@ func StrCut(s string) []string{
 	var isStr = false
 	var isBlock = false
 	var isObject = false
+	var isFile = false
 	var pFloor = 0
 	var bFloor = 0
 	var oFloor = 0
@@ -91,6 +92,8 @@ func StrCut(s string) []string{
 			}else if(nowRune == rune('{')){
 				isObject = true
 				oFloor = 1
+			}else if (nowRune == rune('%')){
+				isFile = true
 			}else if(nowRune == rune(';')){
 				for nowRune != rune('\n') && nowIdx < len(runes)-1 {
 					nowIdx++
@@ -108,7 +111,7 @@ func StrCut(s string) []string{
 			continue
 		}
 
-		if(startIdx >= 0 && unicode.IsSpace(nowRune) && !isStr && !isParen && !isBlock && !isObject){
+		if(startIdx >= 0 && unicode.IsSpace(nowRune) && !isStr && !isParen && !isBlock && !isObject && !isFile){
 			result = append(result, string(runes[startIdx : nowIdx]))
 			startIdx = -1
 			continue
@@ -125,6 +128,7 @@ func StrCut(s string) []string{
 				startIdx = -1
 				continue
 			}
+			continue
 		}
 
 		if(startIdx >= 0 && isParen){
@@ -151,6 +155,7 @@ func StrCut(s string) []string{
 					continue
 				}
 			}
+			continue
 		}
 
 		if(startIdx >= 0 && isBlock){
@@ -177,6 +182,29 @@ func StrCut(s string) []string{
 					continue
 				}
 			}
+			continue
+		}
+
+		if(startIdx >= 0 && isFile){
+			if(isInnerStr){
+				if nowRune == rune('^') {
+					nowIdx++
+					continue
+				}
+				if nowRune == rune('"'){
+					isInnerStr = false
+				}
+			}else{
+				if nowRune == '"' && !(string(runes[nowIdx-1 : nowIdx+1]) == "^\""){
+					isInnerStr = true
+				}else if unicode.IsSpace(nowRune){
+					result = append(result, string(runes[startIdx : nowIdx+1]))
+					isFile = false
+					startIdx = -1
+					continue
+				}
+			}
+			continue
 		}
 
 		if(startIdx >= 0 && isObject){
@@ -203,9 +231,10 @@ func StrCut(s string) []string{
 					continue
 				}
 			}
+			continue
 		}
 
-		if startIdx >= 0 && nowRune == rune('/') && nowIdx < len(runes) && !isStr && !isBlock && !isParen && !isObject {
+		if startIdx >= 0 && nowRune == rune('/') && nowIdx < len(runes) && !isStr && !isBlock && !isParen && !isObject && !isFile {
 			for startIdx >= 0 && nowRune == rune('/') && nowIdx < len(runes)-1 {
 				nowIdx++
 				nowIdx += len(GetOneToken(runes, nowIdx)) - 1
@@ -215,6 +244,7 @@ func StrCut(s string) []string{
 			}
 			result = append(result, string(runes[startIdx : nowIdx+1]))
 			startIdx = -1
+			continue
 		}
 		
 
