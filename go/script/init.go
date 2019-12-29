@@ -206,5 +206,38 @@ read: func [target /bin /string] [
 	_读取 目标 类型
 ]
 
+file?: func [path] [
+	either (take/last to-string path) = #'/' [false] [true]
+]
+
+dir?: func [path] [
+	either (take/last to-string path) = #'/' [true] [false]
+]
+
+文件?为 术 [路径] [
+	是非 (取/尾 转成字符串 路径) 等于 #'/' [假] [真]
+]
+
+文件夹?为 术 [路径] [
+	是非 (取/尾 转成字符串 路径) 等于 #'/' [真] [假]
+]
+
+ls: func [/dir dir] [
+	_ls dir
+]
+
+列出目录为 术 [/目录 目录] [
+	_列出目录 目录
+]
+
+write: func [path data /append] [
+	_write path data append
+]
+
+写出为 术 [路径 数据 /添加] [
+	_写出 路径 数据 添加
+]
+
+
 
 `

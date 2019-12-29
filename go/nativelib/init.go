@@ -19,6 +19,17 @@ func InitNative(ctx *BindMap){
 	ctx.PutNow("quit", &quitToken)
 	ctx.PutNow("q", &quitToken)
 
+	var clearToken = Token{
+		NATIVE,
+		Native{
+			"clear",
+			1,
+			Clear,
+			nil,
+		},
+	}
+	ctx.PutNow("clear", &clearToken)
+
 	var typeOfToken = Token{
 		NATIVE,
 		Native{
@@ -107,6 +118,88 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("let", &letToken)
 
+	
+
+
+	/*******  file  *******/
+
+	var nowDirToken = Token{
+		NATIVE,
+		Native{
+			"now-dir",
+			1,
+			NowDir,
+			nil,
+		},
+	}
+	ctx.PutNow("now-dir", &nowDirToken)
+
+	var chDirToken = Token{
+		NATIVE,
+		Native{
+			"cd",
+			2,
+			ChangeDir,
+			nil,
+		},
+	}
+	ctx.PutNow("cd", &chDirToken)
+
+	var lsToken = Token{
+		NATIVE,
+		Native{
+			"_ls",
+			2,
+			LsDir,
+			nil,
+		},
+	}
+	ctx.PutNow("_ls", &lsToken)
+
+	var renameToken = Token{
+		NATIVE,
+		Native{
+			"rename",
+			3,
+			RenameFile,
+			nil,
+		},
+	}
+	ctx.PutNow("rename", &renameToken)
+
+	var removeToken = Token{
+		NATIVE,
+		Native{
+			"remove",
+			2,
+			RemoveFile,
+			nil,
+		},
+	}
+	ctx.PutNow("remove", &removeToken)
+
+	var makeDirToken = Token{
+		NATIVE,
+		Native{
+			"make-dir",
+			2,
+			makeDir,
+			nil,
+		},
+	}
+	ctx.PutNow("make-dir", &makeDirToken)
+
+	var existToken = Token{
+		NATIVE,
+		Native{
+			"exist?",
+			2,
+			FileExist,
+			nil,
+		},
+	}
+	ctx.PutNow("exist?", &existToken)
+
 	var loadToken = Token{
 		NATIVE,
 		Native{
@@ -118,16 +211,27 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("load", &loadToken)
 
-	var readToken = Token{
+	var readFileToken = Token{
 		NATIVE,
 		Native{
 			"_read",
 			3,
-			Read,
+			ReadFile,
 			nil,
 		},
 	}
-	ctx.PutNow("_read", &readToken)
+	ctx.PutNow("_read", &readFileToken)
+
+	var writeFileToken = Token{
+		NATIVE,
+		Native{
+			"_write",
+			4,
+			WriteFile,
+			nil,
+		},
+	}
+	ctx.PutNow("_write", &writeFileToken)
 
 
 	/*******  math  *******/

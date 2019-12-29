@@ -45,13 +45,13 @@ func Eq(es *EvalStack, ctx *BindMap) (*Token, error){
 	case CHAR:
 		switch args[2].Tp {
 		case INTEGER:
-			result.Val = int(args[1].Val.(byte)) == args[2].Int()
+			result.Val = int(args[1].Val.(rune)) == args[2].Int()
 			return &result, nil
 		case DECIMAL:
-			result.Val = float64(args[1].Val.(byte)) == args[2].Float()
+			result.Val = float64(args[1].Val.(rune)) == args[2].Float()
 			return &result, nil
 		case CHAR:
-			result.Val = args[1].Val.(byte) == args[2].Val.(byte)
+			result.Val = args[1].Val.(rune) == args[2].Val.(rune)
 			return &result, nil
 		default:
 		}	

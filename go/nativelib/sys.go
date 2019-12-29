@@ -2,10 +2,18 @@ package nativelib
 
 import . "../core"
 import "os"
+import "os/exec"
 import "fmt"
 
 func Quit(es *EvalStack, ctx *BindMap) (*Token, error){
 	os.Exit(0)
+	return nil, nil
+}
+
+func Clear(es *EvalStack, ctx *BindMap) (*Token, error){
+	cmd := exec.Command("cmd", "/c", "cls")
+    cmd.Stdout = os.Stdout
+    cmd.Run()
 	return nil, nil
 }
 

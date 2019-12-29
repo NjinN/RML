@@ -266,12 +266,13 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error){
 
 		}else if args[3].Int() == 1 {
 			var idx = args[2].Int() - 1
-			if idx < 0 || idx >= len(args[1].Str()){
+			runes := []rune(args[1].Str())
+			if idx < 0 || idx >= len(runes){
 				result.Tp = NONE
 				result.Val = "none"
 			}else{
 				result.Tp = CHAR
-				result.Val = uint8(args[1].Str()[idx])
+				result.Val = runes[idx]
 			}
 
 			if args[4].Tp == LOGIC && args[4].Val.(bool){

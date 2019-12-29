@@ -57,6 +57,7 @@ const ZHScript =
 或为	:or
 
 退出为 	:q	
+清屏为	:clear	
 类型?为	:type?
 转成为	:to
 _执行为	:_do
@@ -66,6 +67,14 @@ _打印为	:_print
 令为	:let
 加载为	:load	
 _读取为	:_read
+存在?为	:exist?
+当前目录为	:now-dir
+变更目录为	:cd
+_列出目录为	:_ls
+重命名为	:rename
+删除文件为	:remove
+创建目录为	:make-dir
+_写出为	:_write
 
 加法为	:add
 减法为	:sub
