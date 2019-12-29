@@ -78,7 +78,7 @@ func InitNative(ctx *BindMap){
 		NATIVE,
 		Native{
 			"_print",
-			3,
+			4,
 			Pprint,
 			nil,
 		},

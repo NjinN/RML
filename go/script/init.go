@@ -28,12 +28,12 @@ copy: func [source /deep] [
 	_复制 源 深
 ]
 
-print: func [n /inline] [
-	_print n inline
+print: func [n /inline /only] [
+	_print n inline only
 ]
 
-打印为 术 [甲 /行内] [
-	_打印 甲 行内
+打印为 术 [甲 /行内 /单独] [
+	_打印 甲 行内 单独
 ]
 
 insert*: func [serial item /at at /only] [
