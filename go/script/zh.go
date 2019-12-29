@@ -65,7 +65,7 @@ _复制为	:_copy
 _打印为	:_print
 令为	:let
 加载为	:load	
-读取为	:_read
+_读取为	:_read
 
 加法为	:add
 减法为	:sub
