@@ -67,6 +67,8 @@ _打印为	:_print
 令为	:let
 _命令为	:_cmd
 帮助为 	:help
+此为	:this
+_库?为	:_lib?
 
 加载为	:load	
 _读取为	:_read

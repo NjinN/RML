@@ -361,6 +361,19 @@ spawn: func [codes /wait] [
 	_并行 代码集 等待
 ]
 
+lib?: func [/output output] [
+	_lib? output
+]
+
+库?为 术 [
+	"显示lib语境中定义的函数"
+	/输出 输出	"带参，指定保存库信息的Token"
+	] [
+	_库? 输出
+]
+
+
+
 
 
 

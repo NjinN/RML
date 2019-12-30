@@ -186,4 +186,41 @@ func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error){
 
 }
 
+func ThisRef(es *EvalStack, ctx *BindMap) (*Token, error){
+	var c = ctx
+	for c.Tp != USR_CTX && c.Father != nil {
+		c = c.Father
+	}
+
+	return &Token{OBJECT, c}, nil
+}
+
+func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	var c = ctx
+	for c.Father != nil {
+		c = c.Father
+	}
+
+	result := "Lib:"
+	for k, v := range c.Table {
+		result += "  " + k + "\t"
+		if len([]rune(k)) < 4 {
+			result += "\t"
+		}
+		str := v.ToString()
+		runes := []rune(str)
+		if len(runes) > 50 {
+			str = string(runes[0:50]) + "..."
+		}
+		result += str + "\n"
+	}
+
+	fmt.Print(result)
+	if args[1] != nil && args[1].Tp != NONE {
+		args[1].Tp = STRING
+		args[1].Val = result
+	}
+	return nil, nil
+}
 

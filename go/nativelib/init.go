@@ -141,6 +141,28 @@ func InitNative(ctx *BindMap){
 	ctx.PutNow("help", &helpToken)
 	ctx.PutNow("?", &helpToken)
 
+	var thisToken = Token{
+		NATIVE,
+		Native{
+			"this",
+			1,
+			ThisRef,
+			nil,
+		},
+	}
+	ctx.PutNow("this", &thisToken)
+
+	var libInfoToken = Token{
+		NATIVE,
+		Native{
+			"_lib?",
+			2,
+			LibInfo,
+			nil,
+		},
+	}
+	ctx.PutNow("_lib?", &libInfoToken)
+
 
 	/*******  file  *******/
 
