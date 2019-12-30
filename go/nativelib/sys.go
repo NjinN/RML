@@ -167,4 +167,22 @@ func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
+func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	if args[1] == nil {
+		fmt.Println("nil")
+		return nil, nil
+	}
+	temp, err:= args[1].GetVal(ctx, es)
+	if err != nil {
+		return &Token{ERR, "Type Mismatch"}, nil
+	}
+	if temp.Tp == FUNC {
+		fmt.Println(temp.Val.(Func).GetFuncInfo())
+		return nil, nil
+	}
+	fmt.Println("This is a " + TypeToStr(temp.Tp) + ", format to " + temp.ToString())
+	return nil, nil
+
+}
 

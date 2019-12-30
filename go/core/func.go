@@ -7,6 +7,7 @@ type Func struct {
 	Codes		[]*Token
 	QuoteList	[]int
 	Props 		[]*Token
+	Desc		[]string
 }
 
 func (f Func) Run(es *EvalStack, ctx *BindMap) (*Token, error){
@@ -72,4 +73,39 @@ func (f Func) RunWithProps(es *EvalStack, ctx *BindMap, ps []*Token) (*Token, er
 	}
 	return es.Eval(f.Codes, &c)
 
+}
+
+func (f Func) GetFuncInfo() string{
+	var result = "FUNC: \n"
+	result += "  desc:    "
+	if len(f.Desc) >= 2 {
+		result += f.Desc[1]
+	}
+	result += "\n\n"
+	result +="  args:    "
+	for i:=0; i<len(f.Args); i++ {
+		result += f.Args[i].Str() + "\t\t"
+		for j:=0; j<len(f.Desc); j++ {
+			if f.Desc[j] == f.Args[i].Str() {
+				result += f.Desc[j+1]
+			}
+		}
+		result += "\n           "
+	}
+	result += "\n"
+	result += "  props:   "
+	for i:=0; i<len(f.Props); i+=2 {
+		result += "/" + f.Props[i].Str()
+		if i+1 < len(f.Props) && f.Props[i+1] != nil {
+			result += "  " + f.Props[i+1].Str()
+		}
+		result += "\t"
+		for j:=0; j<len(f.Desc); j++ {
+			if f.Desc[j] == f.Props[i].Str() {
+				result += f.Desc[j+1]
+			}
+		}
+		result += "\n           "
+	}
+	return result
 }

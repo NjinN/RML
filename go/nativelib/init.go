@@ -129,6 +129,18 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_cmd", &cmdToken)
 
+	var helpToken = Token{
+		NATIVE,
+		Native{
+			"help",
+			2,
+			HelpInfo,
+			[]int{0,},
+		},
+	}
+	ctx.PutNow("help", &helpToken)
+	ctx.PutNow("?", &helpToken)
+
 
 	/*******  file  *******/
 
