@@ -8,6 +8,11 @@ import "encoding/hex"
 func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	var result Token
 	var str = Trim(s)
+
+	if str[0] != '"' {
+		str = strings.ToLower(str)
+	}
+
 	// fmt.Println(s)
 
 	if(strings.ToLower(str) == "true"){

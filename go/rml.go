@@ -87,7 +87,6 @@ func main() {
 
 		temp, _ := reader.ReadString('\n')
 		temp = strings.Replace(temp, "\r\n", "", -1)
-		temp = strings.ToLower(temp)
 		if temp == "" {
 			continue
 		}
