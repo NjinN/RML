@@ -17,6 +17,7 @@ type BindMap struct{
 
 func (bm *BindMap) Get(key string) *Token{
 	var ctx = bm
+	var prev = ctx
 
 	var tk *Token
 	var ok bool
@@ -28,6 +29,7 @@ func (bm *BindMap) Get(key string) *Token{
 	}
 
 	for !ok && ctx.Father != nil {
+		prev = ctx
 		ctx = ctx.Father
 
 		if(ctx.Table != nil){
@@ -36,6 +38,9 @@ func (bm *BindMap) Get(key string) *Token{
 	}
 
 	if tk != nil {
+		if ctx.Father == nil {
+			prev.Table[key] = tk
+		}
 		return tk
 	}else{
 		return &Token{Tp: NONE}
