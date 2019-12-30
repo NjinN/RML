@@ -55,7 +55,6 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 		return result, nil
 	}
 
-
 	// fmt.Println("------  start eval -------")
 	// for _, item := range inp {
 	// 	fmt.Println(item.OutputStr())
@@ -187,6 +186,11 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			if err != nil {
 				return temp, err
 			}
+			if temp != nil && temp.Tp == ERR {
+				getStackErrInfo(es, inp, i, temp)
+				es.Line[es.Idx - 1] = temp
+				break
+			}
 			if len(args) > 0 && args[0] == 1 {
 				resultBlk = append(resultBlk, temp)
 			}
@@ -197,7 +201,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 	result = es.Line[es.Idx - 1]
 	es.Idx = startIdx
 
-	if len(args) > 0 && args[0] == 1 {
+	if len(args) > 0 && args[0] == 1 && result.Tp != ERR {
 		return &Token{BLOCK, resultBlk}, nil
 	}
 
@@ -241,7 +245,9 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 		
 	}
 
-
+	if temp != nil && temp.Tp == ERR {
+		return temp, err
+	}
 
 	if err != nil {
 		if err.Error() == "return"{
@@ -264,6 +270,26 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 
 	es.StartPos = es.StartPos[0 : len(es.StartPos)-1]
 	es.EndPos = es.EndPos[0 : len(es.EndPos)-1]
+
 	
 	return temp, err
+}
+
+
+func getStackErrInfo(es *EvalStack, inp []*Token, idx int, t *Token) *Token{
+	t.Val = t.Str() + "\nNear: "
+
+	for i := 5; i >= 0 ; i-- {
+		if len(inp) - i > 0 {
+			t.Val = t.Str() + inp[idx-i].ToString() + "   "
+		}
+	}
+
+	t.Val = t.Str() + "\nCall-by: "
+
+	for i := 0; i < 5 && len(es.StartPos) - i > 0; i++ {
+		t.Val = t.Str() + es.Line[es.StartPos[len(es.StartPos)-i-1]].ToString() + "   "
+	}
+
+	return t
 }
