@@ -19,6 +19,7 @@ const (
 	OBJECT
 	PROP
 	WORD
+	WRAP
 	SET_WORD
 	PUT_WORD 		
 	PATH 			
@@ -69,6 +70,8 @@ func TypeToStr(n int) string{
 		return "path!"
 	case WORD:
 		return "word!"
+	case WRAP:
+		return "wrap!"
 	case SET_WORD:
 		return "set-word!"
 	case PUT_WORD:
@@ -123,6 +126,8 @@ func StrToType(s string) int{
 		return PROP
 	case "word!":
 		return WORD
+	case "wrap!":
+		return WRAP
 	case "set-word!":
 		return SET_WORD
 	case "put-word!":

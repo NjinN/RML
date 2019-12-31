@@ -248,6 +248,8 @@ func (t *Token) GetVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 		return ctx.Get(t.Str()), nil
 	case GET_WORD:
 		return ctx.Get(t.Str()), nil
+	case WRAP:
+		return t.Val.(*Token), nil
 	case LIT_WORD:
 		result.Tp = WORD
 		result.Val = t.Str()

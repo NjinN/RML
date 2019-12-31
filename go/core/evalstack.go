@@ -70,14 +70,14 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 		var nextToken *Token
 		
 		var skip = false
-		if nowToken.Tp == GET_WORD {
+		if nowToken.Tp == GET_WORD || nowToken.Tp == WRAP {
 			skip = true
 		}
 
 		var nextSkip = false
 		if(i < len(inp) - 1){
 			nextToken = inp[i+1]
-			if nextToken.Tp == GET_WORD {
+			if nextToken.Tp == GET_WORD || nextToken.Tp == WRAP {
 				nextSkip = true
 			}
 			if(nextToken.Tp == WORD){

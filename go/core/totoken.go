@@ -183,6 +183,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	}
 
 	if str[0] == '!' && strings.IndexByte(str, '{') > 1 && str[len(str)-1] == '}' {
+		result.Tp = WRAP
 		var startIdx = strings.IndexByte(str, '{')
 		var typeStr = str[1:startIdx]
 		var bodyStr = str[startIdx+1:len(str)-1]
@@ -191,11 +192,12 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		if typeStr == "func" {
 			if len(bodyBlock) >= 2 {
 				bodyBlock = append([]*Token{&Token{WORD, "func"}}, bodyBlock...)
-				result, err := es.Eval(bodyBlock, ctx)
+				temp, err := es.Eval(bodyBlock, ctx)
 				if err != nil {
 					panic(err)
 				}
-				return result
+				result.Val = temp
+				return &result
 			} 
 		}
 

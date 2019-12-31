@@ -165,6 +165,10 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				return &result, nil
 			}
 
+		case WRAP:
+			result.Val = args[2]
+			return &result, nil
+
 		default:
 
 		}

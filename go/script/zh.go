@@ -19,6 +19,7 @@ const ZHScript =
 方块类型为	block!	
 对象类型为	object!	
 修饰字类型为	prop!	
+包装类型为	warp!
 单字类型为	word!	
 设字类型为	set-word!
 置字类型为	put-word!
@@ -64,6 +65,7 @@ _执行为	:_do
 _收敛为	:_reduce
 _复制为	:_copy
 _打印为	:_print
+格式化为	:format 
 令为	:let
 _命令为	:_cmd
 帮助为 	:help
