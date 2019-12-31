@@ -103,7 +103,7 @@ func StrToType(s string) int{
 		return LOGIC
 	case "integer!":
 		return INTEGER
-	case "decimal":
+	case "decimal!":
 		return DECIMAL
 	case "char!":
 		return CHAR
