@@ -136,8 +136,8 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				return &result, nil
 
 			default:
-				result.Val = make([]*Token, 1)
-				result.Tks()[0] = args[2].CloneDeep()
+				result.Val = NewTks(8)
+				result.List().Add(args[2].CloneDeep())
 				return &result, nil
 			}
 

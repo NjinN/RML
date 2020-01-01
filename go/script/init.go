@@ -120,7 +120,7 @@ take*: func [serial /at at /part part /last] [
 		part: 1
 	]
 
-	_take serial at part true
+	_take serial at part
 ]
 
 取*为 术 [
@@ -138,7 +138,7 @@ take*: func [serial /at at /part part /last] [
 		部分为 	1
 	]
 
-	_取 集合 于 部分 真
+	_取 集合 于 部分
 ]
 
 take: func [serial /at at /part part /last] [
@@ -150,7 +150,7 @@ take: func [serial /at at /part part /last] [
 		part: 1
 	]
 
-	_take copy/deep serial at part false
+	_take copy/deep serial at part
 ]
 
 取为 术 [
@@ -168,7 +168,7 @@ take: func [serial /at at /part part /last] [
 		部分为 	1
 	]
 
-	_取 复制/深 集合 于 部分 假
+	_取 复制/深 集合 于 部分
 ]
 
 replace*: func [serial old new /at at /amount amount /all] [

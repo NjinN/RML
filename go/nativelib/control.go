@@ -340,7 +340,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 	if args[1].Tp == WORD {
 		if args[2].Tp == BLOCK || args[2].Tp == PAREN || args[2].Tp == PATH {
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-			for i:=0; i<len(args[2].Tks()); i++ {
+			for i:=0; i<args[2].List().Len(); i++ {
 				c.PutNow(args[1].Str(), args[2].Tks()[i])
 				if args[3].Tp == BLOCK {
 					temp, err := es.Eval(args[3].Tks(), &c)
@@ -379,7 +379,9 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 		}else if args[2].Tp == OBJECT {
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
 			for k, v := range(args[2].Ctx().Table){
-				c.PutNow(args[1].Str(), &Token{BLOCK, []*Token{&Token{WORD, k}, v}})
+				var blk = NewTks(4)
+				blk.AddArr([]*Token{&Token{WORD, k}, v})
+				c.PutNow(args[1].Str(), &Token{BLOCK, blk})
 				if args[3].Tp == BLOCK {
 					temp, err := es.Eval(args[3].Tks(), &c)
 					if err != nil {
@@ -424,9 +426,9 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 
 		if args[2].Tp == BLOCK {
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
-			for i:=0; i<len(args[2].Tks()); i+=len(args[1].Tks()){
-				for j:=0; j<len(args[1].Tks()); j++ {
-					if i+j < len(args[2].Tks()) {
+			for i:=0; i<args[2].List().Len(); i+=args[1].List().Len() {
+				for j:=0; j<args[1].List().Len(); j++ {
+					if i+j < args[2].List().Len() {
 						c.PutNow(args[1].Tks()[j].Str(), args[2].Tks()[i+j])
 					}else{
 						c.PutNow(args[1].Tks()[j].Str(), &Token{NONE, "none"})
@@ -449,7 +451,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 			
 			return nil, nil
 		}else if args[2].Tp == OBJECT {
-			if len(args[1].Tks()) < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
+			if args[1].List().Len() < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
 				var result = Token{ERR, "Type Mismatch"}
 				return &result, nil
 			}

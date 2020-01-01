@@ -663,7 +663,7 @@ func InitNative(ctx *BindMap){
 		NATIVE,
 		Native{
 			"_take",
-			5,
+			4,
 			Take,
 			nil,
 		},

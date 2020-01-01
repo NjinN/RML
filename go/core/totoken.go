@@ -107,7 +107,8 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 				break
 			}
 		}
-		result.Val = ToTokens(str[1 : endIdx], ctx, es)
+		result.Val = NewTks(8)
+		result.Val.(*TokenList).AddArr(ToTokens(str[1 : endIdx], ctx, es))
 		return &result
 	}
 
@@ -119,7 +120,8 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 				break
 			}
 		}
-		result.Val = ToTokens(str[1 : endIdx], ctx, es)
+		result.Val = NewTks(8)
+		result.Val.(*TokenList).AddArr(ToTokens(str[1 : endIdx], ctx, es))
 		return &result
 	}
 
@@ -220,11 +222,11 @@ func ToTokens(str string, ctx *BindMap, es *EvalStack) []*Token{
 	return result
 }
 
-func PathToTokens(str string, ctx *BindMap, es *EvalStack) []*Token{
-	var result []*Token
+func PathToTokens(str string, ctx *BindMap, es *EvalStack) *TokenList{
+	var result = NewTks(8)
 	var strs = PathCut(str)
 	for _, item := range strs {
-		result = append(result, ToToken(item, ctx, es))
+		result.Add(ToToken(item, ctx, es))
 	}
 	return result
 }

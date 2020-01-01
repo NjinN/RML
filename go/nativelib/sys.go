@@ -44,10 +44,7 @@ func Do(es *EvalStack, ctx *BindMap) (*Token, error){
 		}
 		return es.EvalStr(args[1].Str(), ctx)
 	default:
-		var result *Token
-		result.Tp = ERR
-		result.Val = "Type Mismatch"
-		return result, nil
+		return &Token{ERR, "Type Mismatch"}, nil
 	}
 }
 
@@ -98,7 +95,7 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 		fmt.Print("[")
 		for idx, item := range args[1].Tks(){
 			if args[3].ToBool(){
-				if idx == len(args[1].Tks()) - 1 {
+				if idx == args[1].List().Len() - 1 {
 					fmt.Print(item.OutputStr())
 				}else{
 					fmt.Print(item.OutputStr() + " ")
@@ -108,7 +105,7 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 				if err != nil {
 					return nil, err
 				}
-				if idx == len(args[1].Tks()) - 1 {
+				if idx == args[1].List().Len() - 1 {
 					fmt.Print(temp.OutputStr())
 				}else{
 					fmt.Print(temp.OutputStr() + " ")

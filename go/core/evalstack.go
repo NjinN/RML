@@ -49,7 +49,7 @@ func (es *EvalStack) EvalStr(inpStr string, ctx *BindMap, args ...int) (*Token, 
 
 func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, error){
 	var result *Token
-	var resultBlk []*Token
+	var resultBlk = NewTks(8)
 
 	if(len(inp) == 0){
 		return result, nil
@@ -155,7 +155,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			}else if(nowToken != nil && nowToken.Tp < SET_WORD){
 				es.Push(nowToken)
 				if len(args) > 0 && args[0] == 1 && (len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP) {
-					resultBlk = append(resultBlk, nowToken)
+					resultBlk.Add(nowToken.Clone())
 				}
 			}else if nowToken.Tp == PATH && nowToken.Tks()[0] != nil && nowToken.Tks()[0].Tp == FUNC {
 				es.StartPos = append(es.StartPos, es.Idx)
@@ -192,7 +192,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				break
 			}
 			if len(args) > 0 && args[0] == 1 {
-				resultBlk = append(resultBlk, temp)
+				resultBlk.Add(temp)
 			}
 		}
 
@@ -280,7 +280,7 @@ func getStackErrInfo(es *EvalStack, inp []*Token, idx int, t *Token) *Token{
 	t.Val = t.Str() + "\nNear: "
 
 	for i := 5; i >= 0 ; i-- {
-		if len(inp) - i > 0 {
+		if idx - i > 0 {
 			t.Val = t.Str() + inp[idx-i].ToString() + "   "
 		}
 	}

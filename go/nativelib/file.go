@@ -72,13 +72,14 @@ func LsDir(es *EvalStack, ctx *BindMap) (*Token, error){
 			return &Token{ERR, err.Error()}, nil
 		}
 		result.Tp = BLOCK
-		result.Val = make([]*Token, len(fileNames))
+		// result.Val = make([]*Token, len(fileNames))
+		result.Val = NewTks(len(fileNames))
 		for i := 0; i < len(fileNames); i++ {
 			fi, _ := os.Stat(path + "/" + fileNames[i]) 
 			if fi.IsDir(){
-				result.Tks()[i] = &Token{FILE, fileNames[i] + "/"}
+				result.List().Add(&Token{FILE, fileNames[i] + "/"})
 			}else{
-				result.Tks()[i] = &Token{FILE, fileNames[i]}
+				result.List().Add(&Token{FILE, fileNames[i]})
 			}
 		}
 		return &result, nil
@@ -91,13 +92,13 @@ func LsDir(es *EvalStack, ctx *BindMap) (*Token, error){
 			return &Token{ERR, err.Error()}, nil
 		}
 		result.Tp = BLOCK
-		result.Val = make([]*Token, len(fileNames))
+		result.Val = NewTks(len(fileNames)) 
 		for i := 0; i < len(fileNames); i++ {
 			fi, _ := os.Stat(fileNames[i]) 
 			if fi.IsDir(){
-				result.Tks()[i] = &Token{FILE, fileNames[i] + "/"}
+				result.List().Add(&Token{FILE, fileNames[i] + "/"})
 			}else{
-				result.Tks()[i] = &Token{FILE, fileNames[i]}
+				result.List().Add(&Token{FILE, fileNames[i]})
 			}
 			
 		}
