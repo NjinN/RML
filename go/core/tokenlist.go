@@ -27,6 +27,13 @@ func (tks *TokenList) List() []*Token{
 	return tks.Line[0:tks.EndIdx]
 }
 
+func (tks *TokenList) Get(idx int) *Token{
+	if idx < 0 || uint(idx) >= tks.EndIdx {
+		return nil
+	}
+	return tks.Line[idx]
+}
+
 func (tks *TokenList) Size() int{
 	return int(tks.Room)
 }

@@ -3,10 +3,10 @@ package core
 // import "fmt"
 
 type Func struct {
-	Args 		[]*Token
-	Codes		[]*Token
+	Args 		*TokenList
+	Codes		*TokenList
 	QuoteList	[]int
-	Props 		[]*Token
+	Props 		*TokenList
 	Desc		[]string
 }
 
@@ -16,17 +16,17 @@ func (f Func) Run(es *EvalStack, ctx *BindMap) (*Token, error){
 		Father: ctx,
 		Tp:		USR_CTX,
 	}
-	for i, item := range f.Args {
+	for i, item := range f.Args.List() {
 		c.PutNow(item.Str(), es.Line[int(es.LastStartPos()) + i + 1])
 	}
-	for j:=0; j<len(f.Props); j+=2 {
-		if f.Props[j+1] == nil {
-			c.PutNow(f.Props[j].Str(), &Token{LOGIC, false})
+	for j:=0; j<f.Props.Len(); j+=2 {
+		if f.Props.Get(j+1) == nil {
+			c.PutNow(f.Props.Get(j).Str(), &Token{LOGIC, false})
 		}else{
-			c.PutNow(f.Props[j].Str(), &Token{NONE, "none"})
+			c.PutNow(f.Props.Get(j).Str(), &Token{NONE, "none"})
 		}
 	}
-	return es.Eval(f.Codes, &c)
+	return es.Eval(f.Codes.List(), &c)
 
 }
 
@@ -41,37 +41,37 @@ func (f Func) RunWithProps(es *EvalStack, ctx *BindMap, ps []*Token) (*Token, er
 		Father: fatherCtx,
 		Tp:		USR_CTX,
 	}
-	for i, item := range f.Args {
+	for i, item := range f.Args.List() {
 		c.PutNow(item.Str(), es.Line[int(es.LastStartPos()) + i + 1])
 	}
-	for j:=0; j<len(f.Props); j+=2 {
-		if f.Props[j+1] == nil {
+	for j:=0; j<f.Props.Len(); j+=2 {
+		if f.Props.Get(j+1) == nil {
 			var set = false
 			for i:=2; i<len(ps); i++ {
-				if ps[i].Str() == f.Props[j].Str() {
-					c.PutNow(f.Props[j].Str(), &Token{LOGIC, true})
+				if ps[i].Str() == f.Props.Get(j).Str() {
+					c.PutNow(f.Props.Get(j).Str(), &Token{LOGIC, true})
 					set = true
 					break
 				}
 			}
 			if !set {
-				c.PutNow(f.Props[j].Str(), &Token{LOGIC, false})
+				c.PutNow(f.Props.Get(j).Str(), &Token{LOGIC, false})
 			}
 		}else{
 			var set = false
 			for i:=2; i<len(ps); i++ {
-				if ps[i].Str() == f.Props[j].Str() {
-					c.PutNow(f.Props[j+1].Str(), es.Line[int(es.LastStartPos()) + len(f.Args) + i - 1])
+				if ps[i].Str() == f.Props.Get(j).Str() {
+					c.PutNow(f.Props.Get(j+1).Str(), es.Line[int(es.LastStartPos()) + f.Args.Len() + i - 1])
 					set = true
 					break
 				}
 			}
 			if !set {
-				c.PutNow(f.Props[j+1].Str(), &Token{NONE, "none"})
+				c.PutNow(f.Props.Get(j+1).Str(), &Token{NONE, "none"})
 			}
 		}
 	}
-	return es.Eval(f.Codes, &c)
+	return es.Eval(f.Codes.List(), &c)
 
 }
 
@@ -83,10 +83,10 @@ func (f Func) GetFuncInfo() string{
 	}
 	result += "\n\n"
 	result +="  args:    "
-	for i:=0; i<len(f.Args); i++ {
-		result += f.Args[i].Str() + "\t\t"
+	for i:=0; i<f.Args.Len(); i++ {
+		result += f.Args.Get(i).Str() + "\t\t"
 		for j:=0; j<len(f.Desc); j++ {
-			if f.Desc[j] == f.Args[i].Str() {
+			if f.Desc[j] == f.Args.Get(i).Str() {
 				result += f.Desc[j+1]
 			}
 		}
@@ -94,14 +94,14 @@ func (f Func) GetFuncInfo() string{
 	}
 	result += "\n"
 	result += "  props:   "
-	for i:=0; i<len(f.Props); i+=2 {
-		result += "/" + f.Props[i].Str()
-		if i+1 < len(f.Props) && f.Props[i+1] != nil {
-			result += "  " + f.Props[i+1].Str()
+	for i:=0; i<f.Props.Len(); i+=2 {
+		result += "/" + f.Props.Get(i).Str()
+		if i+1 < f.Props.Len() && f.Props.Get(i+1) != nil {
+			result += "  " + f.Props.Get(i+1).Str()
 		}
 		result += "\t"
 		for j:=0; j<len(f.Desc); j++ {
-			if f.Desc[j] == f.Props[i].Str() {
+			if f.Desc[j] == f.Props.Get(i).Str() {
 				result += f.Desc[j+1]
 			}
 		}

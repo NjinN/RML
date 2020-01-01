@@ -23,8 +23,8 @@ func DefFunc(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	result.Tp = FUNC
 	
-	var a 		[]*Token
-	var p		[]*Token
+	var a = NewTks(8)
+	var p = NewTks(8)
 	var desc 	[]string
 
 	if len(args[1].Tks()) > 0 && args[1].Tks()[0].Tp == STRING {
@@ -34,20 +34,20 @@ func DefFunc(es *EvalStack, ctx *BindMap) (*Token, error){
 	for i:=0; i < len(args[1].Tks()); i++ {
 		
 		if args[1].Tks()[i].Tp == WORD {
-			a = append(a, args[1].Tks()[i])
+			a.Add(args[1].Tks()[i])
 			if i + 1 < len(args[1].Tks()) && args[1].Tks()[i+1].Tp == STRING {
 				desc = append(desc, args[1].Tks()[i].Str(), args[1].Tks()[i+1].Str())
 			}
 		}else if args[1].Tks()[i].Tp == PROP {
 			if i == len(args[1].Tks())-1 || args[1].Tks()[i+1].Tp != WORD {
-				p = append(p, args[1].Tks()[i])
-				p = append(p, nil)
+				p.Add(args[1].Tks()[i])
+				p.Add(nil)
 				if i + 1 < len(args[1].Tks()) && args[1].Tks()[i+1].Tp == STRING {
 					desc = append(desc, args[1].Tks()[i].Str(), args[1].Tks()[i+1].Str())
 				}
 			}else{
-				p = append(p, args[1].Tks()[i])
-				p = append(p, args[1].Tks()[i+1])
+				p.Add(args[1].Tks()[i])
+				p.Add(args[1].Tks()[i+1])
 				if i + 2 < len(args[1].Tks()) && args[1].Tks()[i+2].Tp == STRING {
 					desc = append(desc, args[1].Tks()[i+1].Str(), args[1].Tks()[i+2].Str())
 				}
@@ -58,7 +58,8 @@ func DefFunc(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	result.Val = Func{
 		Args: 	a,
-		Codes: 	args[2].Tks()[0:],
+		// Codes: 	args[2].Tks()[0:],
+		Codes: &TokenList{uint(len(args[2].Tks())), uint(len(args[2].Tks())), args[2].Tks()},
 		Props: 	p,
 		Desc: 	desc,
 	}

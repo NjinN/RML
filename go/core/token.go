@@ -134,15 +134,15 @@ func (t *Token) ToString() string{
 	case FUNC:
 		var buffer bytes.Buffer
 		buffer.WriteString("!func{[")
-		for _, item := range t.Val.(Func).Args{
+		for _, item := range t.Val.(Func).Args.List(){
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
-		for i:=0; i<len(t.Val.(Func).Props); i+=2 {
-			buffer.WriteString(t.Val.(Func).Props[i].ToString())
+		for i:=0; i<len(t.Val.(Func).Props.List()); i+=2 {
+			buffer.WriteString(t.Val.(Func).Props.Get(i).ToString())
 			buffer.WriteString(" ")
-			if t.Val.(Func).Props[i+1] != nil {
-				buffer.WriteString(t.Val.(Func).Props[i+1].ToString())
+			if t.Val.(Func).Props.Get(i+1) != nil {
+				buffer.WriteString(t.Val.(Func).Props.Get(i+1).ToString())
 				buffer.WriteString(" ")
 			}
 		}
@@ -152,7 +152,7 @@ func (t *Token) ToString() string{
 			buffer.WriteString("]")
 		}
 		buffer.WriteString(" [")
-		for _, item := range t.Val.(Func).Codes{
+		for _, item := range t.Val.(Func).Codes.List(){
 			buffer.WriteString(item.ToString())
 			buffer.WriteString(" ")
 		}
@@ -272,7 +272,7 @@ func (t Token) Explen() int{
 	case NATIVE:
 		return t.Val.(Native).Explen
 	case FUNC:
-		return len(t.Val.(Func).Args) + 1
+		return t.Val.(Func).Args.Len() + 1
 	case OP:
 		return 3
 	case PATH:
@@ -460,11 +460,11 @@ func (t *Token)GetPathExpLen() int{
 		return 1
 	}
 
-	var length = len(f.Val.(Func).Args) + 1
+	var length = f.Val.(Func).Args.Len() + 1
 
 	for i:=2; i<len(t.Tks()); i++ {
-		for j:=0; j<len(f.Val.(Func).Props); j+=2 {
-			if t.Tks()[i].Str() == f.Val.(Func).Props[j].Str() && f.Val.(Func).Props[j +1] != nil {
+		for j:=0; j<f.Val.(Func).Props.Len(); j+=2 {
+			if t.Tks()[i].Str() == f.Val.(Func).Props.Get(j).Str() && f.Val.(Func).Props.Get(j +1) != nil {
 				length++
 			}
 		}
