@@ -28,14 +28,14 @@ func main() {
 	InitOp(&libCtx)
 	InitExt(&libCtx)
 
-	var Es = EvalStack{
+	var es = EvalStack{
 		MainCtx: &libCtx,
 	}
 
 	/** 初始化执行栈，执行初始化脚本 **/
-	Es.Init()
-	Es.EvalStr(script.ZHScript, Es.MainCtx)
-	Es.EvalStr(script.InitScript, Es.MainCtx)
+	es.Init()
+	es.EvalStr(script.ZHScript, es.MainCtx)
+	es.EvalStr(script.InitScript, es.MainCtx)
 
 
 	/** 创建user语境 **/
@@ -44,7 +44,7 @@ func main() {
 		Father: &libCtx,
 		Tp:		USR_CTX,
 	}
-	Es.MainCtx = &userCtx
+	es.MainCtx = &userCtx
 
 	/** 命令行参数不为空时，执行传入的脚本文件 **/
 	if len(os.Args) > 1 {
@@ -56,9 +56,9 @@ func main() {
 			fileData, err := ioutil.ReadFile(scriptPath)
 			if err == nil {
 				// fmt.Println(string(fileData))
-				Es.Init()
+				es.Init()
 
-				t, err := Es.EvalStr(string(fileData), Es.MainCtx)
+				t, err := es.EvalStr(string(fileData), es.MainCtx)
 				if t != nil && t.Tp != NIL {
 					fmt.Println(t.OutputStr())
 				} else {
@@ -103,9 +103,9 @@ func main() {
 		}
 		
 		inp = Trim(inp)
-		Es.Init()
+		es.Init()
 
-		t, err := Es.EvalStr(inp, Es.MainCtx)
+		t, err := es.EvalStr(inp, es.MainCtx)
 		if t != nil && t.Tp != NIL {
 			fmt.Println(t.ToString())
 		} else {
