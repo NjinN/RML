@@ -4,8 +4,8 @@ import "errors"
 // import "fmt"
 
 type EvalStack struct {
-	StartPos 		[]int
-	EndPos 			[]int
+	StartPos 		*IntList
+	EndPos 			*IntList
 	Line			[]*Token
 	Idx 			int
 	MainCtx 		*BindMap
@@ -15,8 +15,8 @@ type EvalStack struct {
 
 
 func (es *EvalStack) Init(){
-	es.StartPos = make([]int, 0)
-	es.EndPos = make([]int, 0)
+	es.StartPos = NewIntList(8)
+	es.EndPos = NewIntList(8)
 	es.Line = make([]*Token, 1024*1024)
 	es.Idx = 0
 	es.QuoteList = make([]int, 0)
@@ -29,17 +29,17 @@ func (es *EvalStack) Push(t *Token){
 }
 
 func (es *EvalStack) LastStartPos() int{
-	if(len(es.StartPos) <= 0){
+	if(es.StartPos.Len() <= 0){
 		return -1
 	}
-	return es.StartPos[len(es.StartPos) - 1]
+	return es.StartPos.Last()
 }
 
 func (es *EvalStack) LastEndPos() int{
-	if(len(es.EndPos) <= 0){
+	if(es.EndPos.Len() <= 0){
 		return -1
 	}
-	return es.EndPos[len(es.EndPos) - 1]
+	return es.EndPos.Last()
 }
 
 func (es *EvalStack) EvalStr(inpStr string, ctx *BindMap, args ...int) (*Token, error){
@@ -62,7 +62,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 	// fmt.Println("------  end eval -------")
 
 	var startIdx = es.Idx
-	var startDeep = len(es.EndPos)
+	var startDeep = es.EndPos.Len()
 	
 	var i = 0
 	for i < len(inp){
@@ -90,17 +90,17 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 		}
 
 
-		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx > es.EndPos[startDeep - 1]) && !nextSkip){
-			if(len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP){
-				es.StartPos = append(es.StartPos, es.Idx)
+		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx > es.EndPos.Get(startDeep - 1)) && !nextSkip){
+			if(es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp != OP){
+				es.StartPos.Add(es.Idx)
 				es.Push(nextToken)
 				temp, err := nowToken.GetVal(ctx, es)
 				if err != nil {
 					return temp, err
 				}
-				es.EndPos = append(es.EndPos, es.Idx + 1)
+				es.EndPos.Add(es.Idx + 1)
 				es.Push(temp)
-			}else if(len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp == OP){
+			}else if(es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp == OP){
 				temp, err := nowToken.GetVal(ctx, es)
 				if err != nil {
 					return temp, err
@@ -109,8 +109,8 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				es.EvalExp(ctx)
 				es.Push(es.Line[es.Idx - 1])
 				es.Line[es.Idx - 2] = nextToken
-				es.StartPos = append(es.StartPos, es.Idx - 2)
-				es.EndPos = append(es.EndPos, es.Idx)
+				es.StartPos.Add(es.Idx - 2)
+				es.EndPos.Add(es.Idx)
 			}
 			i += 1
 		}else{
@@ -143,8 +143,8 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				return nowToken, nil
 			}else if(nowToken != nil && nowToken.Tp == OP && !skip && es.Idx >= 1){
 				if(es.Idx > startIdx){
-					es.StartPos = append(es.StartPos, es.Idx - 1)
-					es.EndPos = append(es.EndPos, es.Idx + 1)
+					es.StartPos.Add(es.Idx - 1)
+					es.EndPos.Add(es.Idx + 1) 
 					es.Push(es.Line[es.Idx - 1])
 					es.Line[es.Idx - 2] = nowToken
 				}else{
@@ -154,12 +154,12 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				}
 			}else if(nowToken != nil && nowToken.Tp < SET_WORD){
 				es.Push(nowToken)
-				if len(args) > 0 && args[0] == 1 && (len(es.StartPos) == 0 || es.Line[es.LastStartPos()].Tp != OP) {
+				if len(args) > 0 && args[0] == 1 && (es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp != OP) {
 					resultBlk.Add(nowToken.Clone())
 				}
 			}else if nowToken.Tp == PATH && nowToken.Tks()[0] != nil && nowToken.Tks()[0].Tp == FUNC {
-				es.StartPos = append(es.StartPos, es.Idx)
-				es.EndPos = append(es.EndPos, es.Idx + nowToken.GetPathExpLen() - 1)
+				es.StartPos.Add(es.Idx)
+				es.EndPos.Add(es.Idx + nowToken.GetPathExpLen() - 1)
 				es.Push(nowToken);
 			}else{
 				if(nowToken.Tp == NATIVE){
@@ -173,15 +173,15 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				}
 
 				if !skip {
-					es.StartPos = append(es.StartPos, es.Idx)
-					es.EndPos = append(es.EndPos, es.Idx + nowToken.Explen() - 1)
+					es.StartPos.Add(es.Idx) 
+					es.EndPos.Add(es.Idx + nowToken.Explen() - 1) 
 				}
 				
 				es.Push(nowToken);
 			}
 		}
 		
-		for(len(es.EndPos) > startDeep && es.Idx == es.LastEndPos() + 1){
+		for(es.EndPos.Len() > startDeep && es.Idx == es.LastEndPos() + 1){
 			temp, err := es.EvalExp(ctx)
 			if err != nil {
 				return temp, err
@@ -255,8 +255,8 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 			if startToken.Tp == FUNC {
 				es.Line[es.LastStartPos()] = temp
 				es.Idx = es.LastStartPos() + 1
-				es.StartPos = es.StartPos[0 : len(es.StartPos)-1]
-				es.EndPos = es.EndPos[0 : len(es.EndPos)-1]
+				es.StartPos.Pop() 
+				es.EndPos.Pop() 
 				return temp, nil
 			}
 		}
@@ -268,8 +268,8 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 		es.Idx = es.LastStartPos() + 1
 	}	
 
-	es.StartPos = es.StartPos[0 : len(es.StartPos)-1]
-	es.EndPos = es.EndPos[0 : len(es.EndPos)-1]
+	es.StartPos.Pop() 
+	es.EndPos.Pop() 
 
 	
 	return temp, err
@@ -287,8 +287,8 @@ func getStackErrInfo(es *EvalStack, inp []*Token, idx int, t *Token) *Token{
 
 	t.Val = t.Str() + "\nCall-by: "
 
-	for i := 0; i < 5 && len(es.StartPos) - i > 0; i++ {
-		t.Val = t.Str() + es.Line[es.StartPos[len(es.StartPos)-i-1]].ToString() + "   "
+	for i := 0; i < 5 && es.StartPos.Len() - i > 0; i++ {
+		t.Val = t.Str() + es.Line[es.StartPos.Get(es.StartPos.Len()-i-1)].ToString() + "   "
 	}
 
 	return t

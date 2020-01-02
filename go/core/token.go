@@ -47,9 +47,9 @@ func (t *Token) ToString() string{
 	case ERR:
 		return "Err: " + t.Str()
 	case LIT_WORD:
-		return t.Str()
+		return  "'" + t.Str()
 	case GET_WORD:
-		return t.Str()
+		return ":" + t.Str()
 	case DATATYPE:
 		return TypeToStr(t.Int())
 	case LOGIC:
