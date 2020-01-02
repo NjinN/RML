@@ -400,8 +400,8 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 }
 
 func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, error){
-	var holderPath = t.Dup()
-	holderPath.Val = holderPath.Tks()[0: holderPath.List().Len()-1]
+	var holderPath = t.Clone()
+	holderPath.List().Pop()
 	holder, err := holderPath.GetPathVal(ctx, stack)
 	if err != nil {
 		return nil, err
