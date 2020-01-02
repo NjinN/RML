@@ -25,15 +25,15 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 			return &result, nil
 
 		case LIT_WORD:
-			result.Val = "'" + args[2].OutputStr()
+			result.Val = args[2].OutputStr()
 			return &result, nil
 
 		case GET_WORD:
-			result.Val = ":" + args[2].OutputStr()
+			result.Val = args[2].OutputStr()
 			return &result, nil
 
 		case DATATYPE:
-			result.Val = args[2].OutputStr() + "!"
+			result.Val = args[2].Tp
 			return &result, nil
 
 		case LOGIC:
@@ -146,11 +146,11 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 			return &result, nil
 			
 		case SET_WORD:
-			result.Val = args[2].OutputStr() + ":"
+			result.Val = args[2].OutputStr() 
 			return &result, nil
 
 		case PUT_WORD:
-			result.Val = args[2].OutputStr() + ":="
+			result.Val = args[2].OutputStr() 
 			return &result, nil
 
 		case FILE:
