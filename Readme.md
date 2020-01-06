@@ -192,7 +192,6 @@ RML直接继承自Rebol语言。Rebol语言由Carl Sassenrath于1997年发布问
 项目目标是使用最简单、清晰的代码结构实现RML的基本语法。依赖宿主语言(目前主要是Go)的生态，实现较高的可用性和可拓展性。
 ## 相关链接
 github:  [ https://github.com/NjinN/RML](https://github.com/NjinN/RML)<br/>
-gitee: [https://gitee.com/NjinN/RML](https://gitee.com/NjinN/RML<br/>)<br/>
 相关: [D语言版本实现分析](http://www.raccoode.fun/writ.reb?id=109)
 
 
