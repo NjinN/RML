@@ -4,6 +4,7 @@ import . "../core"
 import "os"
 import "os/exec"
 import "bytes"
+import "runtime"
 import "fmt"
 
 func Quit(es *EvalStack, ctx *BindMap) (*Token, error){
@@ -125,6 +126,7 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 			fmt.Println(args[1].OutputStr())
 		}
 	}
+	runtime.GC()
 	return nil, nil
 }
 

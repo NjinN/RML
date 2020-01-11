@@ -8,6 +8,7 @@ import "io/ioutil"
 import "path/filepath"
 import "math/rand"
 import "time"
+import "runtime"
 
 import . "./core"
 import . "./nativelib"
@@ -117,6 +118,7 @@ func main() {
 		}
 
 		inp = ""
+		runtime.GC()
 	}
 
 }
