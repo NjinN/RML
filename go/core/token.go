@@ -209,9 +209,8 @@ func (t *Token) Clone() *Token{
 	switch t.Tp {
 	case BLOCK, PAREN, PATH:
 		result.Val = NewTks(8)
-		for _, item := range(t.Tks()){
-			result.List().Add(item.Dup())
-		}
+		result.List().AddAll(t.List())
+		
 		return result
 	case OBJECT:
 		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp}

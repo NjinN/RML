@@ -163,6 +163,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_lib?", &libInfoToken)
 
+	var unsetToken = Token{
+		NATIVE,
+		Native{
+			"unset",
+			2,
+			Unset,
+			[]int{0},
+		},
+	}
+	ctx.PutNow("unset", &unsetToken)
+
 
 	/*******  file  *******/
 

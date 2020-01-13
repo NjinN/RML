@@ -157,10 +157,14 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				if len(args) > 0 && args[0] == 1 && (es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp != OP) {
 					resultBlk.Add(nowToken.Clone())
 				}
-			}else if nowToken.Tp == PATH && nowToken.Tks()[0] != nil && nowToken.Tks()[0].Tp == FUNC {
-				es.StartPos.Add(es.Idx)
-				es.EndPos.Add(es.Idx + nowToken.GetPathExpLen() - 1)
-				es.Push(nowToken);
+			}else if nowToken.Tp == PATH {
+				if nowToken.Tks()[0] != nil && nowToken.Tks()[0].Tp == FUNC {
+					es.StartPos.Add(es.Idx)
+					es.EndPos.Add(es.Idx + nowToken.GetPathExpLen() - 1)
+					es.Push(nowToken);
+				}else{
+					es.Push(nowToken)
+				}	
 			}else{
 				if(nowToken.Tp == NATIVE){
 					if(len(nowToken.Val.(Native).QuoteList) > 0){
@@ -176,11 +180,10 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					es.StartPos.Add(es.Idx) 
 					es.EndPos.Add(es.Idx + nowToken.Explen() - 1) 
 				}
-				
-				es.Push(nowToken);
+				es.Push(nowToken)
 			}
 		}
-		
+ 
 		for(es.EndPos.Len() > startDeep && es.Idx == es.LastEndPos() + 1){
 			temp, err := es.EvalExp(ctx)
 			if err != nil {

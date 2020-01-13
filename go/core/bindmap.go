@@ -1,5 +1,7 @@
 package core
 
+import "runtime"
+
 const (
 	SYS_CTX = iota
 	USR_CTX
@@ -73,12 +75,13 @@ func (bm *BindMap)Put(key string, val *Token){
 			if(ok){
 				ctx.Table[key] = val.Clone()
 				inserted = true
+				break
 			}
 			ctx = ctx.Father
 		}
 	}
 	if(!inserted){
-		bm.Table[key] = val
+		bm.PutLocal(key, val)
 	}
 }
 
@@ -93,3 +96,30 @@ func (bm *BindMap)PutLocal(key string, val *Token){
 	ctx.Table[key] = val.Dup()
 }
 
+
+func (bm *BindMap)Unset(key string){
+	var ctx = bm
+	var ok = false
+
+	if(ctx.Table != nil){
+		_, ok = ctx.Table[key]
+	}
+
+	if(ok){
+		delete(ctx.Table, key)
+		runtime.GC()
+	}else{
+		for !ok && ctx.Father != nil {
+			if(ctx.Table != nil){
+				_, ok = ctx.Table[key]
+			}
+			if(ok){
+				delete(ctx.Table, key)
+				runtime.GC()
+				break
+			}
+			ctx = ctx.Father
+		}
+	}
+	
+}

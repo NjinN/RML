@@ -223,3 +223,29 @@ func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error){
 	return nil, nil
 }
 
+
+func Unset(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+
+	if args[1].Tp == WORD {
+		ctx.Unset(args[1].Str())
+		return nil, nil
+	}else if args[1].Tp == PATH && args[1].List().Last().Tp == WORD {
+		var holderPath = args[1].CloneDeep()
+		holderPath.List().Pop()
+		holder, err := holderPath.GetPathVal(ctx, es)
+		if err != nil {
+			return &Token{ERR, "Error Path"}, nil
+		}
+		if holder.Tp != OBJECT {
+			return &Token{ERR, "Type Mismatch"}, nil
+		}
+
+		holder.Ctx().Unset(args[1].List().Last().Str())
+		return nil, nil
+	}
+
+	return &Token{ERR, "Type Mismatch"}, nil
+}
+
+
