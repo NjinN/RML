@@ -163,6 +163,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_lib?", &libInfoToken)
 
+	var gcToken = Token{
+		NATIVE,
+		Native{
+			"gc",
+			1,
+			Rgc,
+			nil,
+		},
+	}
+	ctx.PutNow("gc", &gcToken)
+
 	var unsetToken = Token{
 		NATIVE,
 		Native{

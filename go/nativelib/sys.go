@@ -223,6 +223,10 @@ func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error){
 	return nil, nil
 }
 
+func Rgc(es *EvalStack, ctx *BindMap) (*Token, error){
+	runtime.GC()
+	return nil, nil
+}
 
 func Unset(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
