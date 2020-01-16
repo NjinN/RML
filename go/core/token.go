@@ -78,6 +78,8 @@ func (t *Token) ToString() string{
 		return "%" + t.Str()
 	case BIN:
 		return "#{" + hex.EncodeToString(t.Val.([]byte)) + "}"
+	case RANGE:
+		return t.Tks()[0].ToString() + ".." + t.Tks()[1].ToString()
 	case SET_WORD:
 		return t.Str() + ":"
 	case PUT_WORD:

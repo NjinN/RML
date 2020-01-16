@@ -131,7 +131,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 
 		case BLOCK, PAREN, PATH:
 			switch args[2].Tp {
-			case BLOCK, PAREN, PATH:
+			case BLOCK, PAREN, PATH, RANGE:
 				result.Val = args[2].CloneDeep().Val
 				return &result, nil
 
@@ -163,6 +163,17 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 			if args[2].Tp == STRING {
 				result.Val = []byte(args[2].Str())
 				return &result, nil
+			}
+
+		case RANGE:
+			if args[2].Tp == BLOCK || args[2].Tp == PAREN || args[3].Tp == PATH {
+				if args[2].List().Len() >= 2 {
+					if (args[2].Tks()[0].Tp == INTEGER || args[2].Tks()[0].Tp == DECIMAL) && (args[2].Tks()[1].Tp == INTEGER || args[2].Tks()[1].Tp == DECIMAL) {
+						result.Val = NewTks(4)
+						result.List().AddArr(args[2].Tks()[0:2])
+						return &result, nil
+					}
+				}
 			}
 
 		case WRAP:

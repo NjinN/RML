@@ -172,6 +172,55 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
+	if(IsNumberStr(str) >= 2){
+		var strs = strings.Split(str, "..")
+		if len(strs) != 2 || IsNumberStr(strs[0]) < 0 || IsNumberStr(strs[0]) > 1 || IsNumberStr(strs[1]) < 0 || IsNumberStr(strs[1]) > 1 {
+			result.Tp = ERR
+			result.Val = "Error format of " + str
+			return &result
+		}
+
+		result.Tp = RANGE
+		var sToken, eToken Token
+		var err error
+		if IsNumberStr(strs[0]) == 0 && IsNumberStr(strs[1]) == 0 {
+			sToken.Tp = INTEGER
+			sToken.Val, err = strconv.Atoi(strs[0])
+			if err != nil {
+				result.Tp = ERR
+				result.Val = "Error format of " + str
+				return &result
+			}
+			eToken.Tp = INTEGER
+			eToken.Val, err = strconv.Atoi(strs[1])
+			if err != nil {
+				result.Tp = ERR
+				result.Val = "Error format of " + str
+				return &result
+			}
+		}else{
+			sToken.Tp = DECIMAL
+			sToken.Val, err = strconv.ParseFloat(strs[0], 64)
+			if err != nil {
+				result.Tp = ERR
+				result.Val = "Error format of " + str
+				return &result
+			}
+			eToken.Tp = DECIMAL
+			eToken.Val, err = strconv.ParseFloat(strs[1], 64)
+			if err != nil {
+				result.Tp = ERR
+				result.Val = "Error format of " + str
+				return &result
+			}
+		}
+
+		result.Val = NewTks(4)
+		result.List().Add(&sToken)
+		result.List().Add(&eToken)
+		return &result
+	}
+
 	if(str[0] == '\''){
 		result.Tp = LIT_WORD
 		result.Val = str[1 : ]

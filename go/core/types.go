@@ -13,7 +13,8 @@ const (
 	CHAR	  	
 	STRING
 	FILE
-	BIN 		
+	BIN
+	RANGE 		
 	PAREN 		
 	BLOCK
 	OBJECT
@@ -58,6 +59,8 @@ func TypeToStr(n int) string{
 		return "file!"
 	case BIN:
 		return "bin!"
+	case RANGE:
+		return "range!"
 	case PAREN:
 		return "paren!"
 	case BLOCK:
@@ -116,6 +119,8 @@ func StrToType(s string) int{
 		return FILE
 	case "bin!":
 		return BIN
+	case "range!":
+		return RANGE
 	case "paren!":
 		return PAREN
 	case "block!":
