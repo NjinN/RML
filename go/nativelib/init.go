@@ -727,7 +727,19 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_spawn", &spawnToken)
 
+	
+	/*******  parse  *******/
 
+	var parseToken = Token{
+		NATIVE,
+		Native{
+			"parse",
+			3,
+			Parse,
+			nil,
+		},
+	}
+	ctx.PutNow("parse", &parseToken)
 
 
 }
