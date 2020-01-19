@@ -4,6 +4,7 @@ import . "../core"
 import "fmt"
 import "strconv"
 
+const INT_MAX = int(^uint(0) >> 1)
 const MAX_PARSE_DEEP = 500
 
 type Rule struct {
@@ -15,6 +16,7 @@ type Rule struct {
 	isEnd		bool
 	isSkip		bool
 	model		string
+	opposite	bool
 }
 
 func (r *Rule) init() {
@@ -26,6 +28,7 @@ func (r *Rule) init() {
 	r.isEnd = false
 	r.isSkip = false
 	r.model = ""
+	r.opposite = false
 }
 
 func (r *Rule) isRuleComplete() bool {
@@ -55,7 +58,9 @@ func (r *Rule) Echo(){
 	fmt.Println("\tisEnd is " + strconv.FormatBool(r.isEnd));
 	fmt.Println("\tisSkip is " + strconv.FormatBool(r.isSkip));
 	fmt.Println("\tmodel is " + r.model);
+	fmt.Println("\topposite is " + strconv.FormatBool(r.opposite));
 }
+
 
 func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx *BindMap) (bool, *Token){
 	var matchTimes = 0
@@ -66,9 +71,45 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 	// fmt.Println("nowIdx is " + strconv.FormatInt(int64(*nowIdx), 10));
 	if r.isEnd {
 		if *nowIdx >= len(str){
-			return true, nil
+			if !r.opposite {
+				return true, nil
+			}else{
+				return false, nil
+			}
+			
 		}else{
-			return false, nil
+			if !r.opposite{
+				return false, nil
+			}else{
+				return true, nil
+			}
+			
+		}
+	}else if r.isSkip {
+		for matchTimes < r.maxTimes && *nowIdx < len(str){
+			if r.code != nil {
+				rst, err = es.Eval(r.code.Tks(), ctx)
+				if err != nil {
+					return false, &Token{ERR, "Error when eval parsing code"}
+				}
+			}
+			matchTimes++
+			*nowIdx++
+		}
+		if matchTimes < r.minTimes {
+			if !r.opposite {
+				return false, nil
+			}else{
+				return true, nil
+			}
+			
+		}else{
+			if !r.opposite{
+				return true, nil	
+			}else{
+				return false, nil
+			}
+			
 		}
 	}else if r.model > "" {
 		if r.model == "thru" {
@@ -77,6 +118,9 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 			r.maxTimes = 1
 			for *nowIdx <= len(str){
 				mch, rst = r.match(str, nowIdx, startDeep, es, ctx)
+				if r.opposite {
+					mch = !mch
+				}
 				if mch {
 					r.init()
 					return true, nil
@@ -86,6 +130,7 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 			if !mch {
 				return false, nil
 			}
+			return true, nil
 		}else if r.model == "to" {
 			r.model = ""
 			r.minTimes = 1
@@ -94,6 +139,9 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 			for tempIdx <= len(str){
 				*nowIdx = tempIdx
 				mch, rst = r.match(str, &tempIdx, startDeep, es, ctx)
+				if r.opposite {
+					mch = !mch
+				}
 				if mch {
 					r.init()
 					return true, nil
@@ -103,6 +151,7 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 			if !mch {
 				return false, nil
 			}
+			return true, nil
 		}
 	
 	}else if r.ruleStr > "" {
@@ -115,7 +164,7 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 				}
 			}else{
 
-				if str[*nowIdx : *nowIdx+len(r.ruleStr)] == r.ruleStr {
+				if (!r.opposite && str[*nowIdx : *nowIdx+len(r.ruleStr)] == r.ruleStr) || (r.opposite && str[*nowIdx : *nowIdx+len(r.ruleStr)] != r.ruleStr) {
 					
 					if r.code != nil {
 						rst, err = es.Eval(r.code.Tks(), ctx)
@@ -147,6 +196,11 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 			if rst != nil && rst.Tp == ERR {
 				return false, rst
 			}
+
+			if r.opposite {
+				mch = !mch
+			}
+
 			if mch {
 				if r.code != nil {
 					rst, err = es.Eval(r.code.Tks(), ctx)
@@ -155,8 +209,15 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 					}
 				}
 				matchTimes++
+			}else{
+				if matchTimes >= r.minTimes {
+					return true, rst
+				}else{
+					return false, rst
+				}		
 			}
 		}
+
 		if matchTimes >= r.minTimes {
 			return true, rst
 		}else{
@@ -164,6 +225,7 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 		}
 
 	}
+
 	return false, &Token{ERR, "Error parsing rule"}
 }
 
@@ -177,6 +239,7 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 	var rule Rule
 	rule.init()
 	if isOrRules(blk){
+		
 		var rules = splitOrRules(blk)
 		var tempIdx int
 		for _, item := range rules.Tks() {
@@ -206,8 +269,8 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 					if blkIdx < blk.List().Len() - 1 && blk.Tks()[blkIdx + 1].Tp == WORD {
 						var startIdx = *nowIdx
 						var word = blk.Tks()[blkIdx + 1].Str()
-						blkIdx++
-						getNextRule(&rule, blk, &blkIdx)
+						blkIdx+=2
+						getNextRule(&rule, blk, &blkIdx, es, ctx)
 						if rule.isRuleComplete() {
 							mch, rst := rule.match(str, nowIdx, startDeep, es, ctx)
 							if !mch || (rst != nil && rst.Tp == ERR){
@@ -217,38 +280,31 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 								return false, rst
 							}else{
 								copy(str, startIdx, *nowIdx, word, ctx)
+								return true, nil
 							}
-							rule.init()
 						}else{
+							
 							return false, &Token{ERR, "Error parsing rule"}
 						}
 					}else{
 						return false, &Token{ERR, "Error parsing rule"}
 					}
 					// blkIdx++
-				}else if nowRule.Str() == "end" {
-					rule.isEnd = true
-					rule.completeRuleRange()
-					blkIdx++
-				}else if nowRule.Str() == "skip" {
-					rule.isSkip = true
-					rule.completeRuleRange()
-					blkIdx++
 				}
 
 			}
 			
 			if !rule.isRuleComplete(){
-				getNextRule(&rule, blk, &blkIdx)
+				getNextRule(&rule, blk, &blkIdx, es, ctx)
 			}
 			
 			if rule.isRuleComplete() {
 				// rule.Echo()
-				if blkIdx < blk.List().Len() - 1 && blk.Tks()[blkIdx + 1].Tp == PAREN {
-					rule.code = blk.Tks()[blkIdx + 1]
+				if blkIdx < blk.List().Len() && blk.Tks()[blkIdx].Tp == PAREN {
+					rule.code = blk.Tks()[blkIdx]
 					blkIdx++
 				}
-
+				
 				mch, rst := rule.match(str, nowIdx, startDeep, es, ctx)
 				if !mch || (rst != nil && rst.Tp == ERR){
 					if rule.ruleBlk != nil {
@@ -275,7 +331,7 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 	
 }
 
-func getNextRule(rule *Rule, blk *Token, blkIdx *int){
+func getNextRule(rule *Rule, blk *Token, blkIdx *int, es *EvalStack, ctx *BindMap){
 	for *blkIdx < len(blk.Tks()) {
 		var nowRule = blk.Tks()[*blkIdx]
 		if nowRule.Tp == INTEGER {
@@ -301,10 +357,77 @@ func getNextRule(rule *Rule, blk *Token, blkIdx *int){
 			*blkIdx++
 			return
 		}else if nowRule.Tp == WORD {
-			if nowRule.Str() == "thru" {
+			if nowRule.Str() == "end" {
+				rule.isEnd = true
+				rule.completeRuleRange()
+				*blkIdx++
+				return
+			}else if nowRule.Str() == "skip" {
+				rule.isSkip = true
+				rule.completeRuleRange()
+				*blkIdx++
+				return
+			}else if nowRule.Str() == "some" {
+				rule.minTimes = 1
+				rule.maxTimes = INT_MAX
+				*blkIdx++
+				continue
+			}else if nowRule.Str() == "any" {
+				rule.minTimes = 0
+				rule.maxTimes = INT_MAX
+				*blkIdx++
+				continue
+			}else if nowRule.Str() == "opt" {
+				rule.minTimes = 0
+				rule.maxTimes = 1
+				*blkIdx++
+				continue
+			}else if nowRule.Str() == "not" {
+				rule.opposite = true
+				*blkIdx++
+				continue
+			}else if nowRule.Str() == "thru" {
 				rule.model = "thru"
+				*blkIdx++
+				continue
 			}else if nowRule.Str() == "to" {
 				rule.model = "to"
+				*blkIdx++
+				continue
+			}
+
+			var tempTk, err = nowRule.GetVal(ctx, es)
+			// tempTk.Echo()
+			if err != nil || tempTk == nil {
+				rule.init()
+				return
+			}
+
+			if tempTk.Tp == INTEGER {
+				if rule.minTimes < 0 {
+					rule.minTimes = tempTk.Int()
+				}else{
+					rule.maxTimes = tempTk.Int()
+				}
+			}else if tempTk.Tp == RANGE {
+				if tempTk.Tks()[0].Tp != INTEGER {
+					return
+				}
+				rule.minTimes = tempTk.Tks()[0].Int()
+				rule.maxTimes = tempTk.Tks()[1].Int()
+			}else if tempTk.Tp == STRING {
+				rule.ruleStr = tempTk.Str()
+				rule.completeRuleRange()
+				*blkIdx++
+				return
+			}else if tempTk.Tp == BLOCK {
+				rule.ruleBlk = tempTk
+				rule.completeRuleRange()
+				*blkIdx++
+				return
+			}else{
+				rule.init()
+				return
 			}
 
 		}
@@ -330,26 +453,32 @@ func splitOrRules(blk *Token) *Token{
 	result.Val = NewTks(8)
 
 	var startIdx = 0
-	for idx, item := range blk.Tks() {
-		if item.Tp == WORD && (item.Str() == "|" || item.Str() == "or") {
+
+	var nowIdx = 0
+	for nowIdx < blk.List().Len(){
+		var nowItem = blk.Tks()[nowIdx]
+
+		if nowItem.Tp == WORD && (nowItem.Str() == "|" || nowItem.Str() == "or") && nowIdx > startIdx {
 			var temp Token
 			temp.Tp = BLOCK
 			temp.Val = NewTks(8)
-			temp.List().AddArr(blk.Tks()[startIdx:idx])
+			temp.List().AddArr(blk.Tks()[startIdx:nowIdx])
 
 			result.List().Add(&temp)
-			startIdx = idx + 1
-		}
+			startIdx = nowIdx + 1
 		
-		if idx == len(blk.Tks()){
+		}else if nowIdx == blk.List().Len() - 1 && nowIdx > 0 && nowIdx >= startIdx {
 			var temp Token
 			temp.Tp = BLOCK
 			temp.Val = NewTks(8)
-			temp.List().AddArr(blk.Tks()[startIdx:])
+			temp.List().AddArr(blk.Tks()[startIdx:nowIdx+1])
 
 			result.List().Add(&temp)
 		}
+
+		nowIdx++
 	}
+
 	return &result
 }
 
