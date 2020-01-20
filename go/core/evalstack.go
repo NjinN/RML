@@ -112,7 +112,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				es.StartPos.Add(es.Idx - 2)
 				es.EndPos.Add(es.Idx)
 			}
-			i += 1
+			i++
 		}else{
 			if len(es.QuoteList) > 0 {
 				
@@ -161,7 +161,13 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				if nowToken.Tks()[0] != nil && nowToken.Tks()[0].Tp == FUNC {
 					es.StartPos.Add(es.Idx)
 					es.EndPos.Add(es.Idx + nowToken.GetPathExpLen() - 1)
-					es.Push(nowToken);
+					es.Push(nowToken)
+				}else if nowToken.IsSetPath() {
+					es.StartPos.Add(es.Idx)
+					es.EndPos.Add(es.Idx + 1)
+					es.Push(nowToken)
+					i++
+					continue
 				}else{
 					es.Push(nowToken)
 				}	
@@ -199,7 +205,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			}
 		}
 
-		i += 1
+		i++
 	}
 	result = es.Line[es.Idx - 1]
 	es.Idx = startIdx

@@ -373,3 +373,45 @@ func Le(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
+
+func Equals(t1 *Token, t2 *Token) bool {
+	if t1.Tp != t2.Tp {
+		return false
+	}
+
+	switch t1.Tp {
+	case NONE:
+		return true
+	case LIT_WORD, GET_WORD, DATATYPE, STRING, FILE, WORD, SET_WORD, PUT_WORD:
+		return t1.Str() == t2.Str()
+	case ERR, LOGIC, INTEGER, DECIMAL, CHAR, BIN, WRAP, OP, NATIVE, FUNC:
+		return t1.Val == t2.Val
+	case RANGE, PAREN, BLOCK, PROP, PATH:
+		if t1.List().Len() != t2.List().Len() {
+			return false
+		}
+		for idx, item := range t1.Tks() {
+			if !Equals(item, t2.Tks()[idx]){
+				return false
+			}
+		}
+		return true
+	case OBJECT:
+		if len(t1.Ctx().Table) != len(t2.Ctx().Table){
+			return false
+		}
+		for k, v := range t1.Ctx().Table {
+			if !Equals(v, t2.Ctx().Table[k]){
+				return false
+			}
+		}
+		return true
+	default:
+		return false
+
+
+	}
+
+
+}
+

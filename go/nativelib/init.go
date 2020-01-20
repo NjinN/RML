@@ -703,6 +703,28 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_replace", &replaceToken)
 
+	var getToken = Token{
+		NATIVE,
+		Native{
+			"get",
+			3,
+			Gget,
+			nil,
+		},
+	}
+	ctx.PutNow("get", &getToken)
+
+	var putToken = Token{
+		NATIVE,
+		Native{
+			"put",
+			4,
+			Pput,
+			nil,
+		},
+	}
+	ctx.PutNow("put", &putToken)
+
 
 	/*******  fork  *******/
 	var forkToken = Token{

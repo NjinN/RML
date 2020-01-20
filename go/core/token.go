@@ -35,6 +35,14 @@ func (t *Token) Ctx() *BindMap{
 	return t.Val.(*BindMap)
 }
 
+func (t *Token) Map() *Rmap {
+	return t.Val.(*Rmap)
+}
+
+func (t *Token) Table() map[string]TokenPair {
+	return t.Val.(*Rmap).Table
+}
+
 func (t *Token) ToString() string{
 	if t == nil {
 		return "nil"
@@ -110,6 +118,8 @@ func (t *Token) ToString() string{
 			buffer.WriteString("]")
 		}
 		return buffer.String()
+	case MAP:
+		return t.Map().ToString()
 	case OBJECT:
 		var buffer bytes.Buffer
 		buffer.WriteString("{")
@@ -220,6 +230,9 @@ func (t *Token) Clone() *Token{
 			result.Ctx().Table[k] = v.Clone()
 		}
 		return result
+	case MAP:
+		result.Val = t.Map().Clone()
+		return result
 	default:
 		return result
 	}
@@ -241,13 +254,16 @@ func (t *Token) CloneDeep() *Token{
 			result.Ctx().Table[k] = v.CloneDeep()
 		}
 		return result
+	case MAP:
+		result.Val = t.Map().CloneDeep()
+		return result
 	default:
 		return result
 	}
 }
 
 
-func (t *Token) GetVal(ctx *BindMap, stack *EvalStack) (*Token, error){
+func (t *Token) GetVal(ctx *BindMap, es *EvalStack) (*Token, error){
 	var result Token
 	switch t.Tp {
 	case WORD:
@@ -261,9 +277,9 @@ func (t *Token) GetVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 		result.Val = t.Str()
 		return &result, nil
 	case PAREN:
-		return stack.Eval(t.Tks(), ctx)
+		return es.Eval(t.Tks(), ctx)
 	case PATH:
-		return t.GetPathVal(ctx, stack)
+		return t.GetPathVal(ctx, es)
 	default:
 		return t, nil
 	}
@@ -309,8 +325,8 @@ func (t *Token) IsGetPath() bool{
 	}
 }
 
-func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
-	result, err := t.Tks()[0].GetVal(ctx, stack)
+func (t *Token) GetPathVal(ctx *BindMap, es *EvalStack) (*Token, error){
+	result, err := t.Tks()[0].GetVal(ctx, es)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +338,7 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 		}
 		key := t.Tks()[idx]
 		if key.Tp == PAREN || key.Tp == GET_WORD {
-			key, err = key.GetVal(ctx, stack)
+			key, err = key.GetVal(ctx, es)
 		}
 
 		if err != nil {
@@ -393,6 +409,8 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 				continue
 			}
 
+		}else if result.Tp == MAP {
+			return result.Map().Get(key), nil
 		}
 		return &Token{ERR, "Error path!"}, nil
 	}
@@ -400,14 +418,13 @@ func (t *Token) GetPathVal(ctx *BindMap, stack *EvalStack) (*Token, error){
 	return result, nil
 }
 
-func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, error){
-	var holderPath = t.Clone()
+func (t *Token)SetPathVal(val *Token, ctx *BindMap, es *EvalStack) (*Token, error){
+	var holderPath = t.CloneDeep()
 	holderPath.List().Pop()
-	holder, err := holderPath.GetPathVal(ctx, stack)
+	holder, err := holderPath.GetPathVal(ctx, es)
 	if err != nil {
 		return nil, err
 	}
-
 	var key = t.Tks()[t.List().Len()-1].Str()
 
 	if holder != nil {
@@ -457,6 +474,9 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, stack *EvalStack) (*Token, e
 				}
 			}
 
+		}else if holder.Tp == MAP {
+			holder.Map().Put(ToToken(key, ctx, es), val.Clone())
+			return holder, nil
 		}else{
 			return &Token{ERR, "Error path!"}, nil
 		}
@@ -506,6 +526,8 @@ func (t *Token)ToBool() bool {
 		return t.List().Len() > 0
 	case OBJECT:
 		return t.Ctx() != nil
+	case MAP:
+		return len(t.Table()) > 0
 	default:
 		return false
 	}

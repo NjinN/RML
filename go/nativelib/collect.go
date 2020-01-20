@@ -405,3 +405,46 @@ func Replace(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
+
+func Gget(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	var result Token
+
+	if args[1].Tp == OBJECT {
+		if args[2].Tp == WORD || args[2].Tp == STRING {
+			v, ok := args[1].Ctx().Table[args[2].Str()]
+			if ok {
+				return v, nil
+			}else {
+				return &Token{NONE, "none"}, nil
+			}
+		}
+	}else if args[1].Tp == MAP {
+		return args[1].Map().Get(args[2]), nil
+	}
+
+
+	result.Tp = ERR
+	result.Val = "Type Mismatch"
+	return &result, nil
+}
+
+func Pput(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	var result Token
+
+	if args[1].Tp == OBJECT {
+		if args[2].Tp == WORD || args[2].Tp == STRING {
+			args[1].Ctx().Table[args[2].Str()] = args[3]
+			return args[1], nil
+		}
+	}else if args[1].Tp == MAP {
+		args[1].Map().Put(args[2], args[3])
+		return args[1], nil
+	}
+
+
+	result.Tp = ERR
+	result.Val = "Type Mismatch"
+	return &result, nil
+}

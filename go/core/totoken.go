@@ -250,6 +250,23 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 				result.Val = temp
 				return &result
 			} 
+		}else if typeStr == "map" {
+			var m Rmap 
+			m.Table = make(map[string]TokenPair, 8)
+			for _, item := range bodyBlock {
+				if item.Tp != BLOCK || item.List().Len() != 2 {
+					return &Token{ERR, "Error format!"}
+				}
+				var pair TokenPair
+				pair.Key = item.Tks()[0]
+				pair.Val = item.Tks()[1]
+				
+				var keyString = TypeToStr(item.Tks()[0].Tp) + item.Tks()[0].ToString()
+				m.Table[keyString] = pair
+			}
+			result.Tp = MAP
+			result.Val = &m
+			return &result
 		}
 
 		result.Tp = ERR

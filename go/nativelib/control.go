@@ -414,6 +414,47 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 			}
 			return nil, nil
+		}else if args[2].Tp == MAP {
+			if len(args[2].Table()) == 0 {
+				return nil, nil
+			}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			for _, v := range(args[2].Table()){
+				var blk = NewTks(4)
+				blk.AddArr([]*Token{v.Key.CloneDeep(), v.Val})
+				c.PutNow(args[1].Str(), &Token{BLOCK, blk})
+				if args[3].Tp == BLOCK {
+					temp, err := es.Eval(args[3].Tks(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+
+				}else if args[3].Tp == STRING {
+					temp, err := es.EvalStr(args[3].Str(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+				}
+			}
+			return nil, nil
 		}
 
 	}else if args[1].Tp == BLOCK {
@@ -473,6 +514,34 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 					return temp, err
 				}
 			}
+			return nil, nil
+		}else if args[2].Tp == MAP {
+			if args[1].List().Len() < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
+				var result = Token{ERR, "Type Mismatch"}
+				return &result, nil
+			}
+			if len(args[2].Table()) == 0{
+				return nil, nil
+			}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			for _, v := range(args[2].Table()){
+				c.PutNow(args[1].Tks()[0].Str(), v.Key.CloneDeep())
+				c.PutNow(args[1].Tks()[1].Str(), v.Val)
+				temp, err := es.Eval(args[3].Tks(), &c)
+				if err != nil {
+					if err.Error() == "continue" {
+						continue
+					}
+					if err.Error() == "break" {
+						break
+					}
+					return temp, err
+				}
+				if temp != nil && temp.Tp == ERR {
+					return temp, err
+				}
+			}
+
 			return nil, nil
 		}
 

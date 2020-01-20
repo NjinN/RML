@@ -17,6 +17,7 @@ const (
 	RANGE 		
 	PAREN 		
 	BLOCK
+	MAP
 	OBJECT
 	PROP
 	WORD
@@ -65,6 +66,8 @@ func TypeToStr(n int) string{
 		return "paren!"
 	case BLOCK:
 		return "block!"
+	case MAP:
+		return "map!"
 	case OBJECT:
 		return "object!"
 	case PROP:
@@ -125,6 +128,8 @@ func StrToType(s string) int{
 		return PAREN
 	case "block!":
 		return BLOCK
+	case "map!":
+		return MAP
 	case "object!":
 		return OBJECT
 	case "prop!":
