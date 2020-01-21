@@ -185,6 +185,16 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("unset", &unsetToken)
 
+	var collectToken = Token{
+		NATIVE,
+		Native{
+			"collect",
+			2,
+			Collect,
+			nil,
+		},
+	}
+	ctx.PutNow("collect", &collectToken)
 
 	/*******  file  *******/
 

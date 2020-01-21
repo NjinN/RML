@@ -253,3 +253,48 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error){
 }
 
 
+
+/********  collect实现开始  *********/
+
+func keep(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	ctx.Table["__result"].List().Add(args[1].CloneDeep())
+	return nil, nil
+}
+
+func Collect(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+
+	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+	var result = Token{BLOCK, NewTks(8)}
+	c.Table["__result"] = &result
+	c.Table["keep"] = &Token{
+		NATIVE,
+		Native{
+			"keep",
+			2,
+			keep,
+			nil,
+		},
+	}
+
+	if args[1].Tp == BLOCK {
+		temp, err := es.Eval(args[1].Tks(), &c)
+		if (temp != nil && temp.Tp == ERR) || err != nil {
+			return temp, err
+		}
+		return &result, nil
+	}else if args[1].Tp == STRING {
+		temp, err := es.EvalStr(args[1].Str(), &c)
+		if (temp != nil && temp.Tp == ERR) || err != nil {
+			return temp, err
+		}
+		return &result, nil
+	}
+
+	return &Token{ERR, "Type Mismatch"}, nil
+}
+
+
+/********  collect实现结束  *********/
+

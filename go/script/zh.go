@@ -117,6 +117,9 @@ _添加为	:_append
 _取为	:_take
 _替换为	:_replace
 
+获取	:get
+设置	:put
+
 _分支为	:_fork
 _并行为	:_spawn
 
