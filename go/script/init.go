@@ -263,7 +263,7 @@ read: func [target /bin /string] [
 	type:= string!
 	if bin [type: bin!]
 	if string [type: string!]
-	_read target type
+	_readfile target type
 ]
 
 读取为 术 [
@@ -311,17 +311,58 @@ ls: func [/dir dir] [
 	_列出目录 目录
 ]
 
-write: func [path data /append] [
-	_write path data append
+read: func [target /bin /string] [
+	type:= string!
+	if bin [type: bin!]
+	if string [type: string!]
+	if (type? target) = file! [
+		_readfile target type
+	] 
+	if (type? target) = port! [
+		_readport target type
+	]
+	none
+]
+
+读取为 术 [
+	"读取文件或端口"
+	目标 		"要读取的目标文件或端口"
+	/二元 		"无参，指定读取结果为二元类型"		
+	/字符串		"无参，指定读取结果为字符串类型"	
+	] [
+	类型设为 字符串类型
+	若 二元 [类型为 二元类型]
+	若 字符串 [类型为 字符串类型]
+	若 (类型? 目标) 等于 文件类型 [
+		_读取文件 目标 类型
+	]
+	若 (类型? 目标) 等于 端口类型 [
+		_读取端口 目标 类型
+	]
+]
+
+write: func [target data /append] [
+	if (type? target) = file! [
+		_writefile target data append
+	]
+	if (type? target) = port! [
+		_writeport target data
+	]
+	
 ]
 
 写出为 术 [
-	"将数据写出到文件中"
-	路径 	"要写出数据的文件"
+	"将数据写出到文件或端口中"
+	目标 	"要写出数据的文件或端口"
 	数据 	"要写出的数据，接受字符串和二元类型"
 	/添加	"无参，在文件的结尾添加数据而不是覆盖"
 	] [
-	_写出 路径 数据 添加
+	若 (类型? 目标) 等于 文件类型 [
+		_写出文件 目标 数据 添加
+	]
+	若 (类型? 目标) 等于 端口类型 [
+		_写出端口 目标 数据
+	]
 ]
 
 cmd: func [c /no-wait /output output] [

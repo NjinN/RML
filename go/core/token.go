@@ -86,6 +86,8 @@ func (t *Token) ToString() string{
 		return "%" + t.Str()
 	case BIN:
 		return "#{" + hex.EncodeToString(t.Val.([]byte)) + "}"
+	case URL:
+		return t.Str()
 	case RANGE:
 		return t.Tks()[0].ToString() + ".." + t.Tks()[1].ToString()
 	case SET_WORD:
@@ -120,7 +122,7 @@ func (t *Token) ToString() string{
 		return buffer.String()
 	case MAP:
 		return t.Map().ToString()
-	case OBJECT:
+	case OBJECT, PORT:
 		var buffer bytes.Buffer
 		buffer.WriteString("{")
 		for k, v := range t.Ctx().Table {
@@ -369,7 +371,7 @@ func (t *Token) GetPathVal(ctx *BindMap, es *EvalStack) (*Token, error){
 				continue
 			}
 			return &Token{ERR, "Error path!"}, nil
-		}else if result.Tp == OBJECT {
+		}else if result.Tp == OBJECT || result.Tp == PORT {
 			if key.Tp == WORD || key.Tp == STRING {
 				var found bool
 				result, found = result.Ctx().Table[key.ToString()]
@@ -448,7 +450,7 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, es *EvalStack) (*Token, erro
 			}
 
 			return &Token{ERR, "Error path!"}, nil
-		}else if holder.Tp == OBJECT {
+		}else if holder.Tp == OBJECT || holder.Tp == PORT {
 			holder.Ctx().Table[key] = val
 			return holder, nil
 		}else if holder.Tp == STRING {
@@ -520,7 +522,7 @@ func (t *Token)ToBool() bool {
 		return t.Float() != 0.0
 	case CHAR:
 		return t.Val.(byte) != 0
-	case STRING:
+	case STRING, URL:
 		return t.Str() != ""
 	case BLOCK, PAREN, PATH:
 		return t.List().Len() > 0

@@ -15,8 +15,11 @@ const ZHScript =
 字符串类型为	string!	
 文件类型为	file!
 二元类型为	bin!
+地址类型为	url!  
+端口类型为	port!
 圆块类型为	paren!	
 方块类型为	block!	
+表类型为	map!  	
 对象类型为	object!	
 修饰字类型为	prop!	
 包装类型为	warp!
@@ -73,7 +76,6 @@ _命令为	:_cmd
 _库?为	:_lib?
 
 加载为	:load	
-_读取为	:_read
 存在?为	:exist?
 当前目录为	:now-dir
 绝对目录为	:abs-path
@@ -82,7 +84,8 @@ _列出目录为	:_ls
 重命名为	:rename
 删除文件为	:remove
 创建目录为	:make-dir
-_写出为	:_write
+_读取文件为	:_readfile 
+_写出文件为	:_writefile
 
 加法为	:add
 减法为	:sub

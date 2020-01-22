@@ -65,8 +65,13 @@ func Eq(es *EvalStack, ctx *BindMap) (*Token, error){
 			result.Val = args[1].Str() == args[2].Str()
 			return &result, nil
 		}
+	case DATATYPE:
+		if args[2].Tp == DATATYPE {
+			result.Val = args[1].Int()== args[2].Int()
+			return &result, nil
+		}
 	default:
-		result.Tp = LOGIC
+		result.Tp = ERR
 		result.Val = "Type Mismatch"
 	}
 	
@@ -382,7 +387,7 @@ func Equals(t1 *Token, t2 *Token) bool {
 	switch t1.Tp {
 	case NONE:
 		return true
-	case LIT_WORD, GET_WORD, DATATYPE, STRING, FILE, WORD, SET_WORD, PUT_WORD:
+	case LIT_WORD, GET_WORD, DATATYPE, STRING, FILE, URL, WORD, SET_WORD, PUT_WORD:
 		return t1.Str() == t2.Str()
 	case ERR, LOGIC, INTEGER, DECIMAL, CHAR, BIN, WRAP, OP, NATIVE, FUNC:
 		return t1.Val == t2.Val

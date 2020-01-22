@@ -14,6 +14,8 @@ const (
 	STRING
 	FILE
 	BIN
+	URL
+	PORT
 	RANGE 		
 	PAREN 		
 	BLOCK
@@ -60,6 +62,10 @@ func TypeToStr(n int) string{
 		return "file!"
 	case BIN:
 		return "bin!"
+	case URL:
+		return "url!"
+	case PORT:
+		return "port!"
 	case RANGE:
 		return "range!"
 	case PAREN:
@@ -122,6 +128,10 @@ func StrToType(s string) int{
 		return FILE
 	case "bin!":
 		return BIN
+	case "url!":
+		return URL
+	case "port!":
+		return PORT
 	case "range!":
 		return RANGE
 	case "paren!":

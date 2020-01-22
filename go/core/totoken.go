@@ -9,7 +9,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	var result Token
 	var str = Trim(s)
 
-	if str[0] != '"' {
+	if str[0] != '"' && !strings.Contains(str, "://") {
 		str = strings.ToLower(str)
 	}
 
@@ -224,6 +224,12 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	if(str[0] == '\''){
 		result.Tp = LIT_WORD
 		result.Val = str[1 : ]
+		return &result
+	}
+
+	if(strings.Contains(str, "://")) {
+		result.Tp = URL
+		result.Val =str
 		return &result
 	}
 

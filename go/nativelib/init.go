@@ -300,24 +300,24 @@ func InitNative(ctx *BindMap){
 	var readFileToken = Token{
 		NATIVE,
 		Native{
-			"_read",
+			"_readfile",
 			3,
 			ReadFile,
 			nil,
 		},
 	}
-	ctx.PutNow("_read", &readFileToken)
+	ctx.PutNow("_readfile", &readFileToken)
 
 	var writeFileToken = Token{
 		NATIVE,
 		Native{
-			"_write",
+			"_writefile",
 			4,
 			WriteFile,
 			nil,
 		},
 	}
-	ctx.PutNow("_write", &writeFileToken)
+	ctx.PutNow("_writefile", &writeFileToken)
 
 
 	/*******  math  *******/
@@ -773,5 +773,73 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("parse", &parseToken)
 
+
+	/*******  port  *******/
+
+	var openToken = Token{
+		NATIVE,
+		Native{
+			"open",
+			2,
+			Oopen,
+			nil,
+		},
+	}
+	ctx.PutNow("open", &openToken)
+
+	var readPortToken = Token{
+		NATIVE,
+		Native{
+			"_readport",
+			3,
+			ReadPort,
+			nil,
+		},
+	}
+	ctx.PutNow("_readport", &readPortToken)
+
+	var writePortToken = Token{
+		NATIVE,
+		Native{
+			"_writeport",
+			3,
+			WritePort,
+			nil,
+		},
+	}
+	ctx.PutNow("_writeport", &writePortToken)
+
+	var waitToken = Token{
+		NATIVE,
+		Native{
+			"wait",
+			2,
+			Wait,
+			nil,
+		},
+	}
+	ctx.PutNow("wait", &waitToken)
+
+	var listenToken = Token{
+		NATIVE,
+		Native{
+			"listen",
+			2,
+			Listen,
+			nil,
+		},
+	}
+	ctx.PutNow("listen", &listenToken)
+
+	var closeToken = Token{
+		NATIVE,
+		Native{
+			"close",
+			2,
+			Close,
+			nil,
+		},
+	}
+	ctx.PutNow("close", &closeToken)
 
 }
