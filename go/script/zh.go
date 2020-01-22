@@ -126,4 +126,10 @@ _替换为	:_replace
 _分支为	:_fork
 _并行为	:_spawn
 
+
+打开为 	:open  
+等待为 	:wait  
+监听为 	:listen 
+关闭为 	:close
+
 `

@@ -55,6 +55,7 @@ func main() {
 		} else {
 			fileData, err := ioutil.ReadFile(scriptPath)
 			if err == nil {
+				os.Chdir(GetParentDir(scriptPath))
 				// fmt.Println(string(fileData))
 				es.Init()
 

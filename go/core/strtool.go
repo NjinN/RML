@@ -1,6 +1,7 @@
 package core
 
 import "unicode"
+import "strings"
 // import "fmt"
 
 func Trim(s string) string{
@@ -361,6 +362,21 @@ func EndWith(source string, target string) bool{
 		return false
 	}
 	return source[len(source) - len(target):] == target
+}
+
+
+
+func GetParentDir(dir string) string {
+
+	var end = strings.LastIndexByte(dir, '/')
+	if end == 0 {
+		return "/"
+	}else if end < 0 {
+		return "./"
+	}else{
+		return dir[0:end]
+	}
+
 }
 
 
