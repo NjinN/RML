@@ -105,7 +105,7 @@ func listenListener(listener net.Listener, p *BindMap, es *EvalStack){
 		if callback.Tp == BLOCK && callback.List().Len() > 0 {
 			temp, err := es.Eval(callback.Tks(), p)
 			if err != nil {
-				fmt.Println("Error is " + err.Error())
+				fmt.Println(err.Error())
 			}
 			if temp != nil && temp.Tp == ERR {
 				fmt.Println(temp.Str())
@@ -133,6 +133,11 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 
 		n, err := conn.Read(buffer)
 		if err != nil {
+			if err.Error() == "EOF" {
+				conn.Close()
+				fmt.Println("Conn is closed")
+				break
+			}
 			fmt.Println(err.Error())
 		}
 

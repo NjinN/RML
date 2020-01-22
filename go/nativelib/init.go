@@ -152,6 +152,17 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("this", &thisToken)
 
+	var thisPortToken = Token{
+		NATIVE,
+		Native{
+			"this-port",
+			1,
+			ThisPort,
+			nil,
+		},
+	}
+	ctx.PutNow("this-port", &thisPortToken)
+
 	var libInfoToken = Token{
 		NATIVE,
 		Native{

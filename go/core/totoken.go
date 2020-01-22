@@ -9,9 +9,9 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	var result Token
 	var str = Trim(s)
 
-	if str[0] != '"' && !strings.Contains(str, "://") {
-		str = strings.ToLower(str)
-	}
+	// if str[0] != '"' && !strings.Contains(str, "://") {
+	// 	str = strings.ToLower(str)
+	// }
 
 	// fmt.Println(s)
 
@@ -29,37 +29,37 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 	if(str[0] == ':'){
 		result.Tp = GET_WORD
-		result.Val = str[1 :]
+		result.Val = strings.ToLower(str[1 :])
 		return &result
 	}
 	
 	if(str[len(str)-1] == ':' && strings.IndexByte(str, '/') < 0){
 		result.Tp = SET_WORD
-		result.Val = str[0 : len(str)-1]
+		result.Val = strings.ToLower(str[0 : len(str)-1])
 		return &result
 	}
 
 	if EndWith(str, ":="){
 		result.Tp = PUT_WORD
-		result.Val = str[0 : len(str)-2]
+		result.Val = strings.ToLower(str[0 : len(str)-2])
 		return &result
 	}
 
 	if EndWith(str, "设为"){
 		result.Tp = PUT_WORD
-		result.Val = str[0 : len(str)-6]
+		result.Val = strings.ToLower(str[0 : len(str)-6])
 		return &result
 	}
 
 	if EndWith(str, "为") && strings.IndexByte(str, '/') < 0 {
 		result.Tp = SET_WORD
-		result.Val = str[0 : len(str)-3]
+		result.Val = strings.ToLower(str[0 : len(str)-3])
 		return &result
 	}
 
 	if(str[len(str)-1] == '!'){
 		result.Tp = DATATYPE
-		result.Val = StrToType(str)
+		result.Val = StrToType(strings.ToLower(str))
 		return &result
 	}
 
@@ -83,7 +83,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 	if(str[0] == '/' && str != "/" && str != "/="){
 		result.Tp = PROP
-		result.Val = str[1 :]
+		result.Val = strings.ToLower(str[1 :])
 		return &result
 	}
 
@@ -223,7 +223,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 	if(str[0] == '\''){
 		result.Tp = LIT_WORD
-		result.Val = str[1 : ]
+		result.Val = strings.ToLower(str[1 : ])
 		return &result
 	}
 
@@ -242,7 +242,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	if str[0] == '!' && strings.IndexByte(str, '{') > 1 && str[len(str)-1] == '}' {
 		result.Tp = WRAP
 		var startIdx = strings.IndexByte(str, '{')
-		var typeStr = str[1:startIdx]
+		var typeStr = strings.ToLower(str[1:startIdx])
 		var bodyStr = str[startIdx+1:len(str)-1]
 		var bodyBlock = ToTokens(Trim(bodyStr), ctx, es)
 

@@ -194,6 +194,15 @@ func ThisRef(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{OBJECT, c}, nil
 }
 
+func ThisPort(es *EvalStack, ctx *BindMap) (*Token, error){
+	var c = ctx
+	for c.Tp != USR_CTX && c.Father != nil {
+		c = c.Father
+	}
+
+	return &Token{PORT, c}, nil
+}
+
 func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	var c = ctx
