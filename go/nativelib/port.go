@@ -135,7 +135,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 		if err != nil {
 			if err.Error() == "EOF" || strings.Contains(err.Error(), "use of closed network connection") {
 				conn.Close()
-				fmt.Println("Conn is closed")
+				// fmt.Println("Conn is closed")
 				break
 			}
 			fmt.Println(err.Error())
@@ -152,6 +152,11 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 				fmt.Println(err.Error())
 			}
 			if temp != nil && temp.Tp == ERR {
+				if strings.Contains(temp.Str(), "use of closed network connection") {
+					conn.Close()
+					// fmt.Println("Conn is closed")
+					break
+				}
 				fmt.Println(temp.Str())
 			}
 		}

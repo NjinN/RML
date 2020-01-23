@@ -67,7 +67,9 @@ func main() {
 				}
 
 				if err != nil {
-					panic(err)
+					if err.Error() != "return" && err.Error() != "break" && err.Error() != "continue" {
+						panic(err)
+					}
 				}
 			} else {
 				fmt.Print("读取文件失败 \n")
@@ -113,7 +115,7 @@ func main() {
 			fmt.Println("")
 		}
 
-		if err != nil {
+		if err != nil && err.Error() != "return" && err.Error() != "break" && err.Error() != "continue" {
 			panic(err)
 		}
 

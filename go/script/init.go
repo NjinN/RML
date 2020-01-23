@@ -316,10 +316,10 @@ read: func [target /bin /string] [
 	if bin [type: bin!]
 	if string [type: string!]
 	if (type? target) = file! [
-		_readfile target type
+		return _readfile target type
 	] 
 	if (type? target) = port! [
-		_readport target type
+		return _readport target type
 	]
 	none
 ]
@@ -334,19 +334,19 @@ read: func [target /bin /string] [
 	若 二元 [类型为 二元类型]
 	若 字符串 [类型为 字符串类型]
 	若 (类型? 目标) 等于 文件类型 [
-		_读取文件 目标 类型
+		返回 _读取文件 目标 类型
 	]
 	若 (类型? 目标) 等于 端口类型 [
-		_读取端口 目标 类型
+		返回 _读取端口 目标 类型
 	]
 ]
 
 write: func [target data /append] [
 	if (type? target) = file! [
-		_writefile target data append
+		return _writefile target data append
 	]
 	if (type? target) = port! [
-		_writeport target data
+		return _writeport target data
 	]
 	
 ]
@@ -358,10 +358,10 @@ write: func [target data /append] [
 	/添加	"无参，在文件的结尾添加数据而不是覆盖"
 	] [
 	若 (类型? 目标) 等于 文件类型 [
-		_写出文件 目标 数据 添加
+		返回 _写出文件 目标 数据 添加
 	]
 	若 (类型? 目标) 等于 端口类型 [
-		_写出端口 目标 数据
+		返回 _写出端口 目标 数据
 	]
 ]
 

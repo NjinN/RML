@@ -272,10 +272,9 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error){
 			if starIdx < endIdx {
 				result.Val = args[1].Str()[starIdx:endIdx]
 			}
+
+			args[1].Val = args[1].Str()[0:starIdx] + args[1].Str()[endIdx:]
 			
-			if args[4].Tp == LOGIC && args[4].Val.(bool){
-				args[1].Val = args[1].Str()[0:starIdx] + args[1].Str()[endIdx:]
-			}
 			return &result, nil
 
 		}else if args[3].Int() == 1 {
@@ -289,9 +288,8 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error){
 				result.Val = runes[idx]
 			}
 
-			if args[4].Tp == LOGIC && args[4].Val.(bool){
-				args[1].Val = args[1].Str()[0:idx] + args[1].Str()[idx+1:]
-			}
+			args[1].Val = args[1].Str()[0:idx] + args[1].Str()[idx+1:]
+			
 			return &result, nil
 		}
 	}

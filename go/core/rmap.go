@@ -21,8 +21,14 @@ func (r *Rmap) ToString() string{
 		buffer.WriteString(" ")
 		buffer.WriteString(v.Val.ToString())
 		buffer.WriteString("]")
+		buffer.WriteString(" ")
 	}
-	buffer.WriteString("}")
+	if len(buffer.Bytes()) == 5 {
+		buffer.WriteString("}")
+	}else{
+		buffer.Bytes()[len(buffer.Bytes())-1] = '}'
+	}
+	
 	return buffer.String()
 }
 

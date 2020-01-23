@@ -280,7 +280,7 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 								return false, rst
 							}else{
 								copy(str, startIdx, *nowIdx, word, ctx)
-								return true, nil
+								continue
 							}
 						}else{
 							
