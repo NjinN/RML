@@ -133,7 +133,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 
 		n, err := conn.Read(buffer)
 		if err != nil {
-			if err.Error() == "EOF" {
+			if err.Error() == "EOF" || strings.Contains(err.Error(), "use of closed network connection") {
 				conn.Close()
 				fmt.Println("Conn is closed")
 				break

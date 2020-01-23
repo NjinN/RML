@@ -581,6 +581,28 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("foreach", &foreachToken)
 
+	var tryToken = Token{
+		NATIVE,
+		Native{
+			"try",
+			3,
+			Ttry,
+			nil,
+		},
+	}
+	ctx.PutNow("try", &tryToken)
+
+	var causeToken = Token{
+		NATIVE,
+		Native{
+			"cause",
+			2,
+			Cause,
+			nil,
+		},
+	}
+	ctx.PutNow("cause", &causeToken)
+
 	/*******  deffunc  *******/
 
 	var defFuncToken = Token{

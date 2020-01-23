@@ -553,3 +553,36 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
+func Ttry(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+
+	if args[1].Tp == BLOCK && args[2].Tp == BLOCK {
+		temp, err := es.Eval(args[1].Tks(), ctx)
+		if (temp != nil && temp.Tp == ERR) || err != nil {
+			if err != nil {
+				temp.Val = err.Error()
+			}
+
+			var c = BindMap{make(map[string]*Token, 4), ctx, TMP_CTX}
+			c.PutNow("e", temp)
+
+			return es.Eval(args[2].Tks(), &c)
+		}
+
+		return temp, err
+	}
+
+
+	return &Token{ERR, "Type Mismatch"}, nil
+}
+
+func Cause(es *EvalStack, ctx *BindMap) (*Token, error){
+	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+
+	if args[1].Tp == STRING {
+		return &Token{ERR, args[1].Str()}, nil
+	}
+
+
+	return &Token{ERR, "Type Mismatch"}, nil
+}
