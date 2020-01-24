@@ -272,6 +272,7 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 						blkIdx+=2
 						getNextRule(&rule, blk, &blkIdx, es, ctx)
 						if rule.isRuleComplete() {
+							
 							mch, rst := rule.match(str, nowIdx, startDeep, es, ctx)
 							if !mch || (rst != nil && rst.Tp == ERR){
 								if rule.ruleBlk != nil {
@@ -280,6 +281,16 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 								return false, rst
 							}else{
 								copy(str, startIdx, *nowIdx, word, ctx)
+								if blkIdx < blk.List().Len() && blk.Tks()[blkIdx].Tp == PAREN {
+									rst, err := es.Eval(blk.Tks()[blkIdx].Tks(), ctx)
+									if err != nil {
+										return false, &Token{ERR, err.Error()}
+									}
+									if rst != nil && rst.Tp == ERR {
+										return false, rst
+									}
+									blkIdx++
+								}
 								continue
 							}
 						}else{
