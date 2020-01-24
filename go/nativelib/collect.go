@@ -17,6 +17,10 @@ func Length(es *EvalStack, ctx *BindMap) (*Token, error){
 		result.Tp = INTEGER
 		result.Val = len([]rune(args[1].Str()))
 		return &result, nil
+	}else if args[1].Tp == BIN {
+		result.Tp = INTEGER
+		result.Val = len(args[1].Val.([]byte))
+		return &result, nil
 	}
 
 	result.Tp = ERR
@@ -51,6 +55,20 @@ func Append(es *EvalStack, ctx *BindMap) (*Token, error){
 				args[1].Val = args[1].Str() + `'` + string(args[2].Val.(byte)) + `'`
 			}
 			return args[1], nil
+		}else if args[2].Tp == BLOCK {
+			if !args[3].ToBool() {
+				for _, item := range args[2].Tks() {
+					if item.Tp == STRING {
+						args[1].Val = args[1].Str() + item.Str()
+					}else{
+						args[1].Val = args[1].Str() + item.ToString()
+					}
+				}
+			}else{
+				args[1].Val = args[1].Str() + args[2].ToString()
+			}
+			return args[1], nil
+			
 		}else{
 			args[1].Val = args[1].Str() + args[2].ToString()
 			return args[1], nil
@@ -67,6 +85,13 @@ func Append(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 			return args[1], nil
 		}
+	}else if args[1].Tp == FILE {
+		if args[2].Tp == STRING || args[2].Tp == FILE {
+			args[1].Val = args[1].Str() + args[2].Str()
+			return args[1], nil
+		}
+		args[1].Val = args[1].Str() + args[2].ToString()
+		return args[1], nil
 	}
 
 	result.Tp = ERR

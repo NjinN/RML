@@ -58,6 +58,7 @@ func newListenerPort(listener net.Listener, protocol string, addr string, ctx *B
 	p.PutNow("addr", &Token{STRING, addr})
 	// p.PutNow("sub-ports", &Token{BLOCK, NewTks(8)})
 	p.PutNow("awake", &Token{NONE, "none"})
+	p.PutNow("on-close", &Token{NONE, "none"})
 	p.PutNow("conn", &Token{NONE, "none"})
 	p.PutNow("listening", &Token{LOGIC, false})
 
@@ -81,6 +82,7 @@ func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Tok
 	p.PutNow("in-buffer-size", &Token{INTEGER, 4096})
 	p.PutNow("out-buffersize", &Token{INTEGER, 4096})
 	p.PutNow("awake", &Token{NONE, "none"})
+	p.PutNow("on-close", &Token{NONE, "none"})
 	p.PutNow("listening", &Token{LOGIC, false})
 
 	return &Token{PORT, &p}
@@ -132,17 +134,31 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 		var buffer = make([]byte, bufferSize)
 
 		n, err := conn.Read(buffer)
+		// fmt.Println("conn awake")
 		if err != nil {
-			if err.Error() == "EOF" || strings.Contains(err.Error(), "use of closed network connection") {
+			if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
 				conn.Close()
 				// fmt.Println("Conn is closed")
+				var closeCode = p.Table["on-close"]
+				if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
+					temp, err := es.Eval(closeCode.Tks(), p)
+					if err != nil {
+						fmt.Println(err.Error())
+					}
+					if temp != nil && temp.Tp == ERR {
+						fmt.Println(temp.Str())
+					}
+				}
+
 				break
 			}
-			fmt.Println(err.Error())
+			// fmt.Println(err.Error())
 		}
-
+		
 		if n > 0 {
 			p.Table["in-buffer"] = &Token{BIN, buffer[0:n]}
+		}else{
+			continue
 		}
 
 		var callback = p.Table["awake"]
@@ -152,9 +168,19 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 				fmt.Println(err.Error())
 			}
 			if temp != nil && temp.Tp == ERR {
-				if strings.Contains(temp.Str(), "use of closed network connection") {
+				if strings.Contains(temp.Str(), "use of closed network connection")  || strings.Contains(temp.Str(), "wsarecv") {
 					conn.Close()
 					// fmt.Println("Conn is closed")
+					var closeCode = p.Table["on-close"]
+					if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
+						temp, err := es.Eval(closeCode.Tks(), p)
+						if err != nil {
+							fmt.Println(err.Error())
+						}
+						if temp != nil && temp.Tp == ERR {
+							fmt.Println(temp.Str())
+						}
+					}
 					break
 				}
 				fmt.Println(temp.Str())
@@ -309,22 +335,28 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	if args[1].Tp == PORT {
-		var isHost = args[1].Ctx().Get("is-host")
+		var isHost = args[1].Ctx().Table["is-host"]
 		if isHost.Tp == LOGIC {
 			if isHost.Val.(bool) {
-				err := args[1].Ctx().Get("port").Val.(net.Listener).Close()
+				err := args[1].Ctx().Table["port"].Val.(net.Listener).Close()
 				if err != nil {
 					return  &Token{ERR, err.Error()}, nil
 				}
-				return nil, nil
 			}else{
-				err := args[1].Ctx().Get("port").Val.(net.Conn).Close()
+				err := args[1].Ctx().Table["port"].Val.(net.Conn).Close()
 				if err != nil {
 					return  &Token{ERR, err.Error()}, nil
 				}
-				return nil, nil
 			}
+
+			var closeCode = args[1].Ctx().Table["on-close"]
+			if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
+				return es.Eval(closeCode.Tks(), ctx)
+			}
+			return nil, nil
 		}
 	}
 	return &Token{ERR, "Type Mismatch"}, nil
 }
+
+

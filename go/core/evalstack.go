@@ -138,10 +138,11 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					return temp, err
 				}
 			}
-			
-			if(nowToken != nil && nowToken.Tp == ERR){
+			if nowToken == nil {
+				continue
+			}else if nowToken.Tp == ERR{
 				return nowToken, nil
-			}else if(nowToken != nil && nowToken.Tp == OP && !skip && es.Idx >= 1){
+			}else if nowToken.Tp == OP && !skip && es.Idx >= 1{
 				if(es.Idx > startIdx){
 					es.StartPos.Add(es.Idx - 1)
 					es.EndPos.Add(es.Idx + 1) 
@@ -152,7 +153,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					result.Val = "Illegal grammar!!!"
 					return result, errors.New("Illegal grammar!!!")
 				}
-			}else if(nowToken != nil && nowToken.Tp < SET_WORD){
+			}else if nowToken.Tp < SET_WORD{
 				es.Push(nowToken)
 				if len(args) > 0 && args[0] == 1 && (es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp != OP) {
 					resultBlk.Add(nowToken.Clone())

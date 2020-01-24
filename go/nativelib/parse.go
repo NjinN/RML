@@ -36,7 +36,7 @@ func (r *Rule) isRuleComplete() bool {
 }
 
 func (r *Rule) isEmpty() bool {
-	return r.minTimes == - 1 && r.maxTimes == -1 && r.ruleStr == "" && r.ruleBlk == nil && r.code == nil
+	return r.minTimes == - 1 && r.maxTimes == -1 && r.ruleStr == "" && r.ruleBlk == nil && r.code == nil && r.isEnd == false && r.isSkip == false
 }
 
 func (r *Rule) completeRuleRange(){
@@ -69,7 +69,7 @@ func (r *Rule) match(str string, nowIdx *int, startDeep *int, es *EvalStack, ctx
 	var err error
 	// r.Echo()
 	// fmt.Println("nowIdx is " + strconv.FormatInt(int64(*nowIdx), 10));
-	if r.isEnd {
+	if r.isEnd && r.model == "" {
 		if *nowIdx >= len(str){
 			if !r.opposite {
 				return true, nil

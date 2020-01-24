@@ -272,8 +272,8 @@ func ReadFile(es *EvalStack, ctx *BindMap) (*Token, error){
 		}
 
 
-		result.Tp = STRING
-		result.Val = string(fileData)
+		result.Tp = BIN
+		result.Val = fileData
 		
 		return &result, nil
 
