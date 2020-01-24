@@ -774,7 +774,7 @@ func InitNative(ctx *BindMap){
 		NATIVE,
 		Native{
 			"_fork",
-			3,
+			4,
 			Fork,
 			nil,
 		},
@@ -785,7 +785,7 @@ func InitNative(ctx *BindMap){
 		NATIVE,
 		Native{
 			"_spawn",
-			3,
+			4,
 			Spawn,
 			nil,
 		},

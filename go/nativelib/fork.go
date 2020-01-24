@@ -4,9 +4,9 @@ import . "../core"
 import "fmt"
 import "sync"
 
-func forkEval(inp []*Token, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token){
+func forkEval(inp []*Token, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token, stackLen int){
 	var evalStack EvalStack
-	evalStack.Init()
+	evalStack.InitWithLen(stackLen)
 	evalStack.MainCtx = ctx
 	temp, err := evalStack.Eval(inp, ctx)
 	if err != nil {
@@ -20,9 +20,9 @@ func forkEval(inp []*Token, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter 
 	}
 }
 
-func forkEvalStr(inp string, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token){
+func forkEvalStr(inp string, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token, stackLen int){
 	var evalStack EvalStack
-	evalStack.Init()
+	evalStack.InitWithLen(stackLen)
 	evalStack.MainCtx = ctx
 	temp, err := evalStack.EvalStr(inp, ctx)
 	if err != nil {
@@ -39,20 +39,20 @@ func forkEvalStr(inp string, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter
 func Fork(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
-	if args[1].Tp == BLOCK || args[1].Tp == STRING {
+	if args[1].Tp == BLOCK || args[1].Tp == STRING && args[3].Tp == INTEGER && args[3].Int() > 0 {
 		
 
 		if args[1].Tp == BLOCK {
 			if args[2] != nil && args[2].Tp != NONE {
-				go forkEval(args[1].Tks(), ctx, nil, false, args[2])
+				go forkEval(args[1].Tks(), ctx, nil, false, args[2], args[3].Int())
 			}else{
-				go forkEval(args[1].Tks(), ctx, nil, false, nil)
+				go forkEval(args[1].Tks(), ctx, nil, false, nil, args[3].Int())
 			} 
 		}else if args[1].Tp == STRING {
 			if args[2] != nil && args[2].Tp != NONE {
-				go forkEvalStr(args[1].Str(), ctx, nil, false, args[2])
+				go forkEvalStr(args[1].Str(), ctx, nil, false, args[2], args[3].Int())
 			}else{
-				go forkEvalStr(args[1].Str(), ctx, nil, false, nil)
+				go forkEvalStr(args[1].Str(), ctx, nil, false, nil, args[3].Int())
 			}
 		}
 		return nil, nil
@@ -63,7 +63,7 @@ func Fork(es *EvalStack, ctx *BindMap) (*Token, error){
 
 func Spawn(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
-	if args[1].Tp != BLOCK || args[2].Tp != LOGIC {
+	if args[1].Tp != BLOCK || args[2].Tp != LOGIC || args[3].Tp != INTEGER || args[3].Int() <= 0 {
 		return &Token{ERR, "Type Mismatch"}, nil
 	}
 	for _, item := range args[1].Tks() {
@@ -77,16 +77,16 @@ func Spawn(es *EvalStack, ctx *BindMap) (*Token, error){
 		if item.Tp == BLOCK {
 			if args[2].ToBool(){
 				wg.Add(1)
-				go forkEval(item.Tks(), ctx, &wg, true, nil)
+				go forkEval(item.Tks(), ctx, &wg, true, nil, args[3].Int())
 			}else{
-				go forkEval(item.Tks(), ctx, nil, false, nil)
+				go forkEval(item.Tks(), ctx, nil, false, nil, args[3].Int())
 			}
 		}else if item.Tp == STRING {
 			if args[2].ToBool(){
 				wg.Add(1)
-				go forkEvalStr(item.Str(), ctx, &wg, true, nil)
+				go forkEvalStr(item.Str(), ctx, &wg, true, nil, args[3].Int())
 			}else{
-				go forkEvalStr(item.Str(), ctx, nil, false, nil)
+				go forkEvalStr(item.Str(), ctx, nil, false, nil, args[3].Int())
 			}
 		}
 	}

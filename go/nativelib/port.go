@@ -4,6 +4,7 @@ import . "../core"
 import "strings"
 import "net"
 import "sync"
+import "time"
 
 import "fmt"
 
@@ -129,15 +130,19 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 	}else{
 		bufferSize = 4096
 	}
+	p.GetNow("in-buffer").Tp = BIN
+	p.GetNow("in-buffer").Val = make([]byte, 0)
 	p.GetNow("listening").Val = true
+	var buffer = make([]byte, bufferSize)
 	for {
-		p.PutNow("in-buffer", &Token{NONE, ""})
-		var buffer = make([]byte, bufferSize)
-
 		n, err := conn.Read(buffer)
 		// fmt.Println("conn awake")
 		if err != nil {
-			if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
+
+			if err.Error() == "EOF" {
+				time.Sleep(time.Duration(200) * time.Millisecond)
+				continue
+			}else if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
 				conn.Close()
 				// fmt.Println("Conn is closed")
 				var closeCode = p.GetNow("on-close")
@@ -157,7 +162,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 		}
 		
 		if n > 0 {
-			p.PutNow("in-buffer", &Token{BIN, buffer[0:n]})
+			p.GetNow("in-buffer").Val = buffer[0:n]
 		}else{
 			continue
 		}

@@ -378,28 +378,38 @@ cmd: func [c /no-wait /output output] [
 	_命令 令 不等待 输出
 ]
 
-fork: func [code /result result] [
-	_fork code result
+fork: func [code /result result /len len] [
+	stack-len: 1024 
+	if len [stack-len: len]
+	_fork code result stack-len
 ]
 
 分支为 术 [
 	"启动一个线程执行代码"
 	代码 		"要执行的代码，方块或字符串"
 	/结果 结果	"带参，指定保存代码执行结果的Token"
+	/栈长 栈长	"栈长，指定分支线程的栈长"
 	] [
-	_分支 代码 结果
+	长为 1024
+	若 栈长 [长为 栈长]
+	_分支 代码 结果 长
 ]
 
-spawn: func [codes /wait] [
-	_spawn codes wait
+spawn: func [codes /wait /len len] [
+	stack-len: 1024
+	if len [stack-len: len]
+	_spawn codes wait stack-len
 ]
 
 并行为 术 [
 	"同时启动多个线程执行代码，可以选择是否等待线程执行完毕"
 	代码集 	"要执行的代码，方块类型，内部包含的每个方块或字符串会启动一个线程执行"
 	/等待	"无参，等待所有线程执行完毕"
+	/栈长 栈长	"栈长，指定分支线程的栈长"
 	] [
-	_并行 代码集 等待
+	长为 1024
+	若 栈长 [长为 栈长]
+	_并行 代码集 等待 长
 ]
 
 lib?: func [/output output] [

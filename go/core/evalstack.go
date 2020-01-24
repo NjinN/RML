@@ -23,6 +23,15 @@ func (es *EvalStack) Init(){
 	es.IsLocal = false
 }
 
+func (es *EvalStack) InitWithLen(len int){
+	es.StartPos = NewIntList(8)
+	es.EndPos = NewIntList(8)
+	es.Line = make([]*Token, len)
+	es.Idx = 0
+	es.QuoteList = make([]int, 0)
+	es.IsLocal = false
+}
+
 func (es *EvalStack) Push(t *Token){
 	es.Line[es.Idx] = t
 	es.Idx += 1
