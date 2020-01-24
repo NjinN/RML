@@ -86,6 +86,7 @@ func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Tok
 	p.PutNow("awake", &Token{NONE, "none"})
 	p.PutNow("on-close", &Token{NONE, "none"})
 	p.PutNow("listening", &Token{LOGIC, false})
+	p.PutNow("awake-ts", &Token{INTEGER, int64(0)})
 
 	return &Token{PORT, &p}
 }
@@ -138,8 +139,27 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 		n, err := conn.Read(buffer)
 		// fmt.Println("conn awake")
 		if err != nil {
-
 			if err.Error() == "EOF" {
+				if p.GetNow("read-timeout").Int() > 0 {
+					if time.Now().Unix() -  p.GetNow("awake-ts").Val.(int64) > int64(p.GetNow("read-timeout").Int()) {
+						conn.Close()
+						// fmt.Println("Conn is closed")
+						var closeCode = p.GetNow("on-close")
+						if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
+							temp, err := es.Eval(closeCode.Tks(), p)
+							if err != nil {
+								fmt.Println(err.Error())
+							}
+							if temp != nil && temp.Tp == ERR {
+								fmt.Println(temp.Str())
+							}
+						}
+
+						break
+					}
+				}
+
+
 				time.Sleep(time.Duration(200) * time.Millisecond)
 				continue
 			}else if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
@@ -163,6 +183,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 		
 		if n > 0 {
 			p.GetNow("in-buffer").Val = buffer[0:n]
+			p.GetNow("awake-ts").Val = time.Now().Unix()
 		}else{
 			continue
 		}
