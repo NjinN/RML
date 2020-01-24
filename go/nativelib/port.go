@@ -3,6 +3,7 @@ package nativelib
 import . "../core"
 import "strings"
 import "net"
+import "sync"
 
 import "fmt"
 
@@ -50,7 +51,7 @@ func Oopen(es *EvalStack, ctx *BindMap) (*Token, error){
 
 
 func newListenerPort(listener net.Listener, protocol string, addr string, ctx *BindMap, es *EvalStack) *Token {
-	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX}
+	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
 
 	p.PutNow("port", &Token{NONE, listener})
 	p.PutNow("is-host", &Token{LOGIC, true})
@@ -67,7 +68,7 @@ func newListenerPort(listener net.Listener, protocol string, addr string, ctx *B
 
 
 func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Token {
-	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX}
+	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
 
 	p.PutNow("port", &Token{NONE, conn})
 	p.PutNow("is-host", &Token{LOGIC, false})
@@ -90,7 +91,7 @@ func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Tok
 
 
 func listenListener(listener net.Listener, p *BindMap, es *EvalStack){
-	p.Table["listening"].Val = true
+	p.GetNow("listening").Val = true
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -98,12 +99,12 @@ func listenListener(listener net.Listener, p *BindMap, es *EvalStack){
 			break
 		}
 
-		var subConn = newConnPort(conn, p.Table["protocol"].Str(), p.Table["addr"].Str(), p.Father)
+		var subConn = newConnPort(conn, p.GetNow("protocol").Str(), p.GetNow("addr").Str(), p.Father)
 
-		// p.Table["sub-ports"].List().Add(subConn)
-		p.Table["conn"] = subConn
+		// p.GetNow("sub-ports").List().Add(subConn)
+		p.PutNow("conn", subConn)
 
-		var callback = p.Table["awake"]
+		var callback = p.GetNow("awake")
 		if callback.Tp == BLOCK && callback.List().Len() > 0 {
 			temp, err := es.Eval(callback.Tks(), p)
 			if err != nil {
@@ -114,23 +115,23 @@ func listenListener(listener net.Listener, p *BindMap, es *EvalStack){
 			}
 		}
 
-		if p.Get("listening").Tp != LOGIC || p.Get("listening").Val.(bool) != true {
+		if p.GetNow("listening").Tp != LOGIC || p.GetNow("listening").Val.(bool) != true {
 			break
 		}
 	}
 }
 
 func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
-	var bufferSizeToken = p.Get("in-buffer-size")
+	var bufferSizeToken = p.GetNow("in-buffer-size")
 	var bufferSize int
 	if bufferSizeToken.Tp == INTEGER && bufferSizeToken.Int() > 0 {
 		bufferSize = bufferSizeToken.Int()
 	}else{
 		bufferSize = 4096
 	}
-	p.Table["listening"].Val = true
+	p.GetNow("listening").Val = true
 	for {
-		p.Table["in-buffer"] = &Token{NONE, ""}
+		p.PutNow("in-buffer", &Token{NONE, ""})
 		var buffer = make([]byte, bufferSize)
 
 		n, err := conn.Read(buffer)
@@ -139,7 +140,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 			if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
 				conn.Close()
 				// fmt.Println("Conn is closed")
-				var closeCode = p.Table["on-close"]
+				var closeCode = p.GetNow("on-close")
 				if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
 					temp, err := es.Eval(closeCode.Tks(), p)
 					if err != nil {
@@ -156,12 +157,12 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 		}
 		
 		if n > 0 {
-			p.Table["in-buffer"] = &Token{BIN, buffer[0:n]}
+			p.PutNow("in-buffer", &Token{BIN, buffer[0:n]})
 		}else{
 			continue
 		}
 
-		var callback = p.Table["awake"]
+		var callback = p.GetNow("awake")
 		if callback.Tp == BLOCK && callback.List().Len() > 0 {
 			temp, err := es.Eval(callback.Tks(), p)
 			if err != nil {
@@ -171,7 +172,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 				if strings.Contains(temp.Str(), "use of closed network connection")  || strings.Contains(temp.Str(), "wsarecv") {
 					conn.Close()
 					// fmt.Println("Conn is closed")
-					var closeCode = p.Table["on-close"]
+					var closeCode = p.GetNow("on-close")
 					if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
 						temp, err := es.Eval(closeCode.Tks(), p)
 						if err != nil {
@@ -187,7 +188,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 			}
 		}
 
-		if p.Table["listening"].Tp != LOGIC || p.Table["listening"].Val.(bool) != true {
+		if p.GetNow("listening").Tp != LOGIC || p.GetNow("listening").Val.(bool) != true {
 			break
 		}
 	}
@@ -202,16 +203,16 @@ func waitListener(listener net.Listener, p *BindMap, es *EvalStack) *Token{
 		return &Token{ERR, err.Error()}
 	}
 
-	var subConn = newConnPort(conn, p.Table["protocol"].Str(), p.Table["addr"].Str(), p.Father)
+	var subConn = newConnPort(conn, p.GetNow("protocol").Str(), p.GetNow("addr").Str(), p.Father)
 
-	// p.Table["sub-ports"].List().Add(subConn)
-	p.Table["conn"] = subConn
+	// p.GetNow("sub-ports").List().Add(subConn)
+	p.PutNow("conn", subConn)
 
 	return subConn
 }
 
 func waitConn(conn net.Conn, p *BindMap, es *EvalStack) *Token{
-	var bufferSizeToken = p.Get("in-buffer-size")
+	var bufferSizeToken = p.GetNow("in-buffer-size")
 	var bufferSize int
 	if bufferSizeToken.Tp == INTEGER && bufferSizeToken.Int() > 0 {
 		bufferSize = bufferSizeToken.Int()
@@ -221,7 +222,7 @@ func waitConn(conn net.Conn, p *BindMap, es *EvalStack) *Token{
 
 	var none = &Token{NONE, ""}
 
-	p.Table["in-buffer"] = none
+	p.PutNow("in-buffer", none)
 	var buffer = make([]byte, bufferSize)
 
 	n, err := conn.Read(buffer)
@@ -230,7 +231,7 @@ func waitConn(conn net.Conn, p *BindMap, es *EvalStack) *Token{
 	}
 
 	if n > 0 {
-		p.Table["in-buffer"] = &Token{BIN, buffer[0:n]}
+		p.PutNow("in-buffer", &Token{BIN, buffer[0:n]})
 		return &Token{BIN, buffer[0:n]}
 	}else{
 		return none
@@ -242,7 +243,7 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 	
 	if args[1].Tp == PORT && args[2].Tp == DATATYPE {
-		var isHost = args[1].Ctx().Get("is-host")
+		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost == nil || isHost.Tp != LOGIC || isHost.Val.(bool) {
 			return &Token{ERR, "Target is not a conn"}, nil
 		} 
@@ -251,7 +252,7 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error){
 			return &Token{ERR, "Error output type"}, nil
 		}
 
-		var inBuffer = args[1].Ctx().Get("in-buffer")
+		var inBuffer = args[1].Ctx().GetNow("in-buffer")
 		if inBuffer.Tp == NONE {
 			return inBuffer, nil
 		}
@@ -271,7 +272,7 @@ func WritePort(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	if args[1].Tp == PORT && (args[2].Tp == STRING || args[2].Tp == BIN) {
-		var isHost = args[1].Ctx().Get("is-host")
+		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost == nil || isHost.Tp != LOGIC || isHost.Val.(bool) {
 			return &Token{ERR, "Target is not a conn"}, nil
 		} 
@@ -283,7 +284,7 @@ func WritePort(es *EvalStack, ctx *BindMap) (*Token, error){
 			outBuffer = []byte(args[2].Str())
 		}
 
-		n, err := args[1].Ctx().Get("port").Val.(net.Conn).Write(outBuffer)
+		n, err := args[1].Ctx().GetNow("port").Val.(net.Conn).Write(outBuffer)
 		if err != nil {
 			return &Token{ERR, err.Error()}, nil
 		}
@@ -299,12 +300,12 @@ func Wait(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	if args[1].Tp == PORT {
-		var isHost = args[1].Ctx().Get("is-host")
+		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost.Tp == LOGIC {
 			if isHost.Val.(bool) {
-				return waitListener(args[1].Ctx().Get("port").Val.(net.Listener), args[1].Ctx(), es), nil
+				return waitListener(args[1].Ctx().GetNow("port").Val.(net.Listener), args[1].Ctx(), es), nil
 			}else{
-				return waitConn(args[1].Ctx().Get("port").Val.(net.Conn), args[1].Ctx(), es), nil
+				return waitConn(args[1].Ctx().GetNow("port").Val.(net.Conn), args[1].Ctx(), es), nil
 			}
 
 		}
@@ -317,13 +318,13 @@ func Listen(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	if args[1].Tp == PORT {
-		var isHost = args[1].Ctx().Get("is-host")
+		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost.Tp == LOGIC {
 			if isHost.Val.(bool) {
-				listenListener(args[1].Ctx().Get("port").Val.(net.Listener), args[1].Ctx(), es)
+				listenListener(args[1].Ctx().GetNow("port").Val.(net.Listener), args[1].Ctx(), es)
 				return nil, nil
 			}else{
-				listenConn(args[1].Ctx().Get("port").Val.(net.Conn), args[1].Ctx(), es)
+				listenConn(args[1].Ctx().GetNow("port").Val.(net.Conn), args[1].Ctx(), es)
 				return nil, nil
 			}
 		}
@@ -335,21 +336,21 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	if args[1].Tp == PORT {
-		var isHost = args[1].Ctx().Table["is-host"]
+		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost.Tp == LOGIC {
 			if isHost.Val.(bool) {
-				err := args[1].Ctx().Table["port"].Val.(net.Listener).Close()
+				err := args[1].Ctx().GetNow("port").Val.(net.Listener).Close()
 				if err != nil {
 					return  &Token{ERR, err.Error()}, nil
 				}
 			}else{
-				err := args[1].Ctx().Table["port"].Val.(net.Conn).Close()
+				err := args[1].Ctx().GetNow("port").Val.(net.Conn).Close()
 				if err != nil {
 					return  &Token{ERR, err.Error()}, nil
 				}
 			}
 
-			var closeCode = args[1].Ctx().Table["on-close"]
+			var closeCode = args[1].Ctx().GetNow("on-close")
 			if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
 				return es.Eval(closeCode.Tks(), ctx)
 			}

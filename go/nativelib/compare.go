@@ -406,7 +406,7 @@ func Equals(t1 *Token, t2 *Token) bool {
 			return false
 		}
 		for k, v := range t1.Ctx().Table {
-			if !Equals(v, t2.Ctx().Table[k]){
+			if !Equals(v, t2.Ctx().GetNow(k)){
 				return false
 			}
 		}

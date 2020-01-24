@@ -5,6 +5,7 @@ import "bytes"
 import "fmt"
 import "strings"
 import "encoding/hex"
+import "sync"
 
 type Token struct {
 	Tp 		int
@@ -227,9 +228,9 @@ func (t *Token) Clone() *Token{
 		
 		return result
 	case OBJECT:
-		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp}
+		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp, sync.RWMutex{}}
 		for k, v := range(t.Ctx().Table) {
-			result.Ctx().Table[k] = v.Clone()
+			result.Ctx().PutNow(k, v.Clone())
 		}
 		return result
 	case MAP:
@@ -251,9 +252,9 @@ func (t *Token) CloneDeep() *Token{
 		}
 		return result
 	case OBJECT:
-		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp}
+		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp, sync.RWMutex{}}
 		for k, v := range(t.Ctx().Table) {
-			result.Ctx().Table[k] = v.CloneDeep()
+			result.Ctx().PutNow(k, v.CloneDeep())
 		}
 		return result
 	case MAP:
@@ -373,11 +374,10 @@ func (t *Token) GetPathVal(ctx *BindMap, es *EvalStack) (*Token, error){
 			return &Token{ERR, "Error path!"}, nil
 		}else if result.Tp == OBJECT || result.Tp == PORT {
 			if key.Tp == WORD || key.Tp == STRING {
-				var found bool
-				result, found = result.Ctx().Table[key.ToString()]
+				result = result.Ctx().GetNow(key.ToString())
 				if idx == t.List().Len()-1 {
-					if !found {
-						return &Token{NONE, "none"}, nil
+					if result.Tp == NONE {
+						return result, nil
 					}
 					if result.Tp == FUNC {
 						temp := Token{PATH, NewTks(8)}
@@ -451,7 +451,7 @@ func (t *Token)SetPathVal(val *Token, ctx *BindMap, es *EvalStack) (*Token, erro
 
 			return &Token{ERR, "Error path!"}, nil
 		}else if holder.Tp == OBJECT || holder.Tp == PORT {
-			holder.Ctx().Table[key] = val
+			holder.Ctx().PutNow(key, val)
 			return holder, nil
 		}else if holder.Tp == STRING {
 			if IsNumberStr(key) == 0 {

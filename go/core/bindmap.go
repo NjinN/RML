@@ -1,6 +1,7 @@
 package core
 
 import "runtime"
+import "sync"
 
 const (
 	SYS_CTX = iota
@@ -14,17 +15,31 @@ type BindMap struct{
 	Table 	map[string]*Token
 	Father 	*BindMap
 	Tp 		int
+	Lock 	sync.RWMutex
 }
 
+func (bm *BindMap)GetNow(key string) *Token{
+	bm.Lock.RLock()
+	tk, ok := bm.Table[key]
+	bm.Lock.RUnlock()
+	if ok {
+		return tk
+	}else{
+		return &Token{NONE, ""}
+	}
+}
 
 func (bm *BindMap) Get(key string) *Token{
+	
 	var ctx = bm
 	var prev = ctx
 
 	var tk *Token
 	var ok bool
 	if(ctx.Table != nil){
+		bm.Lock.RLock()
 		tk, ok = ctx.Table[key]
+		bm.Lock.RUnlock()
 		if(ok){
 			return tk
 		}
@@ -33,15 +48,20 @@ func (bm *BindMap) Get(key string) *Token{
 	for !ok && ctx.Father != nil {
 		prev = ctx
 		ctx = ctx.Father
-
+		
 		if(ctx.Table != nil){
+			ctx.Lock.RLock()
 			tk, ok = ctx.Table[key]
+			ctx.Lock.RUnlock()
 		}
+		
 	}
 
 	if tk != nil {
 		if ctx.Father == nil {
+			prev.Lock.Lock()
 			prev.Table[key] = tk
+			prev.Lock.Unlock()
 		}
 		return tk
 	}else{
@@ -51,29 +71,42 @@ func (bm *BindMap) Get(key string) *Token{
 
 
 func (bm *BindMap)PutNow(key string, val *Token){
+	bm.Lock.Lock()
+
 	bm.Table[key] = val
+
+	bm.Lock.Unlock()
 }
 
 
 func (bm *BindMap)Put(key string, val *Token){
+
 	var ctx = bm
 	var inserted = false
 	var ok = false
 
 	if(ctx.Table != nil){
+		ctx.Lock.RLock()
 		_, ok = ctx.Table[key]
+		ctx.Lock.RUnlock()
 	}
 
 	if(ok){
+		bm.Lock.Lock()
 		bm.Table[key] = val.Clone()
+		bm.Lock.Unlock()
 		inserted = true
 	}else{
 		for !inserted && !ok && ctx.Father != nil {
 			if(ctx.Table != nil){
+				ctx.Lock.RLock()
 				_, ok = ctx.Table[key]
+				ctx.Lock.RUnlock()
 			}
 			if(ok){
+				ctx.Lock.Lock()
 				ctx.Table[key] = val.Clone()
+				ctx.Lock.Unlock()
 				inserted = true
 				break
 			}
@@ -92,29 +125,39 @@ func (bm *BindMap)PutLocal(key string, val *Token){
 	for ctx.Tp != USR_CTX && ctx.Father != nil {
 		ctx = ctx.Father
 	}
-
+	ctx.Lock.Lock()
 	ctx.Table[key] = val.Dup()
+	ctx.Lock.Unlock()
 }
 
 
 func (bm *BindMap)Unset(key string){
+
 	var ctx = bm
 	var ok = false
 
 	if(ctx.Table != nil){
+		ctx.Lock.RLock()
 		_, ok = ctx.Table[key]
+		ctx.Lock.RUnlock()
 	}
 
 	if(ok){
+		ctx.Lock.Lock()
 		delete(ctx.Table, key)
+		ctx.Lock.Unlock()
 		runtime.GC()
 	}else{
 		for !ok && ctx.Father != nil {
 			if(ctx.Table != nil){
+				ctx.Lock.RLock()
 				_, ok = ctx.Table[key]
+				ctx.Lock.RUnlock()
 			}
 			if(ok){
+				ctx.Lock.Lock()
 				delete(ctx.Table, key)
+				ctx.Lock.RUnlock()
 				runtime.GC()
 				break
 			}

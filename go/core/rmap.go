@@ -1,6 +1,7 @@
 package core
 
 import "bytes"
+import "sync"
 // import "fmt"
 
 type TokenPair struct {
@@ -10,6 +11,7 @@ type TokenPair struct {
 
 type Rmap struct {
 	Table 	map[string]TokenPair
+	Lock 	sync.RWMutex
 }
 
 func (r *Rmap) ToString() string{
@@ -34,7 +36,9 @@ func (r *Rmap) ToString() string{
 
 func (r *Rmap) Get(key *Token) *Token {
 	var keyString = TypeToStr(key.Tp) + key.ToString()
+	r.Lock.RLock()
 	pair, ok := r.Table[keyString]
+	r.Lock.RUnlock()
 	if ok {
 		return pair.Val
 	}else{
@@ -47,7 +51,9 @@ func (r *Rmap) Put(key *Token, val *Token) {
 	var pair TokenPair
 	pair.Key = key.CloneDeep()
 	pair.Val = val.Clone()
+	r.Lock.Lock()
 	r.Table[keyString] = pair
+	r.Lock.Unlock()
 }
 
 func (r *Rmap) Delete(key *Token) {
@@ -64,7 +70,9 @@ func (r *Rmap) Clone() *Rmap {
 		var entity TokenPair
 		entity.Key = v.Key.Clone()
 		entity.Val = v.Val.Clone()
+		r.Lock.Lock()
 		result.Table[k] = entity
+		r.Lock.Unlock()
 	}
 	return &result
 }
@@ -77,7 +85,9 @@ func (r *Rmap) CloneDeep() *Rmap {
 		var entity TokenPair
 		entity.Key = v.Key.CloneDeep()
 		entity.Val = v.Val.CloneDeep()
+		r.Lock.Lock()
 		result.Table[k] = entity
+		r.Lock.Unlock()
 	}
 	return &result
 }

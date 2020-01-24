@@ -2,6 +2,7 @@ package nativelib
 
 import . "../core"
 import "errors"
+import "sync"
 // import "fmt"
 
 func Iif(es *EvalStack, ctx *BindMap) (*Token, error){
@@ -80,7 +81,7 @@ func Repeat(es *EvalStack, ctx *BindMap) (*Token, error){
 	// args[2].Echo()
 
 	if(args[1].Tp == WORD && args[2].Tp == INTEGER && args[3].Tp == BLOCK){
-		 var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+		 var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 		 var countToken = Token{INTEGER, 1}
 		 
 		 c.PutNow(args[1].Str(), &countToken)
@@ -115,7 +116,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	if(args[1].Tp == WORD && args[5].Tp == BLOCK && (args[2].Tp == INTEGER || args[2].Tp == DECIMAL) && (args[3].Tp == INTEGER || args[3].Tp == DECIMAL) && (args[4].Tp == INTEGER || args[4].Tp == DECIMAL)){
-		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 		var countToken = args[2].Dup()
 		c.PutNow(args[1].Str(), countToken)
 		var rs *Token
@@ -281,7 +282,7 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
 	if(args[1].Tp == BLOCK && args[2].Tp == BLOCK){
-		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 		b, e1 := es.Eval(args[1].Tks(), &c)
 		if e1 != nil {
 			return nil, e1
@@ -339,7 +340,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	if args[1].Tp == WORD {
 		if args[2].Tp == BLOCK || args[2].Tp == PAREN || args[2].Tp == PATH {
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for i:=0; i<args[2].List().Len(); i++ {
 				c.PutNow(args[1].Str(), args[2].Tks()[i])
 				if args[3].Tp == BLOCK {
@@ -377,7 +378,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 			return nil, nil
 
 		}else if args[2].Tp == OBJECT {
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for k, v := range(args[2].Ctx().Table){
 				var blk = NewTks(4)
 				blk.AddArr([]*Token{&Token{WORD, k}, v})
@@ -418,7 +419,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 			if len(args[2].Table()) == 0 {
 				return nil, nil
 			}
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for _, v := range(args[2].Table()){
 				var blk = NewTks(4)
 				blk.AddArr([]*Token{v.Key.CloneDeep(), v.Val})
@@ -466,7 +467,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 		}
 
 		if args[2].Tp == BLOCK {
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for i:=0; i<args[2].List().Len(); i+=args[1].List().Len() {
 				for j:=0; j<args[1].List().Len(); j++ {
 					if i+j < args[2].List().Len() {
@@ -496,7 +497,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 				var result = Token{ERR, "Type Mismatch"}
 				return &result, nil
 			}
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for k, v := range(args[2].Ctx().Table){
 				c.PutNow(args[1].Tks()[0].Str(), &Token{WORD, k})
 				c.PutNow(args[1].Tks()[1].Str(), v)
@@ -523,7 +524,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error){
 			if len(args[2].Table()) == 0{
 				return nil, nil
 			}
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for _, v := range(args[2].Table()){
 				c.PutNow(args[1].Tks()[0].Str(), v.Key.CloneDeep())
 				c.PutNow(args[1].Tks()[1].Str(), v.Val)
@@ -563,7 +564,7 @@ func Ttry(es *EvalStack, ctx *BindMap) (*Token, error){
 				temp.Val = err.Error()
 			}
 
-			var c = BindMap{make(map[string]*Token, 4), ctx, TMP_CTX}
+			var c = BindMap{make(map[string]*Token, 4), ctx, TMP_CTX, sync.RWMutex{}}
 			c.PutNow("e", temp)
 
 			return es.Eval(args[2].Tks(), &c)

@@ -3,6 +3,7 @@ package core
 import "strings"
 import "strconv"
 import "encoding/hex"
+import "sync"
 // import "fmt"
 
 func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
@@ -134,7 +135,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			}
 		}
 		var blk = ToTokens(str[1 : endIdx], ctx, es)
-		var c = BindMap{make(map[string]*Token, 8), ctx, USR_CTX}
+		var c = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
 		var orginSts = es.IsLocal
 		es.IsLocal = true
 		es.Eval(blk, &c)
@@ -268,7 +269,9 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 				pair.Val = item.Tks()[1]
 				
 				var keyString = TypeToStr(item.Tks()[0].Tp) + item.Tks()[0].ToString()
+				m.Lock.Lock()
 				m.Table[keyString] = pair
+				m.Lock.Unlock()
 			}
 			result.Tp = MAP
 			result.Val = &m

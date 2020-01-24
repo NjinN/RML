@@ -5,6 +5,7 @@ import "os"
 import "os/exec"
 import "bytes"
 import "runtime"
+import "sync"
 import "fmt"
 
 func Quit(es *EvalStack, ctx *BindMap) (*Token, error){
@@ -267,17 +268,17 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error){
 
 func keep(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
-	ctx.Table["__result"].List().Add(args[1].CloneDeep())
+	ctx.GetNow("__result").List().Add(args[1].CloneDeep())
 	return nil, nil
 }
 
 func Collect(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
-	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX}
+	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 	var result = Token{BLOCK, NewTks(8)}
-	c.Table["__result"] = &result
-	c.Table["keep"] = &Token{
+	c.PutNow("__result", &result)
+	c.PutNow("keep", &Token{
 		NATIVE,
 		Native{
 			"keep",
@@ -285,7 +286,7 @@ func Collect(es *EvalStack, ctx *BindMap) (*Token, error){
 			keep,
 			nil,
 		},
-	}
+	})
 
 	if args[1].Tp == BLOCK {
 		temp, err := es.Eval(args[1].Tks(), &c)

@@ -76,12 +76,12 @@ func Append(es *EvalStack, ctx *BindMap) (*Token, error){
 	}else if args[1].Tp == OBJECT {
 		if args[2].Tp == BLOCK {
 			for i := 0; i < args[2].List().Len() - 1; i+=2 {
-				args[1].Ctx().Table[args[2].Tks()[i].ToString()] = args[2].Tks()[i+1]
+				args[1].Ctx().PutNow(args[2].Tks()[i].ToString(), args[2].Tks()[i+1])
 			}
 			return args[1], nil 
 		}else if args[2].Tp == OBJECT {
 			for k, v := range(args[2].Ctx().Table){
-				args[1].Ctx().Table[k] = v.Clone()
+				args[1].Ctx().PutNow(k, v.Clone())
 			}
 			return args[1], nil
 		}
@@ -218,12 +218,12 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 	}else if args[1].Tp == OBJECT {
 		if args[2].Tp == BLOCK {
 			for i := 0; i < args[2].List().Len() - 1; i+=2 {
-				args[1].Ctx().Table[args[2].Tks()[i].ToString()] = args[2].Tks()[i+1]
+				args[1].Ctx().PutNow(args[2].Tks()[i].ToString(), args[2].Tks()[i+1])
 			}
 			return args[1], nil 
 		}else if args[2].Tp == OBJECT {
 			for k, v := range(args[2].Ctx().Table){
-				args[1].Ctx().Table[k] = v.Clone()
+				args[1].Ctx().PutNow(k, v.Clone())
 			}
 			return args[1], nil
 		}
@@ -435,12 +435,9 @@ func Gget(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	if args[1].Tp == OBJECT {
 		if args[2].Tp == WORD || args[2].Tp == STRING {
-			v, ok := args[1].Ctx().Table[args[2].Str()]
-			if ok {
-				return v, nil
-			}else {
-				return &Token{NONE, "none"}, nil
-			}
+			v := args[1].Ctx().GetNow(args[2].Str())
+			return v, nil
+
 		}
 	}else if args[1].Tp == MAP {
 		return args[1].Map().Get(args[2]), nil
@@ -458,7 +455,7 @@ func Pput(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	if args[1].Tp == OBJECT {
 		if args[2].Tp == WORD || args[2].Tp == STRING {
-			args[1].Ctx().Table[args[2].Str()] = args[3]
+			args[1].Ctx().PutNow(args[2].Str(), args[3])
 			return args[1], nil
 		}
 	}else if args[1].Tp == MAP {
