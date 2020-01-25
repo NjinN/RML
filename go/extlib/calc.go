@@ -1,22 +1,22 @@
 package nativelib
 
-import . "../core"
+import . "github.com/NjinN/RML/go/core"
 
-func fibonacci(n int) int{
+func fibonacci(n int) int {
 	if n < 2 {
 		return n
-	}else{
-		return fibonacci(n-1)+fibonacci(n-2)
+	} else {
+		return fibonacci(n-1) + fibonacci(n-2)
 	}
 }
 
-func Fib(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Fib(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	var result Token
 	if args[1].Tp == INTEGER {
 		result.Tp = INTEGER
-		result.Val = fibonacci(args[1].Int()) 
+		result.Val = fibonacci(args[1].Int())
 		return &result, nil
 	}
 
@@ -24,4 +24,3 @@ func Fib(es *EvalStack, ctx *BindMap) (*Token, error){
 	result.Val = "Type Mismatch"
 	return &result, nil
 }
-

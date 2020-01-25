@@ -1,9 +1,11 @@
 package oplib
 
-import . "../core"
-import . "../nativelib"
+import (
+	. "github.com/NjinN/RML/go/core"
+	. "github.com/NjinN/RML/go/nativelib"
+)
 
-func InitOp(ctx *BindMap){
+func InitOp(ctx *BindMap) {
 
 	var addToken = Token{
 		OP,
@@ -181,7 +183,6 @@ func InitOp(ctx *BindMap){
 	}
 	ctx.PutNow("<=", &leToken)
 
-
 	/*******  logic  *******/
 
 	var andToken = Token{
@@ -206,5 +207,4 @@ func InitOp(ctx *BindMap){
 	}
 	ctx.PutNow("or", &orToken)
 
-	
 }

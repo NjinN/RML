@@ -1,23 +1,26 @@
 package nativelib
 
-import "strings"
+import (
+	"strings"
 
-import . "../core"
+	. "github.com/NjinN/RML/go/core"
+)
+
 // import "fmt"
 
-func Length(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Length(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 
 	if args[1].Tp == BLOCK || args[1].Tp == PAREN {
 		result.Tp = INTEGER
 		result.Val = args[1].List().Len()
 		return &result, nil
-	}else if args[1].Tp == STRING {
+	} else if args[1].Tp == STRING {
 		result.Tp = INTEGER
 		result.Val = len([]rune(args[1].Str()))
 		return &result, nil
-	}else if args[1].Tp == BIN {
+	} else if args[1].Tp == BIN {
 		result.Tp = INTEGER
 		result.Val = len(args[1].Val.([]byte))
 		return &result, nil
@@ -28,64 +31,64 @@ func Length(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
-func Append(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Append(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 	if args[1].Tp == BLOCK || args[1].Tp == PAREN {
 		if !args[3].ToBool() && (args[2].Tp == BLOCK || args[2].Tp == PAREN) {
 			//逐个添加整个block
 			args[1].List().AddAll(args[2].List().Clone())
-		}else{
+		} else {
 			//添加整个Token
 			args[1].List().Add(args[2].Clone())
 		}
 		return args[1], nil
-	}else if args[1].Tp == STRING {
+	} else if args[1].Tp == STRING {
 		if args[2].Tp == STRING {
-			if !args[3].ToBool(){
+			if !args[3].ToBool() {
 				args[1].Val = args[1].Str() + args[2].Str()
-			}else{
+			} else {
 				args[1].Val = args[1].Str() + `"` + args[2].Str() + `"`
 			}
 			return args[1], nil
-		}else if args[2].Tp == CHAR {
-			if !args[3].ToBool(){
+		} else if args[2].Tp == CHAR {
+			if !args[3].ToBool() {
 				args[1].Val = args[1].Str() + string(args[2].Val.(byte))
-			}else{
+			} else {
 				args[1].Val = args[1].Str() + `'` + string(args[2].Val.(byte)) + `'`
 			}
 			return args[1], nil
-		}else if args[2].Tp == BLOCK {
+		} else if args[2].Tp == BLOCK {
 			if !args[3].ToBool() {
 				for _, item := range args[2].Tks() {
 					if item.Tp == STRING {
 						args[1].Val = args[1].Str() + item.Str()
-					}else{
+					} else {
 						args[1].Val = args[1].Str() + item.ToString()
 					}
 				}
-			}else{
+			} else {
 				args[1].Val = args[1].Str() + args[2].ToString()
 			}
 			return args[1], nil
-			
-		}else{
+
+		} else {
 			args[1].Val = args[1].Str() + args[2].ToString()
 			return args[1], nil
 		}
-	}else if args[1].Tp == OBJECT {
+	} else if args[1].Tp == OBJECT {
 		if args[2].Tp == BLOCK {
-			for i := 0; i < args[2].List().Len() - 1; i+=2 {
+			for i := 0; i < args[2].List().Len()-1; i += 2 {
 				args[1].Ctx().PutNow(args[2].Tks()[i].ToString(), args[2].Tks()[i+1])
 			}
-			return args[1], nil 
-		}else if args[2].Tp == OBJECT {
-			for k, v := range(args[2].Ctx().Table){
+			return args[1], nil
+		} else if args[2].Tp == OBJECT {
+			for k, v := range args[2].Ctx().Table {
 				args[1].Ctx().PutNow(k, v.Clone())
 			}
 			return args[1], nil
 		}
-	}else if args[1].Tp == FILE {
+	} else if args[1].Tp == FILE {
 		if args[2].Tp == STRING || args[2].Tp == FILE {
 			args[1].Val = args[1].Str() + args[2].Str()
 			return args[1], nil
@@ -99,16 +102,15 @@ func Append(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
-
-func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Insert(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
-	
+
 	if args[3].Tp != INTEGER {
 		result.Tp = ERR
 		result.Val = "Type Mismatch"
 		return &result, nil
-	}else if args[3].Int() <= 0 {
+	} else if args[3].Int() <= 0 {
 		result.Tp = ERR
 		result.Val = "Bound Overflow"
 		return &result, nil
@@ -133,7 +135,7 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 				// }
 				// args[1].Val = temp
 				// return args[1].Clone(), nil
-			}else{
+			} else {
 				for args[1].List().Len() < idx {
 					args[1].List().Add(&Token{NONE, "none"})
 					// args[1].Val = append(args[1].Tks(), &Token{NONE, "none"})
@@ -142,7 +144,7 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 				// args[1].Val = append(args[1].Tks(), args[2].Clone().Tks()...)
 				return args[1], nil
 			}
-		}else{
+		} else {
 			if idx <= args[1].List().Len() {
 				args[1].List().Insert(idx, args[2].Clone())
 				// temp := make([]*Token, len(args[1].Tks()) + 1)
@@ -155,8 +157,8 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 				// }
 				// args[1].Val = temp
 				return args[1], nil
-			}else{
-				for i:=args[1].List().Len(); i<idx; i++ {
+			} else {
+				for i := args[1].List().Len(); i < idx; i++ {
 					args[1].List().Add(&Token{NONE, "none"})
 					// args[1].Val = append(args[1].Tks(), &Token{NONE, "none"})
 				}
@@ -166,22 +168,22 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 		}
 		return args[1].Clone(), nil
-	}else if args[1].Tp == STRING {
+	} else if args[1].Tp == STRING {
 		if args[2].Tp == STRING {
-			if !args[4].ToBool(){
+			if !args[4].ToBool() {
 				if idx <= len(args[1].Str()) {
 					args[1].Val = args[1].Str()[0:idx] + args[2].Str() + args[1].Str()[idx:]
-				}else{
+				} else {
 					for len(args[1].Str()) < idx {
 						args[1].Val = args[1].Str() + " "
 					}
 					args[1].Val = args[1].Str() + args[2].Str()
 				}
-				
-			}else{
+
+			} else {
 				if idx <= len(args[1].Str()) {
 					args[1].Val = args[1].Str()[0:idx] + `"` + args[2].Str() + `"` + args[1].Str()[idx:]
-				}else{
+				} else {
 					for len(args[1].Str()) < idx {
 						args[1].Val = args[1].Str() + " "
 					}
@@ -189,21 +191,21 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 			}
 			return args[1], nil
-		}else if args[2].Tp == CHAR {
-			if !args[4].ToBool(){
+		} else if args[2].Tp == CHAR {
+			if !args[4].ToBool() {
 				if idx <= len(args[1].Str()) {
 					args[1].Val = args[1].Str()[0:idx] + string(args[2].Val.(byte)) + args[1].Str()[idx:]
-				}else{
+				} else {
 					for len(args[1].Str()) < idx {
 						args[1].Val = args[1].Str() + " "
 					}
 					args[1].Val = args[1].Str() + string(args[2].Val.(byte))
 				}
-				
-			}else{
+
+			} else {
 				if idx <= len(args[1].Str()) {
 					args[1].Val = args[1].Str()[0:idx] + `'` + string(args[2].Val.(byte)) + `'` + args[1].Str()[idx:]
-				}else{
+				} else {
 					for len(args[1].Str()) < idx {
 						args[1].Val = args[1].Str() + " "
 					}
@@ -211,18 +213,18 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 				}
 			}
 			return args[1], nil
-		}else{
+		} else {
 			args[1].Val = args[1].Str() + args[2].ToString()
 			return args[1], nil
 		}
-	}else if args[1].Tp == OBJECT {
+	} else if args[1].Tp == OBJECT {
 		if args[2].Tp == BLOCK {
-			for i := 0; i < args[2].List().Len() - 1; i+=2 {
+			for i := 0; i < args[2].List().Len()-1; i += 2 {
 				args[1].Ctx().PutNow(args[2].Tks()[i].ToString(), args[2].Tks()[i+1])
 			}
-			return args[1], nil 
-		}else if args[2].Tp == OBJECT {
-			for k, v := range(args[2].Ctx().Table){
+			return args[1], nil
+		} else if args[2].Tp == OBJECT {
+			for k, v := range args[2].Ctx().Table {
 				args[1].Ctx().PutNow(k, v.Clone())
 			}
 			return args[1], nil
@@ -234,12 +236,12 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
-func Take(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Take(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 
 	if args[1].Tp == BLOCK && args[2].Tp == INTEGER && args[3].Tp == INTEGER {
-		
+
 		if args[3].Int() > 1 {
 			//取多个Token
 			result.Tp = BLOCK
@@ -249,13 +251,13 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error){
 			if starIdx < 0 {
 				starIdx = 0
 			}
-			if endIdx > args[1].List().Len(){
+			if endIdx > args[1].List().Len() {
 				endIdx = args[1].List().Len()
 			}
 
 			if starIdx < endIdx {
 				result.Val = args[1].Tks()[starIdx:endIdx]
-			}else{
+			} else {
 				endIdx = starIdx
 			}
 
@@ -265,33 +267,33 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error){
 			result.Val = args[1].List().Take(starIdx, endIdx)
 			return &result, nil
 
-		}else if args[3].Int() == 1 {
+		} else if args[3].Int() == 1 {
 			//取单个Token
 			var idx = args[2].Int() - 1
-			if idx < 0 || idx >= args[1].List().Len(){
+			if idx < 0 || idx >= args[1].List().Len() {
 				result.Tp = NONE
 				result.Val = "none"
-			}else{
+			} else {
 				result.Tp = args[1].List().Get(idx).Tp
 				result.Val = args[1].List().Get(idx).Val
 			}
 
-			if args[4].Tp == LOGIC && args[4].Val.(bool){
+			if args[4].Tp == LOGIC && args[4].Val.(bool) {
 				args[1].Val = append(args[1].Tks()[0:idx], args[1].Tks()[idx+1:]...)
 			}
 			return &result, nil
 		}
-	}else if args[1].Tp == STRING && args[2].Tp == INTEGER && args[3].Tp == INTEGER {
+	} else if args[1].Tp == STRING && args[2].Tp == INTEGER && args[3].Tp == INTEGER {
 		if args[3].Int() > 1 {
 			result.Tp = STRING
 			result.Val = ""
 			var starIdx = args[2].Int() - 1
 			var endIdx = starIdx + args[3].Int()
-			
+
 			if starIdx < 0 {
 				starIdx = 0
 			}
-			if endIdx > len(args[1].Str()){
+			if endIdx > len(args[1].Str()) {
 				endIdx = len(args[1].Str())
 			}
 			if starIdx < endIdx {
@@ -299,22 +301,22 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 
 			args[1].Val = args[1].Str()[0:starIdx] + args[1].Str()[endIdx:]
-			
+
 			return &result, nil
 
-		}else if args[3].Int() == 1 {
+		} else if args[3].Int() == 1 {
 			var idx = args[2].Int() - 1
 			runes := []rune(args[1].Str())
-			if idx < 0 || idx >= len(runes){
+			if idx < 0 || idx >= len(runes) {
 				result.Tp = NONE
 				result.Val = "none"
-			}else{
+			} else {
 				result.Tp = CHAR
 				result.Val = runes[idx]
 			}
 
 			args[1].Val = args[1].Str()[0:idx] + args[1].Str()[idx+1:]
-			
+
 			return &result, nil
 		}
 	}
@@ -324,9 +326,8 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
-
-func Replace(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Replace(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 
 	if args[4].Tp != INTEGER || args[5].Tp != INTEGER {
@@ -341,19 +342,19 @@ func Replace(es *EvalStack, ctx *BindMap) (*Token, error){
 		var old = ""
 		if args[2].Tp == STRING {
 			old = args[2].Str()
-		}else{
+		} else {
 			old = args[2].ToString()
 		}
 		var new = ""
 		if args[3].Tp == STRING {
 			new = args[3].Str()
-		}else{
+		} else {
 			new = args[3].ToString()
 		}
-		
+
 		args[1].Val = args[1].Str()[0:at] + strings.Replace(args[1].Str()[at:], old, new, amount)
 		return args[1], nil
-	}else if args[1].Tp == BLOCK || args[1].Tp == PAREN {
+	} else if args[1].Tp == BLOCK || args[1].Tp == PAREN {
 		if amount < 0 {
 			amount = int(^uint(0) >> 1) //取有符号int最大值
 		}
@@ -384,26 +385,26 @@ func Replace(es *EvalStack, ctx *BindMap) (*Token, error){
 			// 			for n := 0; n < i; n++ {
 			// 				temp = append(temp, args[1].Tks()[n])
 			// 			}
-						
+
 			// 			temp = append(temp, args[3])
-						
+
 			// 			for n := i + len(args[2].Tks()); n < len(args[1].Tks()); n++ {
 			// 				temp = append(temp, args[1].Tks()[n])
 			// 			}
 			// 		}
-					
+
 			// 		args[1].Val = temp
 			// 	}
 			// }
 			if args[3].Tp == BLOCK || args[3].Tp == PAREN {
 				args[1].List().ReplacePart(args[2].List(), args[3].List(), at, amount)
-			}else{
+			} else {
 				args[1].List().ReplacePartToOne(args[2].List(), args[3], at, amount)
 			}
-		
+
 			return args[1], nil
 
-		}else{
+		} else {
 			// for i := at; i < len(args[1].Tks()) && amount > 0; i++ {
 			// 	var item = args[1].Tks()[i]
 			// 	if item.Tp == args[2].Tp && item.Val == args[2].Val {
@@ -413,7 +414,7 @@ func Replace(es *EvalStack, ctx *BindMap) (*Token, error){
 			// }
 			if args[3].Tp == BLOCK || args[3].Tp == PAREN {
 				args[1].List().ReplaceOneToPart(args[2], args[3].List(), at, amount)
-			}else{
+			} else {
 				args[1].List().Replace(args[2], args[3], at, amount)
 			}
 			return args[1], nil
@@ -421,16 +422,13 @@ func Replace(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	}
 
-
-
 	result.Tp = ERR
 	result.Val = "Type Mismatch"
 	return &result, nil
 }
 
-
-func Gget(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Gget(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 
 	if args[1].Tp == OBJECT {
@@ -439,18 +437,17 @@ func Gget(es *EvalStack, ctx *BindMap) (*Token, error){
 			return v, nil
 
 		}
-	}else if args[1].Tp == MAP {
+	} else if args[1].Tp == MAP {
 		return args[1].Map().Get(args[2]), nil
 	}
-
 
 	result.Tp = ERR
 	result.Val = "Type Mismatch"
 	return &result, nil
 }
 
-func Pput(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Pput(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 
 	if args[1].Tp == OBJECT {
@@ -458,11 +455,10 @@ func Pput(es *EvalStack, ctx *BindMap) (*Token, error){
 			args[1].Ctx().PutNow(args[2].Str(), args[3])
 			return args[1], nil
 		}
-	}else if args[1].Tp == MAP {
+	} else if args[1].Tp == MAP {
 		args[1].Map().Put(args[2], args[3])
 		return args[1], nil
 	}
-
 
 	result.Tp = ERR
 	result.Val = "Type Mismatch"
