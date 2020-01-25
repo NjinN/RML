@@ -271,7 +271,7 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 	if err != nil {
 		if err.Error() == "return"{
 			isReturn = true
-			if startToken.Tp == FUNC {
+			if startToken.Tp == FUNC || (startToken.Tp == PATH && startToken.Tks()[0].Tp == FUNC) {
 				es.Line[es.LastStartPos()] = temp
 				es.Idx = es.LastStartPos() + 1
 				es.StartPos.Pop() 
