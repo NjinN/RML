@@ -1,10 +1,8 @@
 package nativelib
 
-import . "../core"
+import . "github.com/NjinN/RML/go/core"
 
-
-
-func InitNative(ctx *BindMap){
+func InitNative(ctx *BindMap) {
 	/*******  sys  *******/
 
 	var quitToken = Token{
@@ -135,7 +133,7 @@ func InitNative(ctx *BindMap){
 			"help",
 			2,
 			HelpInfo,
-			[]int{0,},
+			[]int{0},
 		},
 	}
 	ctx.PutNow("help", &helpToken)
@@ -330,7 +328,6 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_writefile", &writeFileToken)
 
-
 	/*******  math  *******/
 
 	var addToken = Token{
@@ -454,9 +451,8 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("swap", &swapToken)
 
-
 	/*******  logic  *******/
-	
+
 	var notToken = Token{
 		NATIVE,
 		Native{
@@ -467,7 +463,6 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("not", &notToken)
-
 
 	/*******  control  *******/
 
@@ -616,7 +611,6 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("func", &defFuncToken)
 
-
 	/*******  compare  *******/
 
 	var eqToken = Token{
@@ -674,7 +668,6 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("le", &leToken)
 
-
 	/*******  time  *******/
 
 	var costToken = Token{
@@ -687,7 +680,6 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("cost", &costToken)
-
 
 	/*******  collect  *******/
 
@@ -768,7 +760,6 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("put", &putToken)
 
-
 	/*******  fork  *******/
 	var forkToken = Token{
 		NATIVE,
@@ -792,7 +783,6 @@ func InitNative(ctx *BindMap){
 	}
 	ctx.PutNow("_spawn", &spawnToken)
 
-	
 	/*******  parse  *******/
 
 	var parseToken = Token{
@@ -805,7 +795,6 @@ func InitNative(ctx *BindMap){
 		},
 	}
 	ctx.PutNow("parse", &parseToken)
-
 
 	/*******  port  *******/
 

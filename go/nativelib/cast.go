@@ -1,21 +1,23 @@
 package nativelib
 
-import "math"
-import "strconv"
-// import "encoding/hex"
-// import "fmt"
+import (
+	"math"
+	"strconv"
 
-import . "../core"
+	// import "encoding/hex"
+	// import "fmt"
 
-func To(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+	. "github.com/NjinN/RML/go/core"
+)
+
+func To(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 
 	if args[1].Tp == DATATYPE && args[2] != nil {
 		if args[1].Int() == args[2].Tp {
 			return args[2].CloneDeep(), nil
 		}
-
 
 		result.Tp = args[1].Int()
 
@@ -45,7 +47,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 			case LOGIC:
 				if args[2].Val.(bool) {
 					result.Val = 1
-				}else{
+				} else {
 					result.Val = 0
 				}
 				return &result, nil
@@ -62,7 +64,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				i, err := strconv.Atoi(args[2].Str())
 				if err != nil {
 					result.Val = 0
-				}else{
+				} else {
 					result.Val = i
 				}
 				return &result, nil
@@ -71,13 +73,13 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				result.Val = 0
 				return &result, nil
 			}
-			
+
 		case DECIMAL:
 			switch args[2].Tp {
 			case LOGIC:
 				if args[2].Val.(bool) {
 					result.Val = 1.0
-				}else{
+				} else {
 					result.Val = 0.0
 				}
 				return &result, nil
@@ -94,7 +96,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				f, err := strconv.ParseFloat(args[2].Str(), 64)
 				if err != nil {
 					result.Val = 0.0
-				}else{
+				} else {
 					result.Val = f
 				}
 				return &result, nil
@@ -103,7 +105,6 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 				result.Val = 0.0
 				return &result, nil
 			}
-		
 
 		case CHAR:
 			switch args[2].Tp {
@@ -114,7 +115,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 			case DECIMAL:
 				result.Val = byte(args[2].Float())
 				return &result, nil
-				
+
 			default:
 				result.Val = byte(0x00)
 				return &result, nil
@@ -144,13 +145,13 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 		case WORD:
 			result.Val = args[2].OutputStr()
 			return &result, nil
-			
+
 		case SET_WORD:
-			result.Val = args[2].OutputStr() 
+			result.Val = args[2].OutputStr()
 			return &result, nil
 
 		case PUT_WORD:
-			result.Val = args[2].OutputStr() 
+			result.Val = args[2].OutputStr()
 			return &result, nil
 
 		case FILE:
@@ -185,9 +186,7 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error){
 		}
 	}
 
-
 	result.Tp = ERR
 	result.Val = "Type Mismatch"
 	return &result, nil
 }
-

@@ -1,15 +1,17 @@
 package nativelib
 
-import . "../core"
-import "time"
-import "fmt"
+import (
+	"fmt"
+	"time"
 
+	. "github.com/NjinN/RML/go/core"
+)
 
-func Cost(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Cost(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 
-	if(args[1].Tp != BLOCK){
+	if args[1].Tp != BLOCK {
 		result.Tp = ERR
 		result.Val = "Type Mismatch"
 		return &result, nil
@@ -22,4 +24,3 @@ func Cost(es *EvalStack, ctx *BindMap) (*Token, error){
 
 	return &result, nil
 }
-

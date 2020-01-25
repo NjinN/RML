@@ -1,27 +1,30 @@
 package nativelib
 
-import . "../core"
-import "os"
-import "os/exec"
-import "bytes"
-import "runtime"
-import "sync"
-import "fmt"
+import (
+	"bytes"
+	"fmt"
+	"os"
+	"os/exec"
+	"runtime"
+	"sync"
 
-func Quit(es *EvalStack, ctx *BindMap) (*Token, error){
+	. "github.com/NjinN/RML/go/core"
+)
+
+func Quit(es *EvalStack, ctx *BindMap) (*Token, error) {
 	os.Exit(0)
 	return nil, nil
 }
 
-func Clear(es *EvalStack, ctx *BindMap) (*Token, error){
+func Clear(es *EvalStack, ctx *BindMap) (*Token, error) {
 	cmd := exec.Command("cmd", "/c", "cls")
-    cmd.Stdout = os.Stdout
-    cmd.Run()
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 	return nil, nil
 }
 
-func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	var result = Token{Tp: DATATYPE}
 	if args[1] != nil {
@@ -31,10 +34,10 @@ func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &result, nil
 }
 
-func Do(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Do(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
-	switch args[1].Tp{
+	switch args[1].Tp {
 	case BLOCK:
 		if args[2].Tp == OBJECT {
 			return es.Eval(args[1].Tks(), args[2].Ctx())
@@ -50,10 +53,10 @@ func Do(es *EvalStack, ctx *BindMap) (*Token, error){
 	}
 }
 
-func Reduce(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Reduce(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
-	switch args[1].Tp{
+	switch args[1].Tp {
 	case BLOCK:
 		if args[2].Tp == OBJECT {
 			return es.Eval(args[1].Tks(), args[2].Ctx(), 1)
@@ -72,58 +75,58 @@ func Reduce(es *EvalStack, ctx *BindMap) (*Token, error){
 	}
 }
 
-func Format(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Format(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result Token
 	result.Tp = STRING
 	result.Val = args[1].ToString()
 	return &result, nil
 }
 
-func Copy(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Copy(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var result *Token
 	if args[2] != nil && args[2].Tp == LOGIC && args[2].Val.(bool) {
 		result = args[1].CloneDeep()
-	}else{
+	} else {
 		result = args[1].Clone()
 	}
 	return result, nil
 }
 
-func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Pprint(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	if args[1].Tp == BLOCK && args[2].Tp == LOGIC {
 		fmt.Print("[")
-		for idx, item := range args[1].Tks(){
-			if args[3].ToBool(){
-				if idx == args[1].List().Len() - 1 {
+		for idx, item := range args[1].Tks() {
+			if args[3].ToBool() {
+				if idx == args[1].List().Len()-1 {
 					fmt.Print(item.OutputStr())
-				}else{
+				} else {
 					fmt.Print(item.OutputStr() + " ")
 				}
-			}else{
+			} else {
 				temp, err := item.GetVal(ctx, es)
 				if err != nil {
 					return nil, err
 				}
-				if idx == args[1].List().Len() - 1 {
+				if idx == args[1].List().Len()-1 {
 					fmt.Print(temp.OutputStr())
-				}else{
+				} else {
 					fmt.Print(temp.OutputStr() + " ")
 				}
-				
+
 			}
 		}
-		if args[2].Val.(bool){
+		if args[2].Val.(bool) {
 			fmt.Print("]")
-		}else{
+		} else {
 			fmt.Println("]")
 		}
-	}else{
-		if args[2].Val.(bool){
+	} else {
+		if args[2].Val.(bool) {
 			fmt.Print(args[1].OutputStr())
-		}else{
+		} else {
 			fmt.Println(args[1].OutputStr())
 		}
 	}
@@ -131,8 +134,8 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error){
 	return nil, nil
 }
 
-func Let(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Let(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	if args[1].Tp == BLOCK {
 		var orginSts = es.IsLocal
 		es.IsLocal = true
@@ -143,8 +146,8 @@ func Let(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	if args[1].Tp == STRING && args[2].Tp == LOGIC {
 		cmd := exec.Command("cmd", "/c", args[1].Str())
 		if args[3] != nil && args[3].Tp != NONE {
@@ -154,26 +157,26 @@ func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error){
 			args[3].Tp = BIN
 			args[3].Val = append(make([]byte, 0), output.Bytes()...)
 			return args[3], nil
-		}else if args[2].ToBool() {
+		} else if args[2].ToBool() {
 			cmd.Stdout = os.Stdout
 			cmd.Start()
-		}else{
+		} else {
 			cmd.Stdout = os.Stdout
 			cmd.Run()
-		}	
+		}
 		return nil, nil
 	}
 
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	if args[1] == nil {
 		fmt.Println("nil")
 		return nil, nil
 	}
-	temp, err:= args[1].GetVal(ctx, es)
+	temp, err := args[1].GetVal(ctx, es)
 	if err != nil {
 		return &Token{ERR, "Type Mismatch"}, nil
 	}
@@ -186,7 +189,7 @@ func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error){
 
 }
 
-func ThisRef(es *EvalStack, ctx *BindMap) (*Token, error){
+func ThisRef(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var c = ctx
 	for c.Tp != USR_CTX && c.Father != nil {
 		c = c.Father
@@ -195,7 +198,7 @@ func ThisRef(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{OBJECT, c}, nil
 }
 
-func ThisPort(es *EvalStack, ctx *BindMap) (*Token, error){
+func ThisPort(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var c = ctx
 	for c.Tp != USR_CTX && c.Father != nil {
 		c = c.Father
@@ -204,8 +207,8 @@ func ThisPort(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{PORT, c}, nil
 }
 
-func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	var c = ctx
 	for c.Father != nil {
 		c = c.Father
@@ -233,18 +236,18 @@ func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error){
 	return nil, nil
 }
 
-func Rgc(es *EvalStack, ctx *BindMap) (*Token, error){
+func Rgc(es *EvalStack, ctx *BindMap) (*Token, error) {
 	runtime.GC()
 	return nil, nil
 }
 
-func Unset(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	if args[1].Tp == WORD {
 		ctx.Unset(args[1].Str())
 		return nil, nil
-	}else if args[1].Tp == PATH && args[1].List().Last().Tp == WORD {
+	} else if args[1].Tp == PATH && args[1].List().Last().Tp == WORD {
 		var holderPath = args[1].CloneDeep()
 		holderPath.List().Pop()
 		holder, err := holderPath.GetPathVal(ctx, es)
@@ -262,18 +265,16 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-
-
 /********  collect实现开始  *********/
 
-func keep(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func keep(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	ctx.GetNow("__result").List().Add(args[1].CloneDeep())
 	return nil, nil
 }
 
-func Collect(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Collect(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 	var result = Token{BLOCK, NewTks(8)}
@@ -294,7 +295,7 @@ func Collect(es *EvalStack, ctx *BindMap) (*Token, error){
 			return temp, err
 		}
 		return &result, nil
-	}else if args[1].Tp == STRING {
+	} else if args[1].Tp == STRING {
 		temp, err := es.EvalStr(args[1].Str(), &c)
 		if (temp != nil && temp.Tp == ERR) || err != nil {
 			return temp, err
@@ -305,6 +306,4 @@ func Collect(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-
 /********  collect实现结束  *********/
-

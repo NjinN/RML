@@ -1,21 +1,23 @@
 package nativelib
 
-import . "../core"
-import "strings"
-import "net"
-import "sync"
-import "time"
-import "database/sql"
-import _ "github.com/go-sql-driver/mysql"
-import "reflect"
+import (
+	"database/sql"
+	"net"
+	"strings"
+	"sync"
+	"time"
 
-import "fmt"
+	. "github.com/NjinN/RML/go/core"
 
+	"fmt"
+	"reflect"
 
+	_ "github.com/go-sql-driver/mysql"
+)
 
-func Oopen(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
-	
+func Oopen(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+
 	if args[1].Tp == URL {
 		var temp = strings.Split(args[1].Str(), "://")
 		if len(temp) < 2 {
@@ -33,19 +35,18 @@ func Oopen(es *EvalStack, ctx *BindMap) (*Token, error){
 			}
 			return newMysqlPort(db, ctx), nil
 		}
-		
 
 		if addr[0] == ':' || temp[0] == "127.0.0.1" || temp[0] == "localhost" {
-			listener, err:= net.Listen(protocol, addr)
+			listener, err := net.Listen(protocol, addr)
 			if err != nil {
 				return &Token{ERR, err.Error()}, nil
 			}
 
 			return newListenerPort(listener, protocol, addr, ctx, es), nil
 
-		}else{
+		} else {
 			if strings.IndexByte(temp[0], ':') < 0 {
-				addr = strings.Replace(addr, temp[0], temp[0] + ":80", 1)
+				addr = strings.Replace(addr, temp[0], temp[0]+":80", 1)
 			}
 			conn, err := net.Dial(protocol, addr)
 			if err != nil {
@@ -55,11 +56,9 @@ func Oopen(es *EvalStack, ctx *BindMap) (*Token, error){
 			return newConnPort(conn, protocol, addr, ctx), nil
 		}
 
-		
 	}
 	return &Token{ERR, "Type Mismatch"}, nil
 }
-
 
 func newListenerPort(listener net.Listener, protocol string, addr string, ctx *BindMap, es *EvalStack) *Token {
 	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
@@ -76,7 +75,6 @@ func newListenerPort(listener net.Listener, protocol string, addr string, ctx *B
 
 	return &Token{PORT, &p}
 }
-
 
 func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Token {
 	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
@@ -101,8 +99,7 @@ func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Tok
 	return &Token{PORT, &p}
 }
 
-
-func listenListener(listener net.Listener, p *BindMap, es *EvalStack){
+func listenListener(listener net.Listener, p *BindMap, es *EvalStack) {
 	p.GetNow("listening").Val = true
 	for {
 		conn, err := listener.Accept()
@@ -133,12 +130,12 @@ func listenListener(listener net.Listener, p *BindMap, es *EvalStack){
 	}
 }
 
-func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
+func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 	var bufferSizeToken = p.GetNow("in-buffer-size")
 	var bufferSize int
 	if bufferSizeToken.Tp == INTEGER && bufferSizeToken.Int() > 0 {
 		bufferSize = bufferSizeToken.Int()
-	}else{
+	} else {
 		bufferSize = 4096
 	}
 	p.GetNow("in-buffer").Tp = BIN
@@ -151,7 +148,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 		if err != nil {
 			if err.Error() == "EOF" {
 				if p.GetNow("read-timeout").Int() > 0 {
-					if time.Now().Unix() -  p.GetNow("awake-ts").Val.(int64) > int64(p.GetNow("read-timeout").Int()) {
+					if time.Now().Unix()-p.GetNow("awake-ts").Val.(int64) > int64(p.GetNow("read-timeout").Int()) {
 						conn.Close()
 						// fmt.Println("Conn is closed")
 						var closeCode = p.GetNow("on-close")
@@ -169,10 +166,9 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 					}
 				}
 
-
 				time.Sleep(time.Duration(200) * time.Millisecond)
 				continue
-			}else if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
+			} else if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
 				conn.Close()
 				// fmt.Println("Conn is closed")
 				var closeCode = p.GetNow("on-close")
@@ -190,11 +186,11 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 			}
 			// fmt.Println(err.Error())
 		}
-		
+
 		if n > 0 {
 			p.GetNow("in-buffer").Val = buffer[0:n]
 			p.GetNow("awake-ts").Val = time.Now().Unix()
-		}else{
+		} else {
 			continue
 		}
 
@@ -205,7 +201,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 				fmt.Println(err.Error())
 			}
 			if temp != nil && temp.Tp == ERR {
-				if strings.Contains(temp.Str(), "use of closed network connection")  || strings.Contains(temp.Str(), "wsarecv") {
+				if strings.Contains(temp.Str(), "use of closed network connection") || strings.Contains(temp.Str(), "wsarecv") {
 					conn.Close()
 					// fmt.Println("Conn is closed")
 					var closeCode = p.GetNow("on-close")
@@ -230,10 +226,8 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack){
 	}
 }
 
+func waitListener(listener net.Listener, p *BindMap, es *EvalStack) *Token {
 
-func waitListener(listener net.Listener, p *BindMap, es *EvalStack) *Token{
-
-	
 	conn, err := listener.Accept()
 	if err != nil {
 		return &Token{ERR, err.Error()}
@@ -247,12 +241,12 @@ func waitListener(listener net.Listener, p *BindMap, es *EvalStack) *Token{
 	return subConn
 }
 
-func waitConn(conn net.Conn, p *BindMap, es *EvalStack) *Token{
+func waitConn(conn net.Conn, p *BindMap, es *EvalStack) *Token {
 	var bufferSizeToken = p.GetNow("in-buffer-size")
 	var bufferSize int
 	if bufferSizeToken.Tp == INTEGER && bufferSizeToken.Int() > 0 {
 		bufferSize = bufferSizeToken.Int()
-	}else{
+	} else {
 		bufferSize = 4096
 	}
 
@@ -269,20 +263,20 @@ func waitConn(conn net.Conn, p *BindMap, es *EvalStack) *Token{
 	if n > 0 {
 		p.PutNow("in-buffer", &Token{BIN, buffer[0:n]})
 		return &Token{BIN, buffer[0:n]}
-	}else{
+	} else {
 		return none
 	}
-	
+
 }
 
-func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
-	
+func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+
 	if args[1].Tp == PORT && args[2].Tp == DATATYPE {
 		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost == nil || isHost.Tp != LOGIC || isHost.Val.(bool) {
 			return &Token{ERR, "Target is not a conn"}, nil
-		} 
+		}
 
 		if args[2].Int() != STRING && args[2].Int() != BIN {
 			return &Token{ERR, "Error output type"}, nil
@@ -295,7 +289,7 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error){
 
 		if args[2].Int() == BIN {
 			return inBuffer, nil
-		}else if args[2].Int() == STRING {
+		} else if args[2].Int() == STRING {
 			return &Token{STRING, string(inBuffer.Val.([]byte))}, nil
 		}
 
@@ -304,25 +298,25 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-func WritePort(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func WritePort(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	if args[1].Tp == PORT && (args[2].Tp == STRING || args[2].Tp == BIN || args[2].Tp == BLOCK) {
-		var protocol =  args[1].Ctx().GetNow("protocol") 
+		var protocol = args[1].Ctx().GetNow("protocol")
 		if protocol != nil && protocol.Str() == "mysql" {
 			return writeMysql(args[1], args[2], args[3].ToBool())
 		}
-		
+
 		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost == nil || isHost.Tp != LOGIC || isHost.Val.(bool) {
 			return &Token{ERR, "Target is not a conn"}, nil
-		} 
+		}
 		var outBuffer []byte
 		if args[2].Tp == BIN {
 			outBuffer = args[2].Val.([]byte)
-		}else if args[2].Tp == STRING {
+		} else if args[2].Tp == STRING {
 			outBuffer = []byte(args[2].Str())
-		}else{
+		} else {
 			return &Token{ERR, "Type Mismatch"}, nil
 		}
 
@@ -336,17 +330,15 @@ func WritePort(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-
-
-func Wait(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Wait(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	if args[1].Tp == PORT {
 		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost.Tp == LOGIC {
 			if isHost.Val.(bool) {
 				return waitListener(args[1].Ctx().GetNow("port").Val.(net.Listener), args[1].Ctx(), es), nil
-			}else{
+			} else {
 				return waitConn(args[1].Ctx().GetNow("port").Val.(net.Conn), args[1].Ctx(), es), nil
 			}
 
@@ -355,9 +347,8 @@ func Wait(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-
-func Listen(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Listen(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	if args[1].Tp == PORT {
 		var isHost = args[1].Ctx().GetNow("is-host")
@@ -365,7 +356,7 @@ func Listen(es *EvalStack, ctx *BindMap) (*Token, error){
 			if isHost.Val.(bool) {
 				listenListener(args[1].Ctx().GetNow("port").Val.(net.Listener), args[1].Ctx(), es)
 				return nil, nil
-			}else{
+			} else {
 				listenConn(args[1].Ctx().GetNow("port").Val.(net.Conn), args[1].Ctx(), es)
 				return nil, nil
 			}
@@ -374,8 +365,8 @@ func Listen(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-func Close(es *EvalStack, ctx *BindMap) (*Token, error){
-	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
+func Close(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
 	if args[1].Tp == PORT {
 		var isHost = args[1].Ctx().GetNow("is-host")
@@ -384,18 +375,18 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error){
 			if args[1].Ctx().GetNow("protocol").Str() == "mysql" {
 				err := args[1].Ctx().GetNow("port").Val.(*sql.DB).Close()
 				if err != nil {
-					return  &Token{ERR, err.Error()}, nil
+					return &Token{ERR, err.Error()}, nil
 				}
-			}else{
+			} else {
 				if isHost.Val.(bool) {
 					err := args[1].Ctx().GetNow("port").Val.(net.Listener).Close()
 					if err != nil {
-						return  &Token{ERR, err.Error()}, nil
+						return &Token{ERR, err.Error()}, nil
 					}
-				}else{
+				} else {
 					err := args[1].Ctx().GetNow("port").Val.(net.Conn).Close()
 					if err != nil {
-						return  &Token{ERR, err.Error()}, nil
+						return &Token{ERR, err.Error()}, nil
 					}
 				}
 			}
@@ -410,7 +401,6 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-
 func newMysqlPort(db *sql.DB, ctx *BindMap) *Token {
 	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
 
@@ -421,7 +411,6 @@ func newMysqlPort(db *sql.DB, ctx *BindMap) *Token {
 
 	return &Token{PORT, &p}
 }
-
 
 func writeMysql(port *Token, arg *Token, colName bool) (*Token, error) {
 	var db = port.Ctx().GetNow("port").Val.(*sql.DB)
@@ -435,7 +424,7 @@ func writeMysql(port *Token, arg *Token, colName bool) (*Token, error) {
 		}
 
 		switch sqlType {
-		case "SELECT" :
+		case "SELECT":
 			rows, err := db.Query(sqlStr)
 			if err != nil {
 				return &Token{ERR, err.Error()}, nil
@@ -454,7 +443,7 @@ func writeMysql(port *Token, arg *Token, colName bool) (*Token, error) {
 			return &Token{INTEGER, int(affected)}, nil
 		}
 
-	}else if arg.Tp == BLOCK && arg.List().Len() > 0 {
+	} else if arg.Tp == BLOCK && arg.List().Len() > 0 {
 		var sqlStr = Trim(arg.Tks()[0].Str())
 		var args []interface{}
 		var sqlStrSlice = StrCut(sqlStr)
@@ -468,7 +457,7 @@ func writeMysql(port *Token, arg *Token, colName bool) (*Token, error) {
 		}
 
 		switch sqlType {
-		case "SELECT" :
+		case "SELECT":
 			rows, err := db.Query(sqlStr, args...)
 			if err != nil {
 				return &Token{ERR, err.Error()}, nil
@@ -487,14 +476,12 @@ func writeMysql(port *Token, arg *Token, colName bool) (*Token, error) {
 			return &Token{INTEGER, int(affected)}, nil
 		}
 
-
 	}
 
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
-
-func rowsPacker(rows *sql.Rows, colName bool) *Token{
+func rowsPacker(rows *sql.Rows, colName bool) *Token {
 	defer rows.Close()
 	var cols, err = rows.Columns()
 	if err != nil {
@@ -518,7 +505,7 @@ func rowsPacker(rows *sql.Rows, colName bool) *Token{
 			if colName {
 				rst.List().Add(&Token{WORD, cols[idx]})
 			}
-			switch reflect.TypeOf(item){
+			switch reflect.TypeOf(item) {
 			case reflect.TypeOf(int(0)):
 				rst.List().Add(&Token{INTEGER, item.(int)})
 			case reflect.TypeOf(int64(0)):
@@ -536,4 +523,3 @@ func rowsPacker(rows *sql.Rows, colName bool) *Token{
 
 	return result
 }
-
