@@ -5,6 +5,9 @@ import "strings"
 import "net"
 import "sync"
 import "time"
+import "database/sql"
+import _ "github.com/go-sql-driver/mysql"
+import "reflect"
 
 import "fmt"
 
@@ -23,6 +26,13 @@ func Oopen(es *EvalStack, ctx *BindMap) (*Token, error){
 		var addr = temp[1]
 		temp = strings.Split(addr, "/")
 
+		if protocol == "mysql" {
+			db, err := sql.Open(protocol, addr)
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			return newMysqlPort(db, ctx), nil
+		}
 		
 
 		if addr[0] == ':' || temp[0] == "127.0.0.1" || temp[0] == "localhost" {
@@ -297,7 +307,12 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error){
 func WritePort(es *EvalStack, ctx *BindMap) (*Token, error){
 	var args = es.Line[es.LastStartPos() : es.LastEndPos() + 1]
 
-	if args[1].Tp == PORT && (args[2].Tp == STRING || args[2].Tp == BIN) {
+	if args[1].Tp == PORT && (args[2].Tp == STRING || args[2].Tp == BIN || args[2].Tp == BLOCK) {
+		var protocol =  args[1].Ctx().GetNow("protocol") 
+		if protocol != nil && protocol.Str() == "mysql" {
+			return writeMysql(args[1], args[2], args[3].ToBool())
+		}
+		
 		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost == nil || isHost.Tp != LOGIC || isHost.Val.(bool) {
 			return &Token{ERR, "Target is not a conn"}, nil
@@ -305,9 +320,10 @@ func WritePort(es *EvalStack, ctx *BindMap) (*Token, error){
 		var outBuffer []byte
 		if args[2].Tp == BIN {
 			outBuffer = args[2].Val.([]byte)
-		}
-		if args[2].Tp == STRING {
+		}else if args[2].Tp == STRING {
 			outBuffer = []byte(args[2].Str())
+		}else{
+			return &Token{ERR, "Type Mismatch"}, nil
 		}
 
 		n, err := args[1].Ctx().GetNow("port").Val.(net.Conn).Write(outBuffer)
@@ -364,15 +380,23 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error){
 	if args[1].Tp == PORT {
 		var isHost = args[1].Ctx().GetNow("is-host")
 		if isHost.Tp == LOGIC {
-			if isHost.Val.(bool) {
-				err := args[1].Ctx().GetNow("port").Val.(net.Listener).Close()
+
+			if args[1].Ctx().GetNow("protocol").Str() == "mysql" {
+				err := args[1].Ctx().GetNow("port").Val.(*sql.DB).Close()
 				if err != nil {
 					return  &Token{ERR, err.Error()}, nil
 				}
 			}else{
-				err := args[1].Ctx().GetNow("port").Val.(net.Conn).Close()
-				if err != nil {
-					return  &Token{ERR, err.Error()}, nil
+				if isHost.Val.(bool) {
+					err := args[1].Ctx().GetNow("port").Val.(net.Listener).Close()
+					if err != nil {
+						return  &Token{ERR, err.Error()}, nil
+					}
+				}else{
+					err := args[1].Ctx().GetNow("port").Val.(net.Conn).Close()
+					if err != nil {
+						return  &Token{ERR, err.Error()}, nil
+					}
 				}
 			}
 
@@ -386,4 +410,130 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error){
 	return &Token{ERR, "Type Mismatch"}, nil
 }
 
+
+func newMysqlPort(db *sql.DB, ctx *BindMap) *Token {
+	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+
+	p.PutNow("port", &Token{NONE, db})
+	p.PutNow("is-host", &Token{LOGIC, false})
+	p.PutNow("protocol", &Token{STRING, "mysql"})
+	p.PutNow("on-close", &Token{NONE, "none"})
+
+	return &Token{PORT, &p}
+}
+
+
+func writeMysql(port *Token, arg *Token, colName bool) (*Token, error) {
+	var db = port.Ctx().GetNow("port").Val.(*sql.DB)
+
+	if arg.Tp == STRING {
+		var sqlStr = Trim(arg.Str())
+		var sqlStrSlice = StrCut(sqlStr)
+		var sqlType = ""
+		if len(sqlStrSlice) > 0 {
+			sqlType = strings.ToUpper(sqlStrSlice[0])
+		}
+
+		switch sqlType {
+		case "SELECT" :
+			rows, err := db.Query(sqlStr)
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			return rowsPacker(rows, colName), nil
+
+		default:
+			rst, err := db.Exec(sqlStr)
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			affected, err := rst.RowsAffected()
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			return &Token{INTEGER, int(affected)}, nil
+		}
+
+	}else if arg.Tp == BLOCK && arg.List().Len() > 0 {
+		var sqlStr = Trim(arg.Tks()[0].Str())
+		var args []interface{}
+		var sqlStrSlice = StrCut(sqlStr)
+		var sqlType = ""
+		if len(sqlStrSlice) > 0 {
+			sqlType = strings.ToUpper(sqlStrSlice[0])
+		}
+
+		for idx := 1; idx < arg.List().Len(); idx++ {
+			args = append(args, arg.Tks()[idx].Val)
+		}
+
+		switch sqlType {
+		case "SELECT" :
+			rows, err := db.Query(sqlStr, args...)
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			return rowsPacker(rows, colName), nil
+
+		default:
+			rst, err := db.Exec(sqlStr, args...)
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			affected, err := rst.RowsAffected()
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			return &Token{INTEGER, int(affected)}, nil
+		}
+
+
+	}
+
+	return &Token{ERR, "Type Mismatch"}, nil
+}
+
+
+func rowsPacker(rows *sql.Rows, colName bool) *Token{
+	defer rows.Close()
+	var cols, err = rows.Columns()
+	if err != nil {
+		return &Token{ERR, err.Error()}
+	}
+
+	var result = &Token{BLOCK, NewTks(8)}
+	for rows.Next() {
+		var row = make([]interface{}, len(cols))
+		var rowRef = make([]interface{}, len(cols))
+		for idx, _ := range row {
+			rowRef[idx] = &row[idx]
+		}
+		err := rows.Scan(rowRef...)
+		if err != nil {
+			return &Token{ERR, err.Error()}
+		}
+
+		var rst = &Token{BLOCK, NewTks(8)}
+		for idx, item := range row {
+			if colName {
+				rst.List().Add(&Token{WORD, cols[idx]})
+			}
+			switch reflect.TypeOf(item){
+			case reflect.TypeOf(int(0)):
+				rst.List().Add(&Token{INTEGER, item.(int)})
+			case reflect.TypeOf(int64(0)):
+				rst.List().Add(&Token{INTEGER, int(item.(int64))})
+			case reflect.TypeOf(float64(0.0)):
+				rst.List().Add(&Token{DECIMAL, item.(float64)})
+			case reflect.TypeOf(float32(0.0)):
+				rst.List().Add(&Token{DECIMAL, float64(item.(float32))})
+			default:
+				rst.List().Add(&Token{STRING, string(item.([]byte))})
+			}
+		}
+		result.List().Add(rst)
+	}
+
+	return result
+}
 

@@ -835,7 +835,7 @@ func InitNative(ctx *BindMap){
 		NATIVE,
 		Native{
 			"_writeport",
-			3,
+			4,
 			WritePort,
 			nil,
 		},

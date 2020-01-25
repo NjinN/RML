@@ -341,12 +341,12 @@ read: func [target /bin /string] [
 	]
 ]
 
-write: func [target data /append] [
+write: func [target data /append /name] [
 	if (type? target) = file! [
 		return _writefile target data append
 	]
 	if (type? target) = port! [
-		return _writeport target data
+		return _writeport target data name
 	]
 	
 ]
@@ -356,12 +356,13 @@ write: func [target data /append] [
 	目标 	"要写出数据的文件或端口"
 	数据 	"要写出的数据，接受字符串和二元类型"
 	/添加	"无参，在文件的结尾添加数据而不是覆盖"
+	/名		"无参，用户数据库查询时返回列名"
 	] [
 	若 (类型? 目标) 等于 文件类型 [
 		返回 _写出文件 目标 数据 添加
 	]
 	若 (类型? 目标) 等于 端口类型 [
-		返回 _写出端口 目标 数据
+		返回 _写出端口 目标 数据 名
 	]
 ]
 
