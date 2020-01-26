@@ -269,7 +269,7 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
 
 func keep(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
-	ctx.GetNow("__result").List().Add(args[1].CloneDeep())
+	ctx.Get("__result__").List().Add(args[1].CloneDeep())
 	return nil, nil
 }
 
@@ -278,7 +278,7 @@ func Collect(es *EvalStack, ctx *BindMap) (*Token, error) {
 
 	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 	var result = Token{BLOCK, NewTks(8)}
-	c.PutNow("__result", &result)
+	c.PutNow("__result__", &result)
 	c.PutNow("keep", &Token{
 		NATIVE,
 		Native{

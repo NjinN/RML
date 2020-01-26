@@ -64,7 +64,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
-	if(str[0] == '%'){
+	if(str[0] == '%' && len(str) > 1){
 		result.Tp = FILE
 		result.Val = str[1:]
 		return &result

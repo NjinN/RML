@@ -503,7 +503,7 @@ func rowsPacker(rows *sql.Rows, colName bool) *Token {
 		var rst = &Token{BLOCK, NewTks(8)}
 		for idx, item := range row {
 			if colName {
-				rst.List().Add(&Token{WORD, cols[idx]})
+				rst.List().Add(&Token{SET_WORD, cols[idx]})
 			}
 			switch reflect.TypeOf(item) {
 			case reflect.TypeOf(int(0)):
