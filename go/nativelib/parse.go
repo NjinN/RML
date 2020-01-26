@@ -320,9 +320,7 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 
 				mch, rst := rule.match(str, nowIdx, startDeep, es, ctx)
 				if !mch || (rst != nil && rst.Tp == ERR) {
-					if rule.ruleBlk != nil {
-						*startDeep--
-					}
+					*startDeep--
 					return false, rst
 				}
 				rule.init()
@@ -333,13 +331,17 @@ func matchRuleBlk(str string, blk *Token, nowIdx *int, startDeep *int, es *EvalS
 			// blkIdx++
 		}
 
-		if *startDeep == 1 && (*nowIdx != len(str) || !rule.isEmpty()) {
-			*startDeep--
-			return false, nil
-		} else {
-			*startDeep--
-			return true, nil
+		*startDeep--
+		if *startDeep == 0 {
+			if *nowIdx == len(str) && rule.isEmpty(){
+				return true, nil
+			}else{
+				return false, nil
+			}
+		}else{
+			return rule.isEmpty(), nil
 		}
+
 	}
 
 }
