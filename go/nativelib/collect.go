@@ -95,6 +95,13 @@ func Append(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 		args[1].Val = args[1].Str() + args[2].ToString()
 		return args[1], nil
+	}else if args[1].Tp == URL {
+		if args[2].Tp == STRING || args[2].Tp == URL {
+			args[1].Val = args[1].Str() + args[2].Str()
+			return args[1], nil
+		}
+		args[1].Val = args[1].Str() + args[2].ToString()
+		return args[1], nil
 	}
 
 	result.Tp = ERR

@@ -321,6 +321,9 @@ read: func [target /bin /string] [
 	if (type? target) = port! [
 		return _readport target type
 	]
+	if (type? target) = url! [
+		return _readurl target type
+	]
 	none
 ]
 
@@ -339,6 +342,10 @@ read: func [target /bin /string] [
 	若 (类型? 目标) 等于 端口类型 [
 		返回 _读取端口 目标 类型
 	]
+	若 (类型? 目标) 等于 网址类型 [
+		返回 _读取网址 目标 类型
+	]
+	空
 ]
 
 write: func [target data /append /name] [
@@ -348,7 +355,7 @@ write: func [target data /append /name] [
 	if (type? target) = port! [
 		return _writeport target data name
 	]
-	
+	none
 ]
 
 写出为 术 [
@@ -364,6 +371,7 @@ write: func [target data /append /name] [
 	若 (类型? 目标) 等于 端口类型 [
 		返回 _写出端口 目标 数据 名
 	]
+	空
 ]
 
 cmd: func [c /no-wait /output output] [

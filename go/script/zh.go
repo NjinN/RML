@@ -15,7 +15,7 @@ const ZHScript =
 字符串类型为	string!	
 文件类型为	file!
 二元类型为	bin!
-地址类型为	url!  
+网址类型为	url!  
 端口类型为	port!
 圆块类型为	paren!	
 方块类型为	block!	
@@ -131,5 +131,8 @@ _并行为	:_spawn
 等待为 	:wait  
 监听为 	:listen 
 关闭为 	:close
+
+_读取网址为	:_readurl  
+
 
 `

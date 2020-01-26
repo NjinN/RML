@@ -864,4 +864,17 @@ func InitNative(ctx *BindMap) {
 	}
 	ctx.PutNow("close", &closeToken)
 
+
+	/*******  net  *******/
+	var readUrlToken = Token{
+		NATIVE,
+		Native{
+			"_readurl",
+			3,
+			ReadUrl,
+			nil,
+		},
+	}
+	ctx.PutNow("_readurl", &readUrlToken)
+
 }
