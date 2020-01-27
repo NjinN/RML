@@ -39,7 +39,7 @@ func (es *EvalStack) Push(t *Token){
 
 func (es *EvalStack) LastStartPos() int{
 	if(es.StartPos.Len() <= 0){
-		return -1
+		return 0
 	}
 	return es.StartPos.Last()
 }
