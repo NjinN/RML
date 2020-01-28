@@ -532,6 +532,17 @@ func InitNative(ctx *BindMap) {
 	}
 	ctx.PutNow("while", &whileToken)
 
+	var untilToken = Token{
+		NATIVE,
+		Native{
+			"until",
+			2,
+			Until,
+			nil,
+		},
+	}
+	ctx.PutNow("until", &untilToken)
+
 	var breakToken = Token{
 		NATIVE,
 		Native{

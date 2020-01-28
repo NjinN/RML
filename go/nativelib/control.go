@@ -553,6 +553,23 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 	return &result, nil
 }
 
+func Until(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+
+	if args[1].Tp ==  BLOCK {
+		for {
+			rst, err := es.Eval(args[1].Tks(), ctx)
+			if err != nil || (rst != nil && rst.ToBool()) {
+				return rst, err
+			}
+		}
+	}
+
+	var result = Token{ERR, "Type Mismatch"}
+	return &result, nil
+}
+
+
 func Ttry(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 
