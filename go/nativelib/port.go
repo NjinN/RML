@@ -94,7 +94,7 @@ func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Tok
 	p.PutNow("awake", &Token{NONE, "none"})
 	p.PutNow("on-close", &Token{NONE, "none"})
 	p.PutNow("listening", &Token{LOGIC, false})
-	p.PutNow("awake-ts", &Token{INTEGER, int64(0)})
+	p.PutNow("awake-ts", &Token{INTEGER, 0})
 
 	return &Token{PORT, &p}
 }
@@ -148,7 +148,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 		if err != nil {
 			if err.Error() == "EOF" {
 				if p.GetNow("read-timeout").Int() > 0 {
-					if time.Now().Unix()-p.GetNow("awake-ts").Val.(int64) > int64(p.GetNow("read-timeout").Int()) {
+					if int(time.Now().Unix())-p.GetNow("awake-ts").Int() > p.GetNow("read-timeout").Int() {
 						conn.Close()
 						// fmt.Println("Conn is closed")
 						var closeCode = p.GetNow("on-close")
@@ -189,7 +189,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 
 		if n > 0 {
 			p.GetNow("in-buffer").Val = buffer[0:n]
-			p.GetNow("awake-ts").Val = time.Now().Unix()
+			p.GetNow("awake-ts").Val = int(time.Now().Unix())
 		} else {
 			continue
 		}
