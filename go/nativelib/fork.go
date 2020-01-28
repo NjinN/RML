@@ -46,9 +46,9 @@ func Fork(es *EvalStack, ctx *BindMap) (*Token, error) {
 
 		if args[1].Tp == BLOCK {
 			if args[2] != nil && args[2].Tp != NONE {
-				go forkEval(args[1].Tks(), ctx, nil, false, args[2], args[3].Int())
+				go forkEval(args[1].CloneDeep().Tks(), ctx, nil, false, args[2], args[3].Int())
 			} else {
-				go forkEval(args[1].Tks(), ctx, nil, false, nil, args[3].Int())
+				go forkEval(args[1].CloneDeep().Tks(), ctx, nil, false, nil, args[3].Int())
 			}
 		} else if args[1].Tp == STRING {
 			if args[2] != nil && args[2].Tp != NONE {
@@ -79,9 +79,9 @@ func Spawn(es *EvalStack, ctx *BindMap) (*Token, error) {
 		if item.Tp == BLOCK {
 			if args[2].ToBool() {
 				wg.Add(1)
-				go forkEval(item.Tks(), ctx, &wg, true, nil, args[3].Int())
+				go forkEval(item.CloneDeep().Tks(), ctx, &wg, true, nil, args[3].Int())
 			} else {
-				go forkEval(item.Tks(), ctx, nil, false, nil, args[3].Int())
+				go forkEval(item.CloneDeep().Tks(), ctx, nil, false, nil, args[3].Int())
 			}
 		} else if item.Tp == STRING {
 			if args[2].ToBool() {
