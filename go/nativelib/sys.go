@@ -13,14 +13,14 @@ import (
 
 func Quit(es *EvalStack, ctx *BindMap) (*Token, error) {
 	os.Exit(0)
-	return nil, nil
+	return &Token{NIL, nil}, nil
 }
 
 func Clear(es *EvalStack, ctx *BindMap) (*Token, error) {
 	cmd := exec.Command("cmd", "/c", "cls")
 	cmd.Stdout = os.Stdout
 	cmd.Run()
-	return nil, nil
+	return &Token{NIL, nil}, nil
 }
 
 func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error) {
@@ -131,7 +131,7 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 	}
 	runtime.GC()
-	return nil, nil
+	return &Token{NIL, nil}, nil
 }
 
 func Let(es *EvalStack, ctx *BindMap) (*Token, error) {
@@ -164,7 +164,7 @@ func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error) {
 			cmd.Stdout = os.Stdout
 			cmd.Run()
 		}
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 
 	return &Token{ERR, "Type Mismatch"}, nil
@@ -174,7 +174,7 @@ func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	if args[1] == nil {
 		fmt.Println("nil")
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 	temp, err := args[1].GetVal(ctx, es)
 	if err != nil {
@@ -182,10 +182,10 @@ func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error) {
 	}
 	if temp.Tp == FUNC {
 		fmt.Println(temp.Val.(Func).GetFuncInfo())
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 	fmt.Println("This is a " + TypeToStr(temp.Tp) + ", format to " + temp.ToString())
-	return nil, nil
+	return &Token{NIL, nil}, nil
 
 }
 
@@ -233,12 +233,12 @@ func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error) {
 		args[1].Tp = STRING
 		args[1].Val = result
 	}
-	return nil, nil
+	return &Token{NIL, nil}, nil
 }
 
 func Rgc(es *EvalStack, ctx *BindMap) (*Token, error) {
 	runtime.GC()
-	return nil, nil
+	return &Token{NIL, nil}, nil
 }
 
 func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
@@ -246,7 +246,7 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
 
 	if args[1].Tp == WORD {
 		ctx.Unset(args[1].Str())
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	} else if args[1].Tp == PATH && args[1].List().Last().Tp == WORD {
 		var holderPath = args[1].CloneDeep()
 		holderPath.List().Pop()
@@ -259,7 +259,7 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 
 		holder.Ctx().Unset(args[1].List().Last().Str())
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 
 	return &Token{ERR, "Type Mismatch"}, nil
@@ -270,7 +270,7 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
 func keep(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
 	ctx.Get("__result__").List().Add(args[1].CloneDeep())
-	return nil, nil
+	return &Token{NIL, nil}, nil
 }
 
 func Collect(es *EvalStack, ctx *BindMap) (*Token, error) {

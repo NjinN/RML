@@ -355,10 +355,10 @@ func Listen(es *EvalStack, ctx *BindMap) (*Token, error) {
 		if isHost.Tp == LOGIC {
 			if isHost.Val.(bool) {
 				listenListener(args[1].Ctx().GetNow("port").Val.(net.Listener), args[1].Ctx(), es)
-				return nil, nil
+				return &Token{NIL, nil}, nil
 			} else {
 				listenConn(args[1].Ctx().GetNow("port").Val.(net.Conn), args[1].Ctx(), es)
-				return nil, nil
+				return &Token{NIL, nil}, nil
 			}
 		}
 	}
@@ -395,7 +395,7 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error) {
 			if closeCode != nil && closeCode.Tp == BLOCK && closeCode.List().Len() > 0 {
 				return es.Eval(closeCode.Tks(), ctx)
 			}
-			return nil, nil
+			return &Token{NIL, nil}, nil
 		}
 	}
 	return &Token{ERR, "Type Mismatch"}, nil

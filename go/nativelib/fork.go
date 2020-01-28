@@ -57,7 +57,7 @@ func Fork(es *EvalStack, ctx *BindMap) (*Token, error) {
 				go forkEvalStr(args[1].Str(), ctx, nil, false, nil, args[3].Int())
 			}
 		}
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 
 	return &Token{ERR, "Type Mismatch"}, nil
@@ -97,5 +97,5 @@ func Spawn(es *EvalStack, ctx *BindMap) (*Token, error) {
 		wg.Wait()
 	}
 
-	return nil, nil
+	return &Token{NIL, nil}, nil
 }

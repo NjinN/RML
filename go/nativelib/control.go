@@ -20,7 +20,7 @@ func Iif(es *EvalStack, ctx *BindMap) (*Token, error) {
 			return es.EvalStr(args[2].Str(), ctx)
 		}
 	} else {
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 
 	result.Tp = ERR
@@ -106,7 +106,7 @@ func Repeat(es *EvalStack, ctx *BindMap) (*Token, error) {
 				return rs, err
 			}
 		}
-		return nil, nil
+		return &Token{NIL, nil}, nil
 
 	}
 
@@ -273,7 +273,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error) {
 			}
 		}
 
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 
 	var result = Token{ERR, "Type Mismatch"}
@@ -313,7 +313,7 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error) {
 				return rs, err
 			}
 		}
-		return nil, nil
+		return &Token{NIL, nil}, nil
 	}
 	var result = Token{ERR, "Type Mismatch"}
 	return &result, nil
@@ -376,7 +376,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 				}
 
 			}
-			return nil, nil
+			return &Token{NIL, nil}, nil
 
 		} else if args[2].Tp == OBJECT {
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
@@ -415,10 +415,10 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 					}
 				}
 			}
-			return nil, nil
+			return &Token{NIL, nil}, nil
 		} else if args[2].Tp == MAP {
 			if len(args[2].Table()) == 0 {
-				return nil, nil
+				return &Token{NIL, nil}, nil
 			}
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for _, v := range args[2].Table() {
@@ -456,7 +456,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 					}
 				}
 			}
-			return nil, nil
+			return &Token{NIL, nil}, nil
 		}
 
 	} else if args[1].Tp == BLOCK {
@@ -492,7 +492,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 				}
 			}
 
-			return nil, nil
+			return &Token{NIL, nil}, nil
 		} else if args[2].Tp == OBJECT {
 			if args[1].List().Len() < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
 				var result = Token{ERR, "Type Mismatch"}
@@ -516,14 +516,14 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 					return temp, err
 				}
 			}
-			return nil, nil
+			return &Token{NIL, nil}, nil
 		} else if args[2].Tp == MAP {
 			if args[1].List().Len() < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
 				var result = Token{ERR, "Type Mismatch"}
 				return &result, nil
 			}
 			if len(args[2].Table()) == 0 {
-				return nil, nil
+				return &Token{NIL, nil}, nil
 			}
 			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 			for _, v := range args[2].Table() {
@@ -544,7 +544,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 				}
 			}
 
-			return nil, nil
+			return &Token{NIL, nil}, nil
 		}
 
 	}
