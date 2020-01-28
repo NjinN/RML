@@ -559,7 +559,18 @@ func Until(es *EvalStack, ctx *BindMap) (*Token, error) {
 	if args[1].Tp ==  BLOCK {
 		for {
 			rst, err := es.Eval(args[1].Tks(), ctx)
-			if err != nil || (rst != nil && rst.ToBool()) {
+
+			if err != nil {
+				if err.Error() == "break" {
+					return &Token{NONE, ""}, nil
+				}
+				if err.Error() == "continue" {
+					continue
+				}
+				return rst, err
+			}
+
+			if rst != nil && rst.ToBool() {
 				return rst, err
 			}
 		}
