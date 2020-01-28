@@ -278,7 +278,7 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error) {
 			return &Token{ERR, "Target is not a conn"}, nil
 		}
 
-		if args[2].Int() != STRING && args[2].Int() != BIN {
+		if args[2].Uint8() != STRING && args[2].Uint8() != BIN {
 			return &Token{ERR, "Error output type"}, nil
 		}
 
@@ -287,9 +287,9 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error) {
 			return inBuffer, nil
 		}
 
-		if args[2].Int() == BIN {
+		if args[2].Uint8() == BIN {
 			return inBuffer, nil
-		} else if args[2].Int() == STRING {
+		} else if args[2].Uint8() == STRING {
 			return &Token{STRING, string(inBuffer.Val.([]byte))}, nil
 		}
 

@@ -34,7 +34,7 @@ const (
 	UNDEFINED 		
 )
 
-func TypeToStr(n int) string{
+func TypeToStr(n uint8) string{
 	switch n {
 	case NIL:
 		return "nil!"
@@ -100,7 +100,7 @@ func TypeToStr(n int) string{
 	}
 }
 
-func StrToType(s string) int{
+func StrToType(s string) uint8{
 	switch s {
 	case "nil!":
 		return NIL

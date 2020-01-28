@@ -261,11 +261,11 @@ func ReadFile(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 
 		if args[2].Tp == DATATYPE {
-			if args[2].Int() == BIN {
+			if args[2].Uint8() == BIN {
 				result.Tp = BIN
 				result.Val = fileData
 				return &result, nil
-			} else if args[2].Int() == STRING {
+			} else if args[2].Uint8() == STRING {
 				result.Tp = STRING
 				result.Val = string(fileData)
 				return &result, nil

@@ -66,7 +66,7 @@ func Eq(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 	case DATATYPE:
 		if args[2].Tp == DATATYPE {
-			result.Val = args[1].Int() == args[2].Int()
+			result.Val = args[1].Uint8() == args[2].Uint8()
 			return &result, nil
 		}
 	default:

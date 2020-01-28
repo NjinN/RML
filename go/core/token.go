@@ -8,7 +8,7 @@ import "encoding/hex"
 import "sync"
 
 type Token struct {
-	Tp 		int
+	Tp 		uint8
 	Val 	interface{}
 }
 
@@ -26,6 +26,10 @@ func (t *Token) Tks() []*Token{
 
 func (t *Token) Int() int{
 	return t.Val.(int)
+}
+
+func (t *Token) Uint8() uint8{
+	return t.Val.(uint8)
 }
 
 func (t *Token) Float() float64{
@@ -60,7 +64,7 @@ func (t *Token) ToString() string{
 	case GET_WORD:
 		return ":" + t.Str()
 	case DATATYPE:
-		return TypeToStr(t.Int())
+		return TypeToStr(t.Uint8())
 	case LOGIC:
 		return strconv.FormatBool(t.Val.(bool))
 	case INTEGER:

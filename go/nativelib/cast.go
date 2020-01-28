@@ -4,8 +4,8 @@ import (
 	"math"
 	"strconv"
 
-	// import "encoding/hex"
-	// import "fmt"
+	// "encoding/hex"
+	// "fmt"
 
 	. "github.com/NjinN/RML/go/core"
 )
@@ -15,13 +15,13 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var result Token
 
 	if args[1].Tp == DATATYPE && args[2] != nil {
-		if args[1].Int() == args[2].Tp {
+		if args[1].Uint8() == args[2].Tp {
 			return args[2].CloneDeep(), nil
 		}
 
-		result.Tp = args[1].Int()
+		result.Tp = args[1].Uint8()
 
-		switch args[1].Val {
+		switch args[1].Uint8() {
 		case ERR:
 			result.Val = args[2].OutputStr()
 			return &result, nil

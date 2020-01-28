@@ -26,7 +26,7 @@ func ReadUrl(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 
 		if args[2].Tp == DATATYPE {
-			if args[2].Int() == STRING {
+			if args[2].Uint8() == STRING {
 				return &Token{STRING, string(body)}, nil
 			} 
 		}
