@@ -39,7 +39,7 @@ func (es *EvalStack) Push(t *Token){
 
 func (es *EvalStack) LastStartPos() int{
 	if(es.StartPos.Len() <= 0){
-		return 0
+		return -999999
 	}
 	return es.StartPos.Last()
 }
@@ -236,30 +236,36 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 	// for i := es.LastStartPos(); i <= es.LastEndPos(); i++{
 	// 	fmt.Println(es.Line[i].OutputStr())
 	// }
+	
+	var startPos = es.LastStartPos()
+	var endPos = es.LastEndPos()
+	var startToken = es.Line[startPos]
 
-	var startToken = es.Line[es.LastStartPos()]
+	// if startToken == nil {
+	// 	EchoTokens(es.Line[es.LastStartPos():es.LastEndPos()+1])
+	// }
 
 	switch startToken.Tp {
 	case SET_WORD:
 		if es.IsLocal {
-			ctx.PutLocal(es.Line[es.LastStartPos()].Str(), es.Line[es.LastEndPos()])
+			ctx.PutLocal(startToken.Str(), es.Line[endPos])
 		}else{
-			ctx.Put(es.Line[es.LastStartPos()].Str(), es.Line[es.LastEndPos()])
+			ctx.Put(startToken.Str(), es.Line[endPos])
 		}
-		temp = es.Line[es.LastEndPos()]
+		temp = es.Line[endPos]
 	case PUT_WORD:
-		ctx.PutLocal(es.Line[es.LastStartPos()].Str(), es.Line[es.LastEndPos()])
-		temp = es.Line[es.LastEndPos()]
+		ctx.PutLocal(startToken.Str(), es.Line[endPos])
+		temp = es.Line[endPos]
 	case PATH:
 		if startToken.Tks()[0].Tp == FUNC {
 			temp, err = startToken.Tks()[0].Val.(Func).RunWithProps(es, ctx, startToken.Tks())
 		}else{
-			temp, err = startToken.SetPathVal(es.Line[es.LastEndPos()], ctx, es)
+			temp, err = startToken.SetPathVal(es.Line[endPos], ctx, es)
 		}
 	case NATIVE, OP:
-		temp, err = es.Line[es.LastStartPos()].Val.(Native).Exec(es, ctx)
+		temp, err = startToken.Val.(Native).Exec(es, ctx)
 	case FUNC:
-		temp, err = es.Line[es.LastStartPos()].Val.(Func).Run(es, ctx)
+		temp, err = startToken.Val.(Func).Run(es, ctx)
 	default:
 		
 	}
@@ -272,8 +278,8 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 		if err.Error() == "return"{
 			isReturn = true
 			if startToken.Tp == FUNC || (startToken.Tp == PATH && startToken.Tks()[0].Tp == FUNC) {
-				es.Line[es.LastStartPos()] = temp
-				es.Idx = es.LastStartPos() + 1
+				es.Line[startPos] = temp
+				es.Idx = startPos + 1
 				es.StartPos.Pop() 
 				es.EndPos.Pop() 
 				return temp, nil
@@ -283,8 +289,8 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 	}
 
 	if(!isReturn){
-		es.Line[es.LastStartPos()] = temp
-		es.Idx = es.LastStartPos() + 1
+		es.Line[startPos] = temp
+		es.Idx = startPos + 1
 	}	
 
 	es.StartPos.Pop() 
