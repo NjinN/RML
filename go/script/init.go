@@ -111,6 +111,22 @@ append: func [serial item /only] [
 	_添加 复制/深 集合 单体 单独
 ]
 
+reppend*: func [serial blk /only] [
+	either only [
+		append*/only serial reduce blk
+	] [
+		append* serial reduce blk
+	]	
+]
+
+reppend: func [serial blk /only] [
+	either only [
+		append*/only copy/deep serial reduce blk
+	] [
+		append* copy/deep serial reduce blk
+	]	
+]
+
 take*: func [serial /at at /part part /last] [
 	if not at [at: 1]
 	if not part [part: 1] 
