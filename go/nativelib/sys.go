@@ -24,7 +24,7 @@ func Clear(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result = Token{Tp: DATATYPE}
 	if args[1] != nil {
@@ -35,7 +35,7 @@ func TypeOf(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Do(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	switch args[1].Tp {
 	case BLOCK:
@@ -54,7 +54,7 @@ func Do(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Reduce(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	switch args[1].Tp {
 	case BLOCK:
@@ -76,7 +76,7 @@ func Reduce(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Format(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 	result.Tp = STRING
 	result.Val = args[1].ToString()
@@ -84,7 +84,7 @@ func Format(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Copy(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result *Token
 	if args[2] != nil && args[2].Tp == LOGIC && args[2].Val.(bool) {
 		result = args[1].CloneDeep()
@@ -95,7 +95,7 @@ func Copy(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Pprint(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	if args[1].Tp == BLOCK && args[2].Tp == LOGIC {
 		fmt.Print("[")
 		for idx, item := range args[1].Tks() {
@@ -135,7 +135,7 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Let(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	if args[1].Tp == BLOCK {
 		var orginSts = es.IsLocal
 		es.IsLocal = true
@@ -147,7 +147,7 @@ func Let(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	if args[1].Tp == STRING && args[2].Tp == LOGIC {
 		cmd := exec.Command("cmd", "/c", args[1].Str())
 		if args[3] != nil && args[3].Tp != NONE {
@@ -171,7 +171,7 @@ func CallCmd(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func HelpInfo(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	if args[1] == nil {
 		fmt.Println("nil")
 		return &Token{NIL, nil}, nil
@@ -208,7 +208,7 @@ func ThisPort(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func LibInfo(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var c = ctx
 	for c.Father != nil {
 		c = c.Father
@@ -242,7 +242,7 @@ func Rgc(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == WORD {
 		ctx.Unset(args[1].Str())
@@ -268,13 +268,13 @@ func Unset(es *EvalStack, ctx *BindMap) (*Token, error) {
 /********  collect实现开始  *********/
 
 func keep(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	ctx.Get("__result__").List().Add(args[1].CloneDeep())
 	return &Token{NIL, nil}, nil
 }
 
 func Collect(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
 	var result = Token{BLOCK, NewTks(8)}

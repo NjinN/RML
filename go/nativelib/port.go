@@ -16,7 +16,7 @@ import (
 )
 
 func Oopen(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == URL {
 		var temp = strings.Split(args[1].Str(), "://")
@@ -270,7 +270,7 @@ func waitConn(conn net.Conn, p *BindMap, es *EvalStack) *Token {
 }
 
 func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == PORT && args[2].Tp == DATATYPE {
 		var isHost = args[1].Ctx().GetNow("is-host")
@@ -299,7 +299,7 @@ func ReadPort(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func WritePort(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == PORT && (args[2].Tp == STRING || args[2].Tp == BIN || args[2].Tp == BLOCK) {
 		var protocol = args[1].Ctx().GetNow("protocol")
@@ -331,7 +331,7 @@ func WritePort(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Wait(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == PORT {
 		var isHost = args[1].Ctx().GetNow("is-host")
@@ -348,7 +348,7 @@ func Wait(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Listen(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == PORT {
 		var isHost = args[1].Ctx().GetNow("is-host")
@@ -366,7 +366,7 @@ func Listen(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Close(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == PORT {
 		var isHost = args[1].Ctx().GetNow("is-host")

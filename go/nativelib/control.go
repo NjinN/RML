@@ -10,7 +10,7 @@ import (
 // import "fmt"
 
 func Iif(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].ToBool() {
@@ -30,7 +30,7 @@ func Iif(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Either(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].ToBool() {
@@ -53,7 +53,7 @@ func Either(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Loop(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == INTEGER && args[2].Tp == BLOCK {
 		var rs *Token
@@ -80,7 +80,7 @@ func Loop(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Repeat(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	// args[2].Echo()
 
 	if args[1].Tp == WORD && args[2].Tp == INTEGER && args[3].Tp == BLOCK {
@@ -115,7 +115,7 @@ func Repeat(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Ffor(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == WORD && args[5].Tp == BLOCK && (args[2].Tp == INTEGER || args[2].Tp == DECIMAL) && (args[3].Tp == INTEGER || args[3].Tp == DECIMAL) && (args[4].Tp == INTEGER || args[4].Tp == DECIMAL) {
 		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
@@ -281,7 +281,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == BLOCK && args[2].Tp == BLOCK {
 		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
@@ -328,12 +328,12 @@ func Ccontinue(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Rreturn(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	return args[1], errors.New("return")
 }
 
 func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	if args[3].Tp != BLOCK && args[3].Tp != STRING {
 		var result = Token{ERR, "Type Mismatch"}
 		return &result, nil
@@ -554,7 +554,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Until(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp ==  BLOCK {
 		for {
@@ -582,7 +582,7 @@ func Until(es *EvalStack, ctx *BindMap) (*Token, error) {
 
 
 func Ttry(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == BLOCK && args[2].Tp == BLOCK {
 		temp, err := es.Eval(args[1].Tks(), ctx)
@@ -604,7 +604,7 @@ func Ttry(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Cause(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == STRING {
 		return &Token{ERR, args[1].Str()}, nil

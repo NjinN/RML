@@ -40,7 +40,7 @@ func forkEvalStr(inp string, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter
 }
 
 func Fork(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == BLOCK || args[1].Tp == STRING && args[3].Tp == INTEGER && args[3].Int() > 0 {
 
@@ -64,7 +64,7 @@ func Fork(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Spawn(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	if args[1].Tp != BLOCK || args[2].Tp != LOGIC || args[3].Tp != INTEGER || args[3].Int() <= 0 {
 		return &Token{ERR, "Type Mismatch"}, nil
 	}

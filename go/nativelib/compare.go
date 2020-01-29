@@ -3,7 +3,7 @@ package nativelib
 import . "github.com/NjinN/RML/go/core"
 
 func Eq(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -78,7 +78,7 @@ func Eq(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Gt(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -152,7 +152,7 @@ func Gt(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Lt(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -226,7 +226,7 @@ func Lt(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Ge(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {
@@ -300,7 +300,7 @@ func Ge(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Le(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result = Token{Tp: LOGIC}
 
 	switch args[1].Tp {

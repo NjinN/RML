@@ -9,7 +9,7 @@ import (
 // import "fmt"
 
 func Length(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == BLOCK || args[1].Tp == PAREN {
@@ -32,7 +32,7 @@ func Length(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Append(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 	if args[1].Tp == BLOCK || args[1].Tp == PAREN {
 		if !args[3].ToBool() && (args[2].Tp == BLOCK || args[2].Tp == PAREN) {
@@ -110,7 +110,7 @@ func Append(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Insert(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[3].Tp != INTEGER {
@@ -244,7 +244,7 @@ func Insert(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Take(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == BLOCK && args[2].Tp == INTEGER && args[3].Tp == INTEGER {
@@ -334,7 +334,7 @@ func Take(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Replace(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[4].Tp != INTEGER || args[5].Tp != INTEGER {
@@ -435,7 +435,7 @@ func Replace(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Gget(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == OBJECT {
@@ -454,7 +454,7 @@ func Gget(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Pput(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == OBJECT {

@@ -107,7 +107,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				if err != nil {
 					return temp, err
 				}
-				es.EndPos.Add(es.Idx + 1)
+				es.EndPos.Add(es.Idx + 2)
 				es.Push(temp)
 			}else if(es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp == OP){
 				temp, err := nowToken.GetVal(ctx, es)
@@ -119,7 +119,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				es.Push(es.Line[es.Idx - 1])
 				es.Line[es.Idx - 2] = nextToken
 				es.StartPos.Add(es.Idx - 2)
-				es.EndPos.Add(es.Idx)
+				es.EndPos.Add(es.Idx + 1)
 			}
 			i++
 		}else{
@@ -154,7 +154,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			}else if nowToken.Tp == OP && !skip && es.Idx >= 1{
 				if(es.Idx > startIdx){
 					es.StartPos.Add(es.Idx - 1)
-					es.EndPos.Add(es.Idx + 1) 
+					es.EndPos.Add(es.Idx + 2) 
 					es.Push(es.Line[es.Idx - 1])
 					es.Line[es.Idx - 2] = nowToken
 				}else{
@@ -170,11 +170,11 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			}else if nowToken.Tp == PATH {
 				if nowToken.Tks()[0] != nil && nowToken.Tks()[0].Tp == FUNC {
 					es.StartPos.Add(es.Idx)
-					es.EndPos.Add(es.Idx + nowToken.GetPathExpLen() - 1)
+					es.EndPos.Add(es.Idx + nowToken.GetPathExpLen())
 					es.Push(nowToken)
 				}else if nowToken.IsSetPath() {
 					es.StartPos.Add(es.Idx)
-					es.EndPos.Add(es.Idx + 1)
+					es.EndPos.Add(es.Idx + 2)
 					es.Push(nowToken)
 					i++
 					continue
@@ -194,13 +194,13 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 
 				if !skip {
 					es.StartPos.Add(es.Idx) 
-					es.EndPos.Add(es.Idx + nowToken.Explen() - 1) 
+					es.EndPos.Add(es.Idx + nowToken.Explen()) 
 				}
 				es.Push(nowToken)
 			}
 		}
  
-		for(es.EndPos.Len() > startDeep && es.Idx == es.LastEndPos() + 1){
+		for(es.EndPos.Len() > startDeep && es.Idx == es.LastEndPos()){
 			temp, err := es.EvalExp(ctx)
 			if err != nil {
 				return temp, err
@@ -238,7 +238,7 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 	// }
 	
 	var startPos = es.LastStartPos()
-	var endPos = es.LastEndPos()
+	var endPos = es.LastEndPos()-1
 	var startToken = es.Line[startPos]
 
 	// if startToken == nil {

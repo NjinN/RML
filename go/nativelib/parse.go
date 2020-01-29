@@ -497,7 +497,7 @@ func splitOrRules(blk *Token) *Token {
 }
 
 func Parse(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == STRING && args[2].Tp == BLOCK {
 		var nowIdx = 0

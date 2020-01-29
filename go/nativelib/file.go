@@ -20,7 +20,7 @@ func NowDir(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func ChangeDir(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == FILE {
 		filePath, err := filepath.Abs(strings.ReplaceAll(args[1].Str(), `"`, ``))
@@ -37,7 +37,7 @@ func ChangeDir(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func AbsFilePath(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == FILE {
 		filePath, err := filepath.Abs(strings.ReplaceAll(args[1].Str(), `"`, ``))
@@ -59,7 +59,7 @@ func AbsFilePath(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func LsDir(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1] != nil && args[1].Tp == FILE {
@@ -116,7 +116,7 @@ func LsDir(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func RenameFile(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == FILE && args[2].Tp == FILE {
@@ -143,7 +143,7 @@ func RenameFile(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func RemoveFile(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1] != nil && args[1].Tp == FILE {
@@ -165,7 +165,7 @@ func RemoveFile(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func makeDir(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1] != nil && args[1].Tp == FILE {
@@ -187,7 +187,7 @@ func makeDir(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Load(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1] != nil && args[1].Tp == FILE {
@@ -217,7 +217,7 @@ func Load(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func FileExist(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == FILE {
@@ -243,7 +243,7 @@ func FileExist(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func ReadFile(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == FILE {
@@ -286,7 +286,7 @@ func ReadFile(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func WriteFile(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp == FILE && (args[2].Tp == STRING || args[2].Tp == BIN) {

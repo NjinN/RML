@@ -3,7 +3,7 @@ package nativelib
 import . "github.com/NjinN/RML/go/core"
 
 func Add(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -35,7 +35,7 @@ func Add(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Sub(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -67,7 +67,7 @@ func Sub(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Mul(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -99,7 +99,7 @@ func Mul(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Div(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -131,7 +131,7 @@ func Div(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Mod(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER && args[2].Tp == INTEGER {
@@ -146,7 +146,7 @@ func Mod(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func AddSet(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -175,7 +175,7 @@ func AddSet(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func SubSet(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -204,7 +204,7 @@ func SubSet(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func MulSet(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -233,7 +233,7 @@ func MulSet(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func DivSet(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER {
@@ -263,7 +263,7 @@ func DivSet(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func ModSet(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	var result Token
 	if args[1].Tp == INTEGER && args[2].Tp == INTEGER {
@@ -277,7 +277,7 @@ func ModSet(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func Swap(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	args[1].Tp, args[2].Tp = args[2].Tp, args[1].Tp
 	args[1].Val, args[2].Val = args[2].Val, args[1].Val

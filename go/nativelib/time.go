@@ -8,7 +8,7 @@ import (
 )
 
 func Cost(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 	var result Token
 
 	if args[1].Tp != BLOCK {

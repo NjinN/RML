@@ -11,7 +11,7 @@ import (
 
 
 func ReadUrl(es *EvalStack, ctx *BindMap) (*Token, error) {
-	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == URL {
 		resp, err := http.Get(args[1].Str())
@@ -40,7 +40,7 @@ func ReadUrl(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 // func WriteUrl(es *EvalStack, ctx *BindMap) (*Token, error) {
-// 	var args = es.Line[es.LastStartPos() : es.LastEndPos()+1]
+// 	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 // 	var result Token
 
 // 	if args[1].Tp == FILE && (args[2].Tp == STRING || args[2].Tp == BIN) {
