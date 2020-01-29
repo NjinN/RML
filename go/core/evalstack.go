@@ -164,7 +164,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				}
 			}else if nowToken.Tp < SET_WORD{
 				es.Push(nowToken)
-				if len(args) > 0 && args[0] == 1 && (es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp != OP) {
+				if len(args) > 0 && args[0] == 1 && es.StartPos.Len() == startDeep {
 					resultBlk.Add(nowToken.Clone())
 				}
 			}else if nowToken.Tp == PATH {
