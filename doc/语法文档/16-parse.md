@@ -131,23 +131,22 @@ res: copy ""
 
 parse copy inp [
 	opt [
-		copy start-str to "<?" ( if start-str [append* res " keep " append* res format start-str append* res " " ] )
+		copy start-str to "<?" ( if start-str [reppend* rst [" keep "  format start-str " " ]] )
 		|
-		copy start-str to end ( if start-str [append* res " keep " append* res format start-str append* res " " ] )
+		copy start-str to end ( print start-str if start-str [reppend* rst [" keep " format start-str " " ]] )
 	]
 	
 	some [
 		thru "<?" copy code to "?>"
-		(append* res code)
+		(append* rst code)
 		[
 			thru "?>" copy str to "<?"
-			(append* res " keep " append* res format str)
+			(reppend* rst [" keep " format str])
 			|
 			thru "?>" copy str to end
-			(append* res " keep " append* res format str)  
+			(reppend* rst [" keep " format str])  
 			|
-			thru "?>" end         
-		]
+			thru "?>" end         ]
 	]
 ]
 
