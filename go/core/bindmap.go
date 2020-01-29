@@ -2,6 +2,8 @@ package core
 
 import "runtime"
 import "sync"
+import "bytes"
+import "fmt"
 
 const (
 	SYS_CTX = iota
@@ -165,4 +167,21 @@ func (bm *BindMap)Unset(key string){
 		}
 	}
 	
+}
+
+func (bm *BindMap) Echo() {
+	var buffer bytes.Buffer
+	buffer.WriteString("{")
+	for k, v := range bm.Table {
+		buffer.WriteString(k)
+		buffer.WriteString(": ")
+		buffer.WriteString(v.ToString())
+		buffer.WriteString(" ")
+	}
+	if len(buffer.Bytes()) > 1 {
+		buffer.Bytes()[len(buffer.Bytes())-1] = '}'
+	}else{
+		buffer.WriteString("}")
+	}
+	fmt.Println(buffer.String())
 }

@@ -36,41 +36,44 @@ func (f Func) RunWithProps(es *EvalStack, ctx *BindMap, ps []*Token) (*Token, er
 		fatherCtx = ps[1].Ctx()
 	}
 
+	var startPos = int(es.LastStartPos())
+
 	var c = BindMap{
 		Table: 	make(map[string]*Token, 8),
 		Father: fatherCtx,
 		Tp:		USR_CTX,
 	}
 	for i, item := range f.Args.List() {
-		c.PutNow(item.Str(), es.Line[int(es.LastStartPos()) + i + 1])
+		c.PutNow(item.Str(), es.Line[startPos + i + 1])
 	}
-	for j:=0; j<f.Props.Len(); j+=2 {
-		if f.Props.Get(j+1) == nil {
-			var set = false
-			for i:=2; i<len(ps); i++ {
-				if ps[i].Str() == f.Props.Get(j).Str() {
+
+	var nowArgIdx =  startPos + f.Args.Len() + 1
+
+	for i:=2; i<len(ps);i++ {
+		for j:=0; j<f.Props.Len(); j+=2 {
+			if ps[i].Str() == f.Props.Get(j).Str() {
+				if f.Props.Get(j+1) == nil {
 					c.PutNow(f.Props.Get(j).Str(), &Token{LOGIC, true})
-					set = true
-					break
+				}else{
+					c.PutNow(f.Props.Get(j+1).Str(), es.Line[nowArgIdx])
+					nowArgIdx++
 				}
+				break
 			}
-			if !set {
+		}
+	} 
+
+	for j:=0; j<f.Props.Len(); j+=2 {
+		_, ok := c.Table[f.Props.Get(j).Str()]
+		if !ok {
+			if f.Props.Get(j+1) == nil {
 				c.PutNow(f.Props.Get(j).Str(), &Token{LOGIC, false})
-			}
-		}else{
-			var set = false
-			for i:=2; i<len(ps); i++ {
-				if ps[i].Str() == f.Props.Get(j).Str() {
-					c.PutNow(f.Props.Get(j+1).Str(), es.Line[int(es.LastStartPos()) + f.Args.Len() + i - 1])
-					set = true
-					break
-				}
-			}
-			if !set {
-				c.PutNow(f.Props.Get(j+1).Str(), &Token{NONE, "none"})
+			}else{
+				c.PutNow(f.Props.Get(j+1).Str(), &Token{NONE, ""})
 			}
 		}
 	}
+	
 	return es.Eval(f.Codes.List(), &c)
 
 }
