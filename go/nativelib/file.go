@@ -205,7 +205,9 @@ func Load(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 
 		result.Tp = BLOCK
-		result.Val = ToTokens(string(fileData), ctx, es)
+		var blk = NewTks(8)
+		blk.AddArr(ToTokens(string(fileData), ctx, es))
+		result.Val = blk
 
 		return &result, nil
 
