@@ -264,7 +264,7 @@ func (tks *TokenList) Replace(old *Token, new *Token, at int, amount int){
 	}
 
 	for i:=at; i<tks.Len() && amount>0; i++ {
-		if tks.Line[i].Tp == old.Tp && tks.Line[i].Val == old.Val && at < 0 {
+		if tks.Line[i].Tp == old.Tp && tks.Line[i].Val == old.Val && i >= 0 {
 			tks.Line[i].Copy(new)
 			amount--
 		}

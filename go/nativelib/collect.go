@@ -24,7 +24,16 @@ func Length(es *EvalStack, ctx *BindMap) (*Token, error) {
 		result.Tp = INTEGER
 		result.Val = len(args[1].Val.([]byte))
 		return &result, nil
+	}else if args[1].Tp == OBJECT {
+		result.Tp = INTEGER
+		result.Val = len(args[1].Ctx().Table)
+		return &result, nil
+	}else if args[1].Tp == MAP {
+		result.Tp = INTEGER
+		result.Val = len(args[1].Map().Table)
+		return &result, nil
 	}
+
 
 	result.Tp = ERR
 	result.Val = "Type Mismatch"
