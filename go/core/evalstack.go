@@ -99,7 +99,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 		}
 
 
-		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx > es.EndPos.Get(startDeep - 1)) && !nextSkip){
+		if(nextToken != nil && nextToken.Tp == OP && (startDeep == 0 || es.Idx >= es.EndPos.Get(startDeep - 1)) && !nextSkip){
 			if(es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp != OP){
 				es.StartPos.Add(es.Idx)
 				es.Push(nextToken)

@@ -27,6 +27,10 @@ func (ils *IntList) List() []int{
 }
 
 func (ils *IntList) Get(idx int) int{
+	if idx < 0 {
+		return -999999
+	}
+
 	return ils.Line[idx]
 }
 
