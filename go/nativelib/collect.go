@@ -2,6 +2,7 @@ package nativelib
 
 import (
 	"strings"
+	"sync"
 
 	. "github.com/NjinN/RML/go/core"
 )
@@ -478,5 +479,227 @@ func Pput(es *EvalStack, ctx *BindMap) (*Token, error) {
 
 	result.Tp = ERR
 	result.Val = "Type Mismatch"
+	return &result, nil
+}
+
+
+func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
+	if args[3].Tp != BLOCK && args[3].Tp != STRING {
+		var result = Token{ERR, "Type Mismatch"}
+		return &result, nil
+	}
+
+	if args[1].Tp == WORD {
+		if args[2].Tp == BLOCK || args[2].Tp == PAREN || args[2].Tp == PATH {
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			for i := 0; i < args[2].List().Len(); i++ {
+				c.PutNow(args[1].Str(), args[2].Tks()[i])
+				if args[3].Tp == BLOCK {
+					temp, err := es.Eval(args[3].Tks(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+
+				} else if args[3].Tp == STRING {
+					temp, err := es.EvalStr(args[3].Str(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+				}
+
+			}
+			return &Token{NIL, nil}, nil
+
+		} else if args[2].Tp == OBJECT {
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			for k, v := range args[2].Ctx().Table {
+				var blk = NewTks(4)
+				blk.AddArr([]*Token{&Token{SET_WORD, k}, v})
+				c.PutNow(args[1].Str(), &Token{BLOCK, blk})
+				if args[3].Tp == BLOCK {
+					temp, err := es.Eval(args[3].Tks(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+
+				} else if args[3].Tp == STRING {
+					temp, err := es.EvalStr(args[3].Str(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+				}
+			}
+			return &Token{NIL, nil}, nil
+		} else if args[2].Tp == MAP {
+			if len(args[2].Table()) == 0 {
+				return &Token{NIL, nil}, nil
+			}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			for _, v := range args[2].Table() {
+				var blk = NewTks(4)
+				blk.AddArr([]*Token{v.Key.CloneDeep(), v.Val})
+				c.PutNow(args[1].Str(), &Token{BLOCK, blk})
+				if args[3].Tp == BLOCK {
+					temp, err := es.Eval(args[3].Tks(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+
+				} else if args[3].Tp == STRING {
+					temp, err := es.EvalStr(args[3].Str(), &c)
+					if err != nil {
+						if err.Error() == "continue" {
+							continue
+						}
+						if err.Error() == "break" {
+							break
+						}
+						return temp, err
+					}
+					if temp != nil && temp.Tp == ERR {
+						return temp, err
+					}
+				}
+			}
+			return &Token{NIL, nil}, nil
+		}
+
+	} else if args[1].Tp == BLOCK {
+		for _, item := range args[1].Tks() {
+			if item.Tp != WORD {
+				var result = Token{ERR, "Type Mismatch"}
+				return &result, nil
+			}
+		}
+
+		if args[2].Tp == BLOCK {
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			for i := 0; i < args[2].List().Len(); i += args[1].List().Len() {
+				for j := 0; j < args[1].List().Len(); j++ {
+					if i+j < args[2].List().Len() {
+						c.PutNow(args[1].Tks()[j].Str(), args[2].Tks()[i+j])
+					} else {
+						c.PutNow(args[1].Tks()[j].Str(), &Token{NONE, "none"})
+					}
+				}
+				temp, err := es.Eval(args[3].Tks(), &c)
+				if err != nil {
+					if err.Error() == "continue" {
+						continue
+					}
+					if err.Error() == "break" {
+						break
+					}
+					return temp, err
+				}
+				if temp != nil && temp.Tp == ERR {
+					return temp, err
+				}
+			}
+
+			return &Token{NIL, nil}, nil
+		} else if args[2].Tp == OBJECT {
+			if args[1].List().Len() < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
+				var result = Token{ERR, "Type Mismatch"}
+				return &result, nil
+			}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			for k, v := range args[2].Ctx().Table {
+				c.PutNow(args[1].Tks()[0].Str(), &Token{WORD, k})
+				c.PutNow(args[1].Tks()[1].Str(), v)
+				temp, err := es.Eval(args[3].Tks(), &c)
+				if err != nil {
+					if err.Error() == "continue" {
+						continue
+					}
+					if err.Error() == "break" {
+						break
+					}
+					return temp, err
+				}
+				if temp != nil && temp.Tp == ERR {
+					return temp, err
+				}
+			}
+			return &Token{NIL, nil}, nil
+		} else if args[2].Tp == MAP {
+			if args[1].List().Len() < 2 || args[1].Tks()[0].Tp != WORD || args[1].Tks()[1].Tp != WORD {
+				var result = Token{ERR, "Type Mismatch"}
+				return &result, nil
+			}
+			if len(args[2].Table()) == 0 {
+				return &Token{NIL, nil}, nil
+			}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			for _, v := range args[2].Table() {
+				c.PutNow(args[1].Tks()[0].Str(), v.Key.CloneDeep())
+				c.PutNow(args[1].Tks()[1].Str(), v.Val)
+				temp, err := es.Eval(args[3].Tks(), &c)
+				if err != nil {
+					if err.Error() == "continue" {
+						continue
+					}
+					if err.Error() == "break" {
+						break
+					}
+					return temp, err
+				}
+				if temp != nil && temp.Tp == ERR {
+					return temp, err
+				}
+			}
+
+			return &Token{NIL, nil}, nil
+		}
+
+	}
+
+	var result = Token{ERR, "Type Mismatch"}
 	return &result, nil
 }
