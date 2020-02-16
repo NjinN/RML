@@ -371,6 +371,7 @@ func Ttry(es *EvalStack, ctx *BindMap) (*Token, error) {
 			}
 
 			var c = BindMap{make(map[string]*Token, 4), ctx, TMP_CTX, sync.RWMutex{}}
+			temp.Tp = STRING
 			c.PutNow("e", temp)
 
 			return es.Eval(args[2].Tks(), &c)
