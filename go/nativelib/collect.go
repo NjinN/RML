@@ -355,7 +355,7 @@ func Replace(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var at = args[4].Int() - 1
 	var amount = args[5].Int()
 
-	if args[1].Tp == STRING {
+	if args[1].Tp == STRING || args[1].Tp == URL {
 		var old = ""
 		if args[2].Tp == STRING {
 			old = args[2].Str()

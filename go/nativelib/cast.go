@@ -160,6 +160,12 @@ func To(es *EvalStack, ctx *BindMap) (*Token, error) {
 				return &result, nil
 			}
 
+		case URL:
+			if args[2].Tp == STRING {
+				result.Val = args[2].Val
+				return &result, nil
+			}
+
 		case BIN:
 			if args[2].Tp == STRING {
 				result.Val = []byte(args[2].Str())
