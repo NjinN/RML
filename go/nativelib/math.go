@@ -1,6 +1,7 @@
 package nativelib
 
 import . "github.com/NjinN/RML/go/core"
+// import "fmt"
 
 func Add(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
@@ -27,6 +28,10 @@ func Add(es *EvalStack, ctx *BindMap) (*Token, error) {
 			result.Val = args[1].Float() + args[2].Float()
 			return &result, nil
 		}
+	}else if args[1].Tp == TIME && args[2].Tp == TIME {
+		result.Tp = TIME
+		result.Val = TimeClockAdd(args[1].Time(), args[2].Time())
+		return &result, nil
 	}
 
 	result.Tp = ERR
@@ -59,6 +64,10 @@ func Sub(es *EvalStack, ctx *BindMap) (*Token, error) {
 			result.Val = args[1].Float() - args[2].Float()
 			return &result, nil
 		}
+	}else if args[1].Tp == TIME && args[2].Tp == TIME {
+		result.Tp = TIME
+		result.Val = TimeClockSub(args[1].Time(), args[2].Time())
+		return &result, nil
 	}
 
 	result.Tp = ERR

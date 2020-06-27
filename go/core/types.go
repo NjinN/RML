@@ -14,6 +14,7 @@ const (
 	STRING
 	FILE
 	BIN
+	TIME
 	URL
 	PORT
 	RANGE 		
@@ -62,6 +63,8 @@ func TypeToStr(n uint8) string{
 		return "file!"
 	case BIN:
 		return "bin!"
+	case TIME:
+		return "time!"
 	case URL:
 		return "url!"
 	case PORT:
@@ -128,6 +131,8 @@ func StrToType(s string) uint8{
 		return FILE
 	case "bin!":
 		return BIN
+	case "time!":
+		return TIME
 	case "url!":
 		return URL
 	case "port!":

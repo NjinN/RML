@@ -32,6 +32,14 @@ func (t *Token) Uint8() uint8{
 	return t.Val.(uint8)
 }
 
+func (t *Token) Uint64() int64{
+	return t.Val.(int64)
+}
+
+func (t *Token) Time() *TimeClock{
+	return t.Val.(*TimeClock)
+}
+
 func (t *Token) Float() float64{
 	return t.Val.(float64)
 }
@@ -91,6 +99,18 @@ func (t *Token) ToString() string{
 		return "%" + t.Str()
 	case BIN:
 		return "#{" + hex.EncodeToString(t.Val.([]byte)) + "}"
+	case TIME:
+		v := t.Time()
+		nega := ""
+		if v.Negative {
+			nega = "-"
+		}
+		if v.Date == 0 {
+			return secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+		}else{
+			return nega + daysToDate(v.Date) + "+" + secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+		}
+
 	case URL:
 		return t.Str()
 	case RANGE:

@@ -4,6 +4,7 @@ import "strings"
 import "strconv"
 import "encoding/hex"
 import "sync"
+import "regexp"
 // import "fmt"
 
 func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
@@ -282,6 +283,146 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		result.Val = "Error format!"
 		return &result
 	}
+
+	/*************  parse time format start  *************/
+	var matched bool
+	var err error
+
+	//only date
+	matched, err = regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}", str)
+
+	if err != nil {
+		result.Tp = ERR
+		result.Val = "Error format!"
+		return &result
+	}
+
+	if matched {
+		result.Tp = TIME
+		timeClock := TimeClock{}
+		timeClock.Second = 0
+		timeClock.FloatSecond = 0
+
+		if str[0] == '-' {
+			str = str[1:]
+			timeClock.Negative = true
+		}
+		
+		days := dateStrToDays(str)
+		if days == 0 {
+			result.Tp = ERR
+			result.Val = "Error format!"
+			return &result
+		}
+
+		timeClock.Date = days
+
+		result.Val = &timeClock
+		return &result
+	}
+
+	//only time
+	matched, err = regexp.MatchString("\\-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
+
+	if err != nil {
+		result.Tp = ERR
+		result.Val = "Error format!"
+		return &result
+	}
+
+	if matched {
+		result.Tp = TIME
+		timeClock := TimeClock{}
+		timeClock.Date = 0
+		timeClock.FloatSecond = 0
+
+		if str[0] == '-' {
+			str = str[1:]
+			timeClock.Negative = true
+		}
+
+		secSlice := strings.Split(str, ".")
+		secs := timeStrToSecs(secSlice[0])
+
+		if secs < 0 {
+			result.Tp = ERR
+			result.Val = "Error format!"
+			return &result
+		}
+
+		timeClock.Second = secs
+
+		if len(secSlice) > 1 {
+			floatSecs, err := strconv.ParseFloat("0." + secSlice[1], 64)
+			if err != nil {
+				result.Tp = ERR
+				result.Val = "Error format!"
+				return &result
+			}
+			timeClock.FloatSecond = floatSecs
+		}
+		
+		result.Val = &timeClock
+		return &result
+	}
+
+	//date and time
+	matched, err = regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
+
+	if err != nil {
+		result.Tp = ERR
+		result.Val = "Error format!"
+		return &result
+	}
+
+	if matched {
+		result.Tp = TIME
+
+		timeClock := TimeClock{}
+		timeClock.FloatSecond = 0
+
+		if str[0] == '-' {
+			str = str[1:]
+			timeClock.Negative = true
+		}
+
+		timeSlice := strings.Split(str, "+")
+
+		days := dateStrToDays(timeSlice[0])
+		if days <= 0 {
+			result.Tp = ERR
+			result.Val = "Error format!"
+			return &result
+		}
+
+		timeClock.Date = days
+
+		secSlice := strings.Split(timeSlice[1], ".")
+
+		secs := timeStrToSecs(secSlice[0])
+		if secs < 0 {
+			result.Tp = ERR
+			result.Val = "Error format!"
+			return &result
+		}
+
+		timeClock.Second = secs
+
+		if len(secSlice) > 1 {
+			floatSecs, err := strconv.ParseFloat("0." + secSlice[1], 64)
+			if err != nil {
+				result.Tp = ERR
+				result.Val = "Error format!"
+				return &result
+			}
+			timeClock.FloatSecond = floatSecs
+		}
+
+		result.Val = &timeClock
+		return &result
+	}
+
+	/*************  parse time format end  *************/
 
 	result.Tp = WORD
 	result.Val = str
