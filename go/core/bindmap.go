@@ -21,9 +21,16 @@ type BindMap struct{
 }
 
 func (bm *BindMap)GetNow(key string) *Token{
-	bm.Lock.RLock()
-	tk, ok := bm.Table[key]
-	bm.Lock.RUnlock()
+	var tk *Token
+	var ok bool
+	if FORKS > 1 {
+		bm.Lock.RLock()
+		tk, ok = bm.Table[key]
+		bm.Lock.RUnlock()
+	}else{
+		tk, ok = bm.Table[key]
+	}
+	
 	if ok {
 		return tk
 	}else{
@@ -39,9 +46,13 @@ func (bm *BindMap) Get(key string) *Token{
 	var tk *Token
 	var ok bool
 	if(ctx.Table != nil){
-		bm.Lock.RLock()
-		tk, ok = ctx.Table[key]
-		bm.Lock.RUnlock()
+		if FORKS > 1 {
+			bm.Lock.RLock()
+			tk, ok = ctx.Table[key]
+			bm.Lock.RUnlock()
+		}else{
+			tk, ok = ctx.Table[key]
+		}
 		if(ok){
 			return tk
 		}
@@ -52,18 +63,26 @@ func (bm *BindMap) Get(key string) *Token{
 		ctx = ctx.Father
 		
 		if(ctx.Table != nil){
-			ctx.Lock.RLock()
-			tk, ok = ctx.Table[key]
-			ctx.Lock.RUnlock()
+			if FORKS > 1 {
+				ctx.Lock.RLock()
+				tk, ok = ctx.Table[key]
+				ctx.Lock.RUnlock()
+			}else{
+				tk, ok = ctx.Table[key]
+			}
 		}
 		
 	}
 
 	if tk != nil {
 		if ctx.Father == nil {
-			prev.Lock.Lock()
-			prev.Table[key] = tk
-			prev.Lock.Unlock()
+			if FORKS > 1 {
+				prev.Lock.Lock()
+				prev.Table[key] = tk
+				prev.Lock.Unlock()
+			}else{
+				prev.Table[key] = tk
+			}
 		}
 		return tk
 	}else{
@@ -73,11 +92,13 @@ func (bm *BindMap) Get(key string) *Token{
 
 
 func (bm *BindMap)PutNow(key string, val *Token){
-	bm.Lock.Lock()
-
-	bm.Table[key] = val
-
-	bm.Lock.Unlock()
+	if FORKS > 1 {
+		bm.Lock.Lock()
+		bm.Table[key] = val
+		bm.Lock.Unlock()
+	}else{
+		bm.Table[key] = val
+	}
 }
 
 
@@ -88,27 +109,45 @@ func (bm *BindMap)Put(key string, val *Token){
 	var ok = false
 
 	if(ctx.Table != nil){
-		ctx.Lock.RLock()
-		_, ok = ctx.Table[key]
-		ctx.Lock.RUnlock()
+		if FORKS > 1 {
+			ctx.Lock.RLock()
+			_, ok = ctx.Table[key]
+			ctx.Lock.RUnlock()
+		}else{
+			_, ok = ctx.Table[key]
+		}
 	}
 
 	if(ok){
-		bm.Lock.Lock()
-		bm.Table[key] = val.Clone()
-		bm.Lock.Unlock()
+		if FORKS > 1 {
+			bm.Lock.Lock()
+			bm.Table[key] = val.Clone()
+			bm.Lock.Unlock()
+		}else{
+			bm.Table[key] = val.Clone()
+		}
+		
 		inserted = true
 	}else{
 		for !inserted && !ok && ctx.Father != nil {
 			if(ctx.Table != nil){
-				ctx.Lock.RLock()
-				_, ok = ctx.Table[key]
-				ctx.Lock.RUnlock()
+				if FORKS > 1 {
+					ctx.Lock.RLock()
+					_, ok = ctx.Table[key]
+					ctx.Lock.RUnlock()
+				}else{
+					_, ok = ctx.Table[key]
+				}
 			}
 			if(ok){
-				ctx.Lock.Lock()
-				ctx.Table[key] = val.Clone()
-				ctx.Lock.Unlock()
+				if FORKS > 1 {
+					ctx.Lock.Lock()
+					ctx.Table[key] = val.Clone()
+					ctx.Lock.Unlock()
+				}else{
+					ctx.Table[key] = val.Clone()
+				}
+				
 				inserted = true
 				break
 			}
@@ -127,9 +166,14 @@ func (bm *BindMap)PutLocal(key string, val *Token){
 	for ctx.Tp != USR_CTX && ctx.Father != nil {
 		ctx = ctx.Father
 	}
-	ctx.Lock.Lock()
-	ctx.Table[key] = val.Dup()
-	ctx.Lock.Unlock()
+	if FORKS > 1 {
+		ctx.Lock.Lock()
+		ctx.Table[key] = val.Dup()
+		ctx.Lock.Unlock()
+	}else{
+		ctx.Table[key] = val.Dup()
+	}
+	
 }
 
 
@@ -139,27 +183,47 @@ func (bm *BindMap)Unset(key string){
 	var ok = false
 
 	if(ctx.Table != nil){
-		ctx.Lock.RLock()
-		_, ok = ctx.Table[key]
-		ctx.Lock.RUnlock()
+		if FORKS > 1 {
+			ctx.Lock.RLock()
+			_, ok = ctx.Table[key]
+			ctx.Lock.RUnlock()
+		}else{
+			_, ok = ctx.Table[key]
+		}
+		
 	}
 
 	if(ok){
-		ctx.Lock.Lock()
-		delete(ctx.Table, key)
-		ctx.Lock.Unlock()
+		if FORKS > 1 {
+			ctx.Lock.Lock()
+			delete(ctx.Table, key)
+			ctx.Lock.Unlock()
+		}else{
+			delete(ctx.Table, key)
+		}
+		
 		runtime.GC()
 	}else{
 		for !ok && ctx.Father != nil {
 			if(ctx.Table != nil){
-				ctx.Lock.RLock()
-				_, ok = ctx.Table[key]
-				ctx.Lock.RUnlock()
+				if FORKS > 1 {
+					ctx.Lock.RLock()
+					_, ok = ctx.Table[key]
+					ctx.Lock.RUnlock()
+				}else{
+					_, ok = ctx.Table[key]
+				}
+				
 			}
 			if(ok){
-				ctx.Lock.Lock()
-				delete(ctx.Table, key)
-				ctx.Lock.RUnlock()
+				if FORKS > 1 {
+					ctx.Lock.Lock()
+					delete(ctx.Table, key)
+					ctx.Lock.RUnlock()
+				}else{
+					delete(ctx.Table, key)
+				}
+				
 				runtime.GC()
 				break
 			}
