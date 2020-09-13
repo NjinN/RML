@@ -142,7 +142,17 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 	p.GetNow("in-buffer").Val = make([]byte, 0)
 	p.GetNow("listening").Val = true
 	var buffer = make([]byte, bufferSize)
+
+
+
 	for {
+
+		if p.GetNow("read-timeout").Int() > 0{
+			conn.SetReadDeadline(time.Now().Add(time.Millisecond * time.Duration(p.GetNow("read-timeout").Int())))
+		}else{
+			conn.SetReadDeadline(time.Now().Add(time.Millisecond * time.Duration(200)))
+		}
+
 		n, err := conn.Read(buffer)
 		// fmt.Println("conn awake")
 		if err != nil {
@@ -166,7 +176,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 					}
 				}
 
-				time.Sleep(time.Duration(200) * time.Millisecond)
+				// time.Sleep(time.Duration(200) * time.Millisecond)
 				continue
 			} else if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
 				conn.Close()
