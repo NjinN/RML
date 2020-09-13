@@ -543,7 +543,7 @@ func rowsPacker(rows *sql.Rows, colName bool) *Token {
 			case reflect.TypeOf(rune('0')):
 				rst.List().Add(&Token{CHAR, item.(rune)})
 			case reflect.TypeOf(time.Now()):
-				rst.List().Add(&Token{STRING, item.(time.Time).Format("2006-01-02+15:04:05")})
+				rst.List().Add(&Token{TIME, ParseTimeStr(item.(time.Time).Format("2006-01-02+15:04:05"))})
 			case reflect.TypeOf(float64(0.0)):
 				rst.List().Add(&Token{DECIMAL, item.(float64)})
 			case reflect.TypeOf(float32(0.0)):

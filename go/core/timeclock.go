@@ -3,6 +3,7 @@ package core
 import "fmt"
 import "strings"
 import "strconv"
+import "regexp"
 
 var _DAYS_OF_MONTHS = [12]int{31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
 
@@ -11,6 +12,35 @@ type TimeClock struct {
 	Date			int
 	Second			int
 	FloatSecond		float64
+}
+
+func ParseTimeStr(timeStr string) *TimeClock {
+	result := TimeClock{}
+	str := timeStr
+
+	
+	matched, err := regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}", str)
+	if !matched || err != nil {
+		matched, err = regexp.MatchString("\\-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
+		if !matched || err != nil {
+			matched, err = regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
+		}
+	}
+	if !matched || err != nil {
+		return nil
+	}
+
+	if str[0] == '-' {
+		result.Negative = true
+		str = str[1:]
+	}
+
+	slices := strings.Split(str, "+")
+
+	result.Date = dateStrToDays(slices[0])
+	result.Second = timeStrToSecs(slices[1])
+
+	return &result
 }
 
 func isLeapYear(y int) bool{
