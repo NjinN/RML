@@ -120,8 +120,10 @@ _添加为	:_append
 _取为	:_take
 _替换为	:_replace
 
-获取	:get
-设置	:put
+获取为	:get
+设置为	:put
+
+_包含为	:_include
 
 _分支为	:_fork
 _并行为	:_spawn

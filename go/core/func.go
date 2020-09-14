@@ -14,7 +14,7 @@ func (f Func) Run(es *EvalStack, ctx *BindMap) (*Token, error){
 	var c = BindMap{
 		Table: 	make(map[string]*Token, 8),
 		Father: ctx,
-		Tp:		USR_CTX,
+		Tp:		TMP_CTX,
 	}
 	for i, item := range f.Args.List() {
 		c.PutNow(item.Str(), es.Line[int(es.LastStartPos()) + i + 1])
@@ -41,7 +41,7 @@ func (f Func) RunWithProps(es *EvalStack, ctx *BindMap, ps []*Token) (*Token, er
 	var c = BindMap{
 		Table: 	make(map[string]*Token, 8),
 		Father: fatherCtx,
-		Tp:		USR_CTX,
+		Tp:		TMP_CTX,
 	}
 	for i, item := range f.Args.List() {
 		c.PutNow(item.Str(), es.Line[startPos + i + 1])

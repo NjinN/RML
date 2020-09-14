@@ -7,7 +7,7 @@ import (
 	. "github.com/NjinN/RML/go/core"
 )
 
-func forkEval(inp []*Token, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token, stackLen int) {
+func ForkEval(inp []*Token, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token, stackLen int) {
 	var evalStack EvalStack
 	evalStack.InitWithLen(stackLen)
 	evalStack.MainCtx = ctx
@@ -23,7 +23,7 @@ func forkEval(inp []*Token, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter 
 	}
 }
 
-func forkEvalStr(inp string, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token, stackLen int) {
+func ForkEvalStr(inp string, ctx *BindMap, wg *sync.WaitGroup, wait bool, waiter *Token, stackLen int) {
 	var evalStack EvalStack
 	evalStack.InitWithLen(stackLen)
 	evalStack.MainCtx = ctx
@@ -47,17 +47,17 @@ func Fork(es *EvalStack, ctx *BindMap) (*Token, error) {
 		if args[1].Tp == BLOCK {
 			FORKS++
 			if args[2] != nil && args[2].Tp != NONE {
-				go forkEval(args[1].CloneDeep().Tks(), ctx, nil, false, args[2], args[3].Int())
+				go ForkEval(args[1].CloneDeep().Tks(), ctx, nil, false, args[2], args[3].Int())
 			} else {
-				go forkEval(args[1].CloneDeep().Tks(), ctx, nil, false, nil, args[3].Int())
+				go ForkEval(args[1].CloneDeep().Tks(), ctx, nil, false, nil, args[3].Int())
 			}
 			FORKS--
 		} else if args[1].Tp == STRING {
 			FORKS++
 			if args[2] != nil && args[2].Tp != NONE {
-				go forkEvalStr(args[1].Str(), ctx, nil, false, args[2], args[3].Int())
+				go ForkEvalStr(args[1].Str(), ctx, nil, false, args[2], args[3].Int())
 			} else {
-				go forkEvalStr(args[1].Str(), ctx, nil, false, nil, args[3].Int())
+				go ForkEvalStr(args[1].Str(), ctx, nil, false, nil, args[3].Int())
 			}
 			FORKS--
 		}
@@ -84,18 +84,18 @@ func Spawn(es *EvalStack, ctx *BindMap) (*Token, error) {
 			FORKS++
 			if args[2].ToBool() {
 				wg.Add(1)
-				go forkEval(item.CloneDeep().Tks(), ctx, &wg, true, nil, args[3].Int())
+				go ForkEval(item.CloneDeep().Tks(), ctx, &wg, true, nil, args[3].Int())
 			} else {
-				go forkEval(item.CloneDeep().Tks(), ctx, nil, false, nil, args[3].Int())
+				go ForkEval(item.CloneDeep().Tks(), ctx, nil, false, nil, args[3].Int())
 			}
 			FORKS--
 		} else if item.Tp == STRING {
 			FORKS++
 			if args[2].ToBool() {
 				wg.Add(1)
-				go forkEvalStr(item.Str(), ctx, &wg, true, nil, args[3].Int())
+				go ForkEvalStr(item.Str(), ctx, &wg, true, nil, args[3].Int())
 			} else {
-				go forkEvalStr(item.Str(), ctx, nil, false, nil, args[3].Int())
+				go ForkEvalStr(item.Str(), ctx, nil, false, nil, args[3].Int())
 			}
 			FORKS--
 		}

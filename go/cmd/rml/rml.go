@@ -11,9 +11,11 @@ import (
 	"time"
 
 	. "github.com/NjinN/RML/go/core"
-	. "github.com/NjinN/RML/go/extlib"
 	. "github.com/NjinN/RML/go/nativelib"
 	. "github.com/NjinN/RML/go/oplib"
+	. "github.com/NjinN/RML/go/modlib"
+
+	. "github.com/NjinN/RML/go/extlib"
 
 	"github.com/NjinN/RML/go/script"
 )
@@ -28,6 +30,8 @@ func main() {
 	/** 初始化lib语境，加载原生函数、拓展函数 **/
 	InitNative(&libCtx)
 	InitOp(&libCtx)
+	InitMod(&libCtx)
+	
 	InitExt(&libCtx)
 
 	var es = EvalStack{

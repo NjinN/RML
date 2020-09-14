@@ -703,3 +703,33 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var result = Token{ERR, "Type Mismatch"}
 	return &result, nil
 }
+
+func Include(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
+	var result Token
+
+	if args[1].Tp == OBJECT {
+		if args[2].Tp == NONE {
+			for k, v := range args[1].Ctx().Table {
+				ctx.PutLocal(k, v)
+			}
+
+			result.Tp = LOGIC
+			result.Val = true
+			return &result, nil
+		}else if args[2].Tp == OBJECT {
+			for k, v := range args[1].Ctx().Table {
+				args[2].Ctx().PutLocal(k, v)
+			}
+			result.Tp = LOGIC
+			result.Val = true
+			return &result, nil
+		}
+
+	}
+
+	result.Tp = ERR
+	result.Val = "Type Mismatch"
+	return &result, nil
+}
+

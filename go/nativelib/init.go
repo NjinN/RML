@@ -576,17 +576,6 @@ func InitNative(ctx *BindMap) {
 	}
 	ctx.PutNow("return", &returnToken)
 
-	var foreachToken = Token{
-		NATIVE,
-		Native{
-			"foreach",
-			4,
-			Fforeach,
-			[]int{0, 1, 1},
-		},
-	}
-	ctx.PutNow("foreach", &foreachToken)
-
 	var tryToken = Token{
 		NATIVE,
 		Native{
@@ -770,6 +759,30 @@ func InitNative(ctx *BindMap) {
 		},
 	}
 	ctx.PutNow("put", &putToken)
+	
+	var foreachToken = Token{
+		NATIVE,
+		Native{
+			"foreach",
+			4,
+			Fforeach,
+			[]int{0, 1, 1},
+		},
+	}
+	ctx.PutNow("foreach", &foreachToken)
+
+	var includeToken = Token{
+		NATIVE,
+		Native{
+			"_include",
+			3,
+			Include,
+			nil,
+		},
+	}
+	ctx.PutNow("_include", &includeToken)
+
+
 
 	/*******  fork  *******/
 	var forkToken = Token{

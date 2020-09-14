@@ -448,7 +448,17 @@ lib?: func [/output output] [
 	_库? 输出
 ]
 
+include: func [target /to to] [
+	_include target to
+]
 
+包含为 术 [
+	"将目标对象的键值绑定包含到当前语境或指定对象中"
+	目标 	"要包含的目标对象"
+	/到 到 	"带参，指定要绑定到的对象"
+	] [
+	_包含 目标 到
+]
 
 
 
