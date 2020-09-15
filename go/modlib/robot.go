@@ -100,29 +100,38 @@ func KeyTap(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos():es.LastEndPos()]
 
 	var result Token
-	if args[1].Tp == STRING && (args[2].Tp == BLOCK || args[2].Tp == NONE) {
-		result.Tp = NONE
-		result.Val = ""
 
-		if args[2].Tp == NONE {
+	if args[1].Tp == STRING || args[1].Tp == BLOCK {
+		result.Tp = LOGIC
+		result.Val = true
+
+		if args[1].Tp == STRING {
 			robotgo.KeyTap(args[1].Str())
 			return &result, nil
-		}else{
+		}
+
+		if args[1].Tp == BLOCK && args[1].List().Len() > 0 {
 			checked := true
+			key := ""
 			arr := []string{}
-			for _, item := range args[2].Tks(){
+			for idx, item := range args[1].Tks(){
 				if item.Tp != STRING {
 					checked = false
+					break
 				}else{
-					arr = append(arr, item.Str())
+					if idx == 0 {
+						key = item.Str()
+					}else{
+						arr = append(arr, item.Str())
+					}
 				}
 			}
 			if checked {
-				robotgo.KeyTap(args[1].Str(), arr)
+				robotgo.KeyTap(key, arr)
 				return &result, nil
 			}
 		}
-		
+
 	}
 
 	result.Tp = ERR

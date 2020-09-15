@@ -71,7 +71,7 @@ func InitMod(ctx *BindMap) {
 		NATIVE,
 		Native{
 			"key_tap",
-			3,
+			2,
 			KeyTap,
 			nil,
 		},
