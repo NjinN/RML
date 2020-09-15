@@ -81,13 +81,13 @@ func InitMod(ctx *BindMap) {
 	var ccopyToken = Token{
 		NATIVE,
 		Native{
-			"copy",
+			"copy_str",
 			2,
 			Ccopy,
 			nil,
 		},
 	}
-	robotObj.PutNow("copy", &ccopyToken)
+	robotObj.PutNow("copy_str", &ccopyToken)
 
 	var readCopyToken = Token{
 		NATIVE,
