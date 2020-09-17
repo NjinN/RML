@@ -3,13 +3,20 @@ package nativelib
 import (
 	"bytes"
 	"fmt"
+	"bufio"
 	"os"
 	"os/exec"
 	"runtime"
 	"sync"
+	"syscall"
+	"unsafe"
+	"strings"
 
 	. "github.com/NjinN/RML/go/core"
 )
+
+
+
 
 func Quit(es *EvalStack, ctx *BindMap) (*Token, error) {
 	os.Exit(0)
@@ -132,6 +139,62 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error) {
 	}
 	runtime.GC()
 	return &Token{NIL, nil}, nil
+}
+
+//控制台输入准备 start
+var getStdHandle, getConsoleMode, setConsoleMode *syscall.LazyProc
+
+func WinInitConsole() {
+	lib := syscall.NewLazyDLL("Kernel32.dll")
+	getStdHandle = lib.NewProc("GetStdHandle")
+	getConsoleMode = lib.NewProc("GetConsoleMode")
+	setConsoleMode = lib.NewProc("SetConsoleMode")
+}
+
+func WinPrompt(msg string) string {
+	handle, _, _ := getStdHandle.Call(uintptr(^uint(10) + 1))
+	var mode uint
+	getConsoleMode.Call(handle, uintptr(unsafe.Pointer(&mode)))
+	newMode := mode & ^uint(4)
+	setConsoleMode.Call(handle, uintptr(newMode))
+	passwd, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	setConsoleMode.Call(handle, uintptr(mode))
+	if err != nil {
+		panic(err)
+	}
+	return strings.Replace(passwd, "\r\n", "", 1)
+}
+
+func IsWinOs() bool {
+	os := runtime.GOOS
+	return strings.Index(os, "win") >= 0 
+}
+
+//控制台输入准备 end
+
+func Ask(es *EvalStack, ctx *BindMap) (*Token, error) {
+	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
+	var result Token
+	if args[1].Tp == STRING {
+		fmt.Print(args[1].Str())
+		str := ""
+		if args[2].ToBool() {
+			if IsWinOs(){
+				WinInitConsole()
+				str = WinPrompt(args[1].Str())
+			}else{
+				return &Token{ERR, "OS don't support"}, nil
+			}
+		}else{
+			reader := bufio.NewReader(os.Stdin)
+			str, _ = reader.ReadString('\n')
+			str = strings.Replace(str, "\r\n", "", 1)
+		}
+		result.Tp = STRING
+		result.Val = str
+		return &result, nil
+	} 
+	return &Token{ERR, "Type Mismatch"}, nil
 }
 
 func Let(es *EvalStack, ctx *BindMap) (*Token, error) {

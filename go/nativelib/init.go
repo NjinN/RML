@@ -105,6 +105,17 @@ func InitNative(ctx *BindMap) {
 	}
 	ctx.PutNow("_print", &printToken)
 
+	var askToken = Token{
+		NATIVE,
+		Native{
+			"_ask",
+			3,
+			Ask,
+			nil,
+		},
+	}
+	ctx.PutNow("_ask", &askToken)
+
 	var letToken = Token{
 		NATIVE,
 		Native{

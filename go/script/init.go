@@ -53,6 +53,18 @@ print: func [n /inline /only] [
 	_打印 甲 行内 单独
 ]
 
+ask: func [msg /hide] [
+	_ask msg hide
+]
+
+输入为 术 [
+	"获取控制台输入"
+	信息	"提示信息, 字符串类型"
+	/隐藏	"无参，是否隐藏字符"
+	] [
+	_输入 信息 隐藏
+]
+
 insert*: func [serial item /at at /only] [
 	if not at [at: 1]
 	_insert serial item at only
