@@ -315,4 +315,100 @@ func InitMod(ctx *BindMap) {
 	// init Robot end
 	
 
+
+	// init wlog start
+	var wlogObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var wlogToken = Token{OBJECT, &wlogObj}
+
+	var logToken = Token{
+		NATIVE,
+		Native{
+			"log",
+			2,
+			WlogLog,
+			nil,
+		},
+	}
+	wlogObj.PutNow("log", &logToken)
+
+	var outputToken = Token{
+		NATIVE,
+		Native{
+			"output",
+			2,
+			WlogOutput,
+			nil,
+		},
+	}
+	wlogObj.PutNow("output", &outputToken)
+
+	var successToken = Token{
+		NATIVE,
+		Native{
+			"success",
+			2,
+			WlogSuccess,
+			nil,
+		},
+	}
+	wlogObj.PutNow("success", &successToken)
+
+	var infoToken = Token{
+		NATIVE,
+		Native{
+			"info",
+			2,
+			WlogInfo,
+			nil,
+		},
+	}
+	wlogObj.PutNow("info", &infoToken)
+
+	var errorToken = Token{
+		NATIVE,
+		Native{
+			"error",
+			2,
+			WlogError,
+			nil,
+		},
+	}
+	wlogObj.PutNow("error", &errorToken)
+
+	var warnToken = Token{
+		NATIVE,
+		Native{
+			"warn",
+			2,
+			WlogWarn,
+			nil,
+		},
+	}
+	wlogObj.PutNow("warn", &warnToken)
+
+	var runningToken = Token{
+		NATIVE,
+		Native{
+			"running",
+			2,
+			WlogRunning,
+			nil,
+		},
+	}
+	wlogObj.PutNow("running", &runningToken)
+
+	var askToken = Token{
+		NATIVE,
+		Native{
+			"ask",
+			2,
+			WlogAsk,
+			nil,
+		},
+	}
+	wlogObj.PutNow("ask", &askToken)
+
+
+	ctx.PutNow("log", &wlogToken)
+	// init wlog end
 }
