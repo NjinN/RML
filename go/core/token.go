@@ -106,9 +106,19 @@ func (t *Token) ToString() string{
 			nega = "-"
 		}
 		if v.Date == 0 {
-			return secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+			if v.FloatSecond > 0{
+				return secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+			}else{
+				return secsToTimeStr(v.Second)
+			}
+			
 		}else{
-			return nega + daysToDate(v.Date) + "+" + secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+			if v.FloatSecond > 0 {
+				return nega + daysToDate(v.Date) + "+" + secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+			}else{
+				return nega + daysToDate(v.Date) + "+" + secsToTimeStr(v.Second)
+			}
+			
 		}
 
 	case URL:

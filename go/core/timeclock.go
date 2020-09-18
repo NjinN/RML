@@ -19,11 +19,11 @@ func ParseTimeStr(timeStr string) *TimeClock {
 	str := timeStr
 
 	
-	matched, err := regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}", str)
+	matched, err := regexp.MatchString("^\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}$", str)
 	if !matched || err != nil {
-		matched, err = regexp.MatchString("\\-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
+		matched, err = regexp.MatchString("^\\-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
 		if !matched || err != nil {
-			matched, err = regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
+			matched, err = regexp.MatchString("^\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
 		}
 	}
 	if !matched || err != nil {
@@ -39,6 +39,17 @@ func ParseTimeStr(timeStr string) *TimeClock {
 
 	result.Date = dateStrToDays(slices[0])
 	result.Second = timeStrToSecs(slices[1])
+
+	if strings.Index(slices[1], ".") >= 0 {
+		nsStr := strings.Split(slices[1], ".")[1]
+		nsStr = fmt.Sprintf("s%09", nsStr)
+		ns, err := strconv.ParseFloat(nsStr, 64)
+		if err != nil {
+			fmt.Println(err.Error())
+			return nil
+		}
+		result.FloatSecond = ns
+	}
 
 	return &result
 }
@@ -75,6 +86,29 @@ func dateStrToDays(dateStr string) int{
 		return 0
 	}
 
+	leaps := 0
+	for i := 4; i < y; i++ {
+		if isLeapYear(i){
+			leaps++
+		}
+	}
+	
+	days := (y - 1) * 365 + leaps
+
+	for i := 1; i < m; i++ {
+		days += _DAYS_OF_MONTHS[i-1]
+	}
+
+	if isLeapYear(y) && m > 2 {
+		days++
+	}
+
+	days += d
+	
+	return days
+}
+
+func DateToDays(y int, m int, d int) int {
 	leaps := 0
 	for i := 4; i < y; i++ {
 		if isLeapYear(i){

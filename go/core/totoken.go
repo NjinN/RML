@@ -75,7 +75,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		bin, err := hex.DecodeString(str[2:len(str)-1])
 		if err != nil {
 			result.Tp = ERR
-			result.Val = "Error bin format"
+			result.Val = "Error bin format of " + str
 		}else{
 			result.Tp = BIN
 			result.Val = bin
@@ -263,7 +263,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			m.Table = make(map[string]TokenPair, 8)
 			for _, item := range bodyBlock {
 				if item.Tp != BLOCK || item.List().Len() != 2 {
-					return &Token{ERR, "Error format!"}
+					return &Token{ERR, "Error format of " + str}
 				}
 				var pair TokenPair
 				pair.Key = item.Tks()[0]
@@ -280,7 +280,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		}
 
 		result.Tp = ERR
-		result.Val = "Error format!"
+		result.Val = "Error format of" + str
 		return &result
 	}
 
@@ -289,11 +289,11 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	var err error
 
 	//only date
-	matched, err = regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}", str)
+	matched, err = regexp.MatchString("^\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}$", str)
 
 	if err != nil {
 		result.Tp = ERR
-		result.Val = "Error format!"
+		result.Val = err.Error()
 		return &result
 	}
 
@@ -311,7 +311,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		days := dateStrToDays(str)
 		if days == 0 {
 			result.Tp = ERR
-			result.Val = "Error format!"
+			result.Val = "Error format of " + str
 			return &result
 		}
 
@@ -322,11 +322,11 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	}
 
 	//only time
-	matched, err = regexp.MatchString("\\-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
+	matched, err = regexp.MatchString("^\\-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
 
 	if err != nil {
 		result.Tp = ERR
-		result.Val = "Error format!"
+		result.Val = err.Error()
 		return &result
 	}
 
@@ -346,7 +346,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 		if secs < 0 {
 			result.Tp = ERR
-			result.Val = "Error format!"
+			result.Val = "Error format of " + str
 			return &result
 		}
 
@@ -356,7 +356,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			floatSecs, err := strconv.ParseFloat("0." + secSlice[1], 64)
 			if err != nil {
 				result.Tp = ERR
-				result.Val = "Error format!"
+				result.Val = "Error format of " + str
 				return &result
 			}
 			timeClock.FloatSecond = floatSecs
@@ -367,17 +367,16 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	}
 
 	//date and time
-	matched, err = regexp.MatchString("\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?", str)
-
+	matched, err = regexp.MatchString("^\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
 	if err != nil {
 		result.Tp = ERR
-		result.Val = "Error format!"
+		result.Val = err.Error()
 		return &result
 	}
 
 	if matched {
-		result.Tp = TIME
 
+		result.Tp = TIME
 		timeClock := TimeClock{}
 		timeClock.FloatSecond = 0
 
@@ -390,8 +389,9 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 		days := dateStrToDays(timeSlice[0])
 		if days <= 0 {
+			
 			result.Tp = ERR
-			result.Val = "Error format!"
+			result.Val = "Error format of " + str
 			return &result
 		}
 
@@ -402,7 +402,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		secs := timeStrToSecs(secSlice[0])
 		if secs < 0 {
 			result.Tp = ERR
-			result.Val = "Error format!"
+			result.Val = "Error format of " + str
 			return &result
 		}
 
@@ -412,7 +412,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			floatSecs, err := strconv.ParseFloat("0." + secSlice[1], 64)
 			if err != nil {
 				result.Tp = ERR
-				result.Val = "Error format!"
+				result.Val = "Error format of " + str
 				return &result
 			}
 			timeClock.FloatSecond = floatSecs

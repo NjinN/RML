@@ -692,6 +692,28 @@ func InitNative(ctx *BindMap) {
 	}
 	ctx.PutNow("cost", &costToken)
 
+	var nowToken = Token{
+		NATIVE,
+		Native{
+			"now",
+			1,
+			Nnow,
+			nil,
+		},
+	}
+	ctx.PutNow("now", &nowToken)
+
+	var sleepToken = Token{
+		NATIVE,
+		Native{
+			"sleep",
+			2,
+			Ssleep,
+			nil,
+		},
+	}
+	ctx.PutNow("sleep", &sleepToken)
+
 	/*******  collect  *******/
 
 	var lenToken = Token{
