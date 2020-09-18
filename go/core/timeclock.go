@@ -217,7 +217,7 @@ func (tc *TimeClock) Format(){
 			tc.FloatSecond--
 		}
 	}else{
-		for tc.FloatSecond < -1 {
+		for tc.FloatSecond < 0 {
 			tc.Second--
 			tc.FloatSecond++
 		}
