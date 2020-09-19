@@ -714,6 +714,39 @@ func InitNative(ctx *BindMap) {
 	}
 	ctx.PutNow("sleep", &sleepToken)
 
+	var timerToken = Token{
+		NATIVE,
+		Native{
+			"timer",
+			3,
+			Ttimer,
+			nil,
+		},
+	}
+	ctx.PutNow("timer", &timerToken)
+
+	var startToken = Token{
+		NATIVE,
+		Native{
+			"start",
+			2,
+			Sstart,
+			nil,
+		},
+	}
+	ctx.PutNow("start", &startToken)
+
+	var stopToken = Token{
+		NATIVE,
+		Native{
+			"stop",
+			2,
+			Sstop,
+			nil,
+		},
+	}
+	ctx.PutNow("stop", &stopToken)
+
 	/*******  collect  *******/
 
 	var lenToken = Token{

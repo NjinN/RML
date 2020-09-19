@@ -40,6 +40,10 @@ func (t *Token) Time() *TimeClock{
 	return t.Val.(*TimeClock)
 }
 
+func (t *Token) Timer() *Timer{
+	return t.Val.(*Timer)
+}
+
 func (t *Token) Float() float64{
 	return t.Val.(float64)
 }
@@ -120,6 +124,24 @@ func (t *Token) ToString() string{
 			}
 			
 		}
+
+	case TIMER:
+		v := t.Timer()
+		var buffer bytes.Buffer
+		buffer.WriteString("!timer{")
+		buffer.WriteString(strconv.FormatFloat(v.Time, 'f', -1, 64))
+		buffer.WriteString(" [")
+		for _, item := range v.Code.List() {
+			buffer.WriteString(item.ToString())
+			buffer.WriteString(" ")
+		}
+		if len(buffer.Bytes()) > 1 {
+			buffer.Bytes()[len(buffer.Bytes())-1] = ']'
+		}else{
+			buffer.WriteString("]")
+		}
+		buffer.WriteString("}")
+		return buffer.String()
 
 	case URL:
 		return t.Str()

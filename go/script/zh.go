@@ -17,6 +17,8 @@ const ZHScript =
 二元类型为	bin!
 网址类型为	url!  
 端口类型为	port!
+时间类型为	time! 
+定时器类型为 	timer!
 圆块类型为	paren!	
 方块类型为	block!	
 表类型为	map!  	
@@ -117,6 +119,12 @@ _写出文件为	:_writefile
 术为	:func
 
 用时为	:cost
+时为 	:now 
+定时器为	:timer 
+
+睡眠为	:sleep 
+启动为	:start 
+停止为	:stop 
 
 长?为	:len?	
 _插入为	:_insert

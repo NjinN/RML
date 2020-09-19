@@ -278,6 +278,32 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			result.Tp = MAP
 			result.Val = &m
 			return &result
+		
+		}else if typeStr == "timer" {
+			if len(bodyBlock)  != 2 {
+				return &Token{ERR, "Error format of " + str}
+			}
+
+			time := 0.0
+			if bodyBlock[0].Tp == INTEGER {
+				time = float64(bodyBlock[0].Int())
+			}else if bodyBlock[0].Tp == DECIMAL {
+				time = bodyBlock[0].Float()
+			}else {
+				return &Token{ERR, "Error format of " + str}
+			}
+
+			if bodyBlock[1].Tp != BLOCK {
+				return &Token{ERR, "Error format of " + str}
+			}
+
+			var timer Timer
+			timer.Time = time
+			timer.Code = bodyBlock[1].List()
+
+			result.Tp = TIMER
+			result.Val = &timer
+			return &result
 		}
 
 		result.Tp = ERR
