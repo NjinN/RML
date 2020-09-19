@@ -67,6 +67,7 @@ const ZHScript =
 _执行为	:_do
 _收敛为	:_reduce
 _复制为	:_copy
+之为	:on 
 _打印为	:_print
 _输入为 :_ask
 格式化为	:format 

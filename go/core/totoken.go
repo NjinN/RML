@@ -142,6 +142,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		es.Eval(blk, &c)
 		es.IsLocal = orginSts
 		result.Val = &c
+		es.TempResult = &result
 		return &result
 	}
 

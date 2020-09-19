@@ -28,4 +28,17 @@ func InitMop(ctx *BindMap) {
 	}
 	ctx.PutNow("else", &elseToken)
 
+	var onToken = Token{
+		MOP,
+		Mop{
+			"on",
+			3,
+			Oon,
+			[]int{0, 1},
+		},
+	}
+	ctx.PutNow("on", &onToken)
+
+
+
 }

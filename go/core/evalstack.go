@@ -200,7 +200,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 						}
 					}else if (nowToken.Tp == MOP){
 						if(len(nowToken.Val.(Mop).QuoteList) > 0){
-							es.QuoteList = append(es.QuoteList, nowToken.Val.(Func).QuoteList...)
+							es.QuoteList = append(es.QuoteList, nowToken.Val.(Mop).QuoteList...)
 						}
 					}
 				
