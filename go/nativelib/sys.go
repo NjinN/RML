@@ -137,7 +137,7 @@ func Pprint(es *EvalStack, ctx *BindMap) (*Token, error) {
 			fmt.Println(args[1].OutputStr())
 		}
 	}
-	runtime.GC()
+	// runtime.GC()
 	return &Token{NIL, nil}, nil
 }
 
