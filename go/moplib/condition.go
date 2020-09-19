@@ -22,6 +22,8 @@ func Elif(es *EvalStack, ctx *BindMap) (*Token, error) {
 				return es.EvalStr(args[3].Str(), ctx)
 			}
 
+		}else if args[1].ToBool(){
+			return &Token{LOGIC, true}, nil
 		}
 
 		return &Token{NIL, ""}, nil
@@ -44,6 +46,8 @@ func Eelse(es *EvalStack, ctx *BindMap) (*Token, error) {
 				return es.EvalStr(args[2].Str(), ctx)
 			}
 
+		}else if args[1].ToBool(){
+			return &Token{LOGIC, true}, nil
 		}
 
 		return &Token{NIL, ""}, nil
