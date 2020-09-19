@@ -184,6 +184,8 @@ func (t *Token) ToString() string{
 		return "native: " + t.Val.(Native).Str
 	case OP:
 		return "op: " + t.Val.(Native).Str
+	case MOP:
+		return "mop: " + t.Val.(Mop).Str
 	case FUNC:
 		var buffer bytes.Buffer
 		buffer.WriteString("!func{[")
@@ -334,6 +336,8 @@ func (t Token) Explen() int{
 		return t.Val.(Func).Args.Len() + 1
 	case OP:
 		return 3
+	case MOP:
+		return t.Val.(Mop).Explen
 	case PATH:
 		if t.IsGetPath() {
 			return 1

@@ -11,6 +11,7 @@ type EvalStack struct {
 	MainCtx 		*BindMap
 	QuoteList		[]int
 	IsLocal 		bool
+	TempResult 		*Token
 }
 
 
@@ -92,6 +93,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			if(nextToken.Tp == WORD){
 				temp, err := nextToken.GetVal(ctx, es)
 				if err != nil {
+					es.TempResult = nextToken
 					return nextToken, nil
 				}
 				nextToken = temp
@@ -105,6 +107,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				es.Push(nextToken)
 				temp, err := nowToken.GetVal(ctx, es)
 				if err != nil {
+					es.TempResult = temp
 					return temp, err
 				}
 				es.EndPos.Add(es.Idx + 2)
@@ -112,6 +115,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 			}else if(es.StartPos.Len() == 0 || es.Line[es.LastStartPos()].Tp == OP){
 				temp, err := nowToken.GetVal(ctx, es)
 				if err != nil {
+					es.TempResult = temp
 					return temp, err
 				}
 				es.Push(temp)
@@ -128,6 +132,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 				if(es.QuoteList[0] > 0){
 					temp, err := nowToken.GetVal(ctx, es)
 					if err != nil {
+						es.TempResult = temp
 						return temp, err
 					}
 					nowToken = temp
@@ -144,6 +149,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					nowToken = temp
 				}
 				if err != nil {
+					es.TempResult = temp
 					return temp, err
 				}
 			}
@@ -190,6 +196,10 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					if(len(nowToken.Val.(Func).QuoteList) > 0){
 						es.QuoteList = append(es.QuoteList, nowToken.Val.(Func).QuoteList...)
 					}
+				}else if (nowToken.Tp == MOP){
+					if(len(nowToken.Val.(Mop).QuoteList) > 0){
+						es.QuoteList = append(es.QuoteList, nowToken.Val.(Func).QuoteList...)
+					}
 				}
 
 				if !skip {
@@ -197,11 +207,16 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					es.EndPos.Add(es.Idx + nowToken.Explen()) 
 				}
 				es.Push(nowToken)
+				
+				if nowToken.Tp == MOP {
+					es.Push(es.TempResult)
+				}
 			}
 		}
  
 		for(es.EndPos.Len() > startDeep && es.Idx == es.LastEndPos()){
 			temp, err := es.EvalExp(ctx)
+			es.TempResult = temp
 			if err != nil {
 				return temp, err
 			}
@@ -224,6 +239,7 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 		return &Token{BLOCK, resultBlk}, nil
 	}
 
+	es.TempResult = result
 	return result, nil
 
 }
@@ -264,6 +280,8 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 		}
 	case NATIVE, OP:
 		temp, err = startToken.Val.(Native).Exec(es, ctx)
+	case MOP:
+		temp, err = startToken.Val.(Mop).Exec(es, ctx)
 	case FUNC:
 		temp, err = startToken.Val.(Func).Run(es, ctx)
 	default:

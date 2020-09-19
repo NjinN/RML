@@ -28,7 +28,8 @@ const (
 	SET_WORD
 	PUT_WORD 		
 	PATH 			
-	OP 			
+	OP
+	MOP 			
 	NATIVE 		
 	FUNC
 
@@ -93,6 +94,8 @@ func TypeToStr(n uint8) string{
 		return "put-word!"
 	case OP:
 		return "op!"
+	case MOP:
+		return "mop!"
 	case NATIVE:
 		return "native!"
 	case FUNC:
@@ -161,6 +164,8 @@ func StrToType(s string) uint8{
 		return PATH
 	case "op!":
 		return OP
+	case "mop!":
+		return MOP
 	case "native!":
 		return NATIVE
 	case "func!":

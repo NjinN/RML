@@ -13,6 +13,7 @@ import (
 	. "github.com/NjinN/RML/go/core"
 	. "github.com/NjinN/RML/go/nativelib"
 	. "github.com/NjinN/RML/go/oplib"
+	. "github.com/NjinN/RML/go/moplib"
 	. "github.com/NjinN/RML/go/modlib"
 
 	. "github.com/NjinN/RML/go/extlib"
@@ -30,6 +31,7 @@ func main() {
 	/** 初始化lib语境，加载原生函数、拓展函数 **/
 	InitNative(&libCtx)
 	InitOp(&libCtx)
+	InitMop(&libCtx)
 	InitMod(&libCtx)
 	
 	InitExt(&libCtx)
