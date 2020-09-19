@@ -188,27 +188,29 @@ func (es *EvalStack) Eval(inp []*Token, ctx *BindMap, args ...int) (*Token, erro
 					es.Push(nowToken)
 				}	
 			}else{
-				if(nowToken.Tp == NATIVE){
-					if(len(nowToken.Val.(Native).QuoteList) > 0){
-						es.QuoteList = append(es.QuoteList, nowToken.Val.(Native).QuoteList...)
-					}
-				}else if(nowToken.Tp == FUNC){
-					if(len(nowToken.Val.(Func).QuoteList) > 0){
-						es.QuoteList = append(es.QuoteList, nowToken.Val.(Func).QuoteList...)
-					}
-				}else if (nowToken.Tp == MOP){
-					if(len(nowToken.Val.(Mop).QuoteList) > 0){
-						es.QuoteList = append(es.QuoteList, nowToken.Val.(Func).QuoteList...)
-					}
-				}
-
 				if !skip {
+
+					if(nowToken.Tp == NATIVE){
+						if(len(nowToken.Val.(Native).QuoteList) > 0){
+							es.QuoteList = append(es.QuoteList, nowToken.Val.(Native).QuoteList...)
+						}
+					}else if(nowToken.Tp == FUNC){
+						if(len(nowToken.Val.(Func).QuoteList) > 0){
+							es.QuoteList = append(es.QuoteList, nowToken.Val.(Func).QuoteList...)
+						}
+					}else if (nowToken.Tp == MOP){
+						if(len(nowToken.Val.(Mop).QuoteList) > 0){
+							es.QuoteList = append(es.QuoteList, nowToken.Val.(Func).QuoteList...)
+						}
+					}
+				
 					es.StartPos.Add(es.Idx) 
 					es.EndPos.Add(es.Idx + nowToken.Explen()) 
 				}
+	
 				es.Push(nowToken)
 				
-				if nowToken.Tp == MOP {
+				if nowToken.Tp == MOP && !skip {
 					es.Push(es.TempResult)
 				}
 			}

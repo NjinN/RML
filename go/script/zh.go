@@ -100,7 +100,9 @@ _写出文件为	:_writefile
 模等为	:modset
 对换为	:swap
 
-若为	:if
+若为	:if 
+否若为	:elif 
+否则为	:else 
 是非为	:either
 循环为	:loop
 重复为	:repeat
