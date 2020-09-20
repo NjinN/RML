@@ -346,10 +346,10 @@ read: func [target /bin /string] [
 	if (type? target) = file! [
 		return _readfile target type
 	] 
-	if (type? target) = port! [
+	elif (type? target) = port! [
 		return _readport target type
 	]
-	if (type? target) = url! [
+	elif (type? target) = url! [
 		return _readurl target type
 	]
 	none

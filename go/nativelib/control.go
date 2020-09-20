@@ -15,11 +15,10 @@ func Iif(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var result Token
 	if args[1].ToBool() {
 		if args[2].Tp == BLOCK {
-			es.Eval(args[2].Tks(), ctx)
+			return es.Eval(args[2].Tks(), ctx)
 		} else if args[2].Tp == STRING {
-			es.EvalStr(args[2].Str(), ctx)
+			return es.EvalStr(args[2].Str(), ctx)
 		}
-		return &Token{LOGIC, true}, nil
 	} else {
 		return &Token{NIL, nil}, nil
 	}
