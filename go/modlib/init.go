@@ -411,4 +411,45 @@ func InitMod(ctx *BindMap) {
 
 	ctx.PutNow("log", &wlogToken)
 	// init wlog end
+
+
+	// init audio start
+	var audioObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var audioToken = Token{OBJECT, &audioObj}
+
+	var playAudioToken = Token{
+		NATIVE,
+		Native{
+			"play",
+			2,
+			AudioPlay,
+			nil,
+		},
+	}
+	audioObj.PutNow("play", &playAudioToken)
+
+	var playAudioLoopToken = Token{
+		NATIVE,
+		Native{
+			"play-loop",
+			2,
+			AudioPlayLoop,
+			nil,
+		},
+	}
+	audioObj.PutNow("play-loop", &playAudioLoopToken)
+
+	var stopAudioToken = Token{
+		NATIVE,
+		Native{
+			"stop",
+			1,
+			AudioStop,
+			nil,
+		},
+	}
+	audioObj.PutNow("stop", &stopAudioToken)
+
+	ctx.PutNow("audio", &audioToken)
+	// init audio end
 }
