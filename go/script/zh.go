@@ -17,6 +17,8 @@ const ZHScript =
 二元类型为	bin!
 网址类型为	url!  
 端口类型为	port!
+范围类型为 	range! 
+数对类型为 	pair!
 时间类型为	time! 
 定时器类型为 	timer!
 圆块类型为	paren!	
