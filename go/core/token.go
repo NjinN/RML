@@ -111,16 +111,16 @@ func (t *Token) ToString() string{
 		}
 		if v.Date == 0 {
 			if v.FloatSecond > 0{
-				return secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+				return nega + SecsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
 			}else{
-				return secsToTimeStr(v.Second)
+				return nega + SecsToTimeStr(v.Second)
 			}
 			
 		}else{
 			if v.FloatSecond > 0 {
-				return nega + daysToDate(v.Date) + "+" + secsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
+				return nega + DaysToDate(v.Date) + "+" + SecsToTimeStr(v.Second) + strconv.FormatFloat(v.FloatSecond, 'f', -1, 64)[1:]
 			}else{
-				return nega + daysToDate(v.Date) + "+" + secsToTimeStr(v.Second)
+				return nega + DaysToDate(v.Date) + "+" + SecsToTimeStr(v.Second)
 			}
 			
 		}
@@ -413,7 +413,7 @@ func (t *Token) GetPathVal(ctx *BindMap, es *EvalStack) (*Token, error){
 					result = result.Tks()[key.Int()-1]
 					continue
 				}else{
-					return &Token{ERR, "Error path!"}, nil
+					return &Token{ERR, "Error path of " + t.ToString()}, nil
 				}
 			}else if key.Tp == WORD || key.Tp == STRING {
 				var found = false
@@ -431,7 +431,7 @@ func (t *Token) GetPathVal(ctx *BindMap, es *EvalStack) (*Token, error){
 				result = &Token{NONE, nil}
 				continue
 			}
-			return &Token{ERR, "Error path!"}, nil
+			return &Token{ERR, "Error path of " + t.ToString()}, nil
 		}else if result.Tp == OBJECT || result.Tp == PORT {
 			if key.Tp == WORD || key.Tp == STRING {
 				result = result.Ctx().GetNow(key.ToString())
@@ -452,7 +452,7 @@ func (t *Token) GetPathVal(ctx *BindMap, es *EvalStack) (*Token, error){
 
 				continue
 			}
-			return &Token{ERR, "Error path!"}, nil
+			return &Token{ERR, "Error path of " + t.ToString()}, nil
 		}else if result.Tp == FUNC {
 			temp := Token{PATH, NewTks(8)}
 			temp.List().Add(result)
@@ -474,7 +474,7 @@ func (t *Token) GetPathVal(ctx *BindMap, es *EvalStack) (*Token, error){
 		}else if result.Tp == MAP {
 			return result.Map().Get(key), nil
 		}
-		return &Token{ERR, "Error path!"}, nil
+		return &Token{ERR, "Error path of " + t.ToString()}, nil
 	}
 
 	return result, nil

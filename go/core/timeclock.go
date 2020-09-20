@@ -37,8 +37,8 @@ func ParseTimeStr(timeStr string) *TimeClock {
 
 	slices := strings.Split(str, "+")
 
-	result.Date = dateStrToDays(slices[0])
-	result.Second = timeStrToSecs(slices[1])
+	result.Date = DateStrToDays(slices[0])
+	result.Second = TimeStrToSecs(slices[1])
 
 	if strings.Index(slices[1], ".") >= 0 {
 		nsStr := strings.Split(slices[1], ".")[1]
@@ -54,7 +54,7 @@ func ParseTimeStr(timeStr string) *TimeClock {
 	return &result
 }
 
-func isLeapYear(y int) bool{
+func IsLeapYear(y int) bool{
 	if y % 400 == 0 {
 		return true
 	}else if y % 4 == 0 {
@@ -65,7 +65,7 @@ func isLeapYear(y int) bool{
 	return false
 }
 
-func dateStrToDays(dateStr string) int{
+func DateStrToDays(dateStr string) int{
 	dateSlice :=  strings.Split(dateStr, "-")
 	if len(dateSlice) != 3 {
 		return 0
@@ -88,7 +88,7 @@ func dateStrToDays(dateStr string) int{
 
 	leaps := 0
 	for i := 4; i < y; i++ {
-		if isLeapYear(i){
+		if IsLeapYear(i){
 			leaps++
 		}
 	}
@@ -99,7 +99,7 @@ func dateStrToDays(dateStr string) int{
 		days += _DAYS_OF_MONTHS[i-1]
 	}
 
-	if isLeapYear(y) && m > 2 {
+	if IsLeapYear(y) && m > 2 {
 		days++
 	}
 
@@ -111,7 +111,7 @@ func dateStrToDays(dateStr string) int{
 func DateToDays(y int, m int, d int) int {
 	leaps := 0
 	for i := 4; i < y; i++ {
-		if isLeapYear(i){
+		if IsLeapYear(i){
 			leaps++
 		}
 	}
@@ -122,7 +122,7 @@ func DateToDays(y int, m int, d int) int {
 		days += _DAYS_OF_MONTHS[i-1]
 	}
 
-	if isLeapYear(y) && m > 2 {
+	if IsLeapYear(y) && m > 2 {
 		days++
 	}
 
@@ -132,12 +132,12 @@ func DateToDays(y int, m int, d int) int {
 }
 
 
-func daysToDate(days int) string{
+func DaysToDate(days int) string{
 	y := 1
 	m := 1
 
 	for days > 365 {
-		if isLeapYear(y){
+		if IsLeapYear(y){
 			if days == 366 {
 				break
 			}else{
@@ -150,7 +150,7 @@ func daysToDate(days int) string{
 	}
 
 	for days > _DAYS_OF_MONTHS[m-1] {
-		if isLeapYear(y) && m == 2 {
+		if IsLeapYear(y) && m == 2 {
 			if days == 29 {
 				break
 			}else{
@@ -171,7 +171,7 @@ func daysToDate(days int) string{
 }
 
 
-func timeStrToSecs(timeStr string) int{
+func TimeStrToSecs(timeStr string) int{
 	timeSlice :=  strings.Split(timeStr, ":")
 	if len(timeSlice) != 3 {
 		return -1
@@ -196,7 +196,7 @@ func timeStrToSecs(timeStr string) int{
 
 }
 
-func secsToTimeStr(secs int) string{
+func SecsToTimeStr(secs int) string{
 	h := int(secs / 3600)
 	secs -= h * 3600
 	m := int(secs / 60)
@@ -229,7 +229,7 @@ func (tc *TimeClock) Format(){
 			tc.Date++
 		}
 	}else{
-		for tc.Second < -60*60*24 {
+		for tc.Second < 0 {
 			tc.Second += 60*60*24
 			tc.Date--
 		}

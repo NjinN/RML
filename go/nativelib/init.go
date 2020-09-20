@@ -967,4 +967,28 @@ func InitNative(ctx *BindMap) {
 	}
 	ctx.PutNow("_readurl", &readUrlToken)
 
+
+	/*******  json  *******/
+	var jsonToken = Token{
+		NATIVE,
+		Native{
+			"json",
+			2,
+			Jjson,
+			nil,
+		},
+	}
+	ctx.PutNow("json", &jsonToken)
+
+	var dejsonToken = Token{
+		NATIVE,
+		Native{
+			"dejson",
+			2,
+			Dejson,
+			nil,
+		},
+	}
+	ctx.PutNow("dejson", &dejsonToken)
+
 }

@@ -17,6 +17,12 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 	// fmt.Println(s)
 
+	if(strings.ToLower(str) == "none"){
+		result.Tp = NONE
+		result.Val = ""
+		return &result
+	}
+
 	if(strings.ToLower(str) == "true"){
 		result.Tp = LOGIC
 		result.Val = true
@@ -335,7 +341,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			timeClock.Negative = true
 		}
 		
-		days := dateStrToDays(str)
+		days := DateStrToDays(str)
 		if days == 0 {
 			result.Tp = ERR
 			result.Val = "Error format of " + str
@@ -369,7 +375,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		}
 
 		secSlice := strings.Split(str, ".")
-		secs := timeStrToSecs(secSlice[0])
+		secs := TimeStrToSecs(secSlice[0])
 
 		if secs < 0 {
 			result.Tp = ERR
@@ -414,7 +420,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 		timeSlice := strings.Split(str, "+")
 
-		days := dateStrToDays(timeSlice[0])
+		days := DateStrToDays(timeSlice[0])
 		if days <= 0 {
 			
 			result.Tp = ERR
@@ -426,7 +432,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 
 		secSlice := strings.Split(timeSlice[1], ".")
 
-		secs := timeStrToSecs(secSlice[0])
+		secs := TimeStrToSecs(secSlice[0])
 		if secs < 0 {
 			result.Tp = ERR
 			result.Val = "Error format of " + str
