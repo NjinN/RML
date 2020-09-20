@@ -11,6 +11,9 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	var result Token
 	var str = Trim(s)
 
+	var matched bool
+	var err error
+
 	// if str[0] != '"' && !strings.Contains(str, "://") {
 	// 	str = strings.ToLower(str)
 	// }
@@ -230,6 +233,41 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 		return &result
 	}
 
+	matched, err = regexp.MatchString("^[0-9]{1,9}x[0-9]{1,9}$", str)
+	if err != nil {
+		result.Tp = ERR
+		result.Val = err.Error()
+		return &result
+	}
+	if matched {
+		var sToken, eToken Token
+
+		pair := strings.Split(str, "x")
+
+		sToken.Tp = INTEGER
+		sToken.Val, err = strconv.Atoi(pair[0])
+		if err != nil {
+			result.Tp = ERR
+			result.Val = "Error format of " + str
+			return &result
+		}
+		eToken.Tp = INTEGER
+		eToken.Val, err = strconv.Atoi(pair[1])
+		if err != nil {
+			result.Tp = ERR
+			result.Val = "Error format of " + str
+			return &result
+		}
+
+		result.Tp = PAIR
+		result.Val = NewTks(4)
+		result.List().Add(&sToken)
+		result.List().Add(&eToken)
+		return &result
+	}
+
+
+
 	if(str[0] == '\''){
 		result.Tp = LIT_WORD
 		result.Val = strings.ToLower(str[1 : ])
@@ -318,11 +356,9 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	}
 
 	/*************  parse time format start  *************/
-	var matched bool
-	var err error
 
 	//only date
-	matched, err = regexp.MatchString("^\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}$", str)
+	matched, err = regexp.MatchString("^-?[0-9]{4}-[0-9]{2}-[0-9]{2}$", str)
 
 	if err != nil {
 		result.Tp = ERR
@@ -355,7 +391,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	}
 
 	//only time
-	matched, err = regexp.MatchString("^\\-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
+	matched, err = regexp.MatchString("^-?[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
 
 	if err != nil {
 		result.Tp = ERR
@@ -400,7 +436,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 	}
 
 	//date and time
-	matched, err = regexp.MatchString("^\\-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
+	matched, err = regexp.MatchString("^-?[0-9]{4}-[0-9]{2}-[0-9]{2}\\+[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,8})?$", str)
 	if err != nil {
 		result.Tp = ERR
 		result.Val = err.Error()

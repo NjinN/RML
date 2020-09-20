@@ -18,6 +18,7 @@ const (
 	TIMER
 	URL
 	PORT
+	PAIR
 	RANGE 		
 	PAREN 		
 	BLOCK
@@ -73,6 +74,8 @@ func TypeToStr(n uint8) string{
 		return "url!"
 	case PORT:
 		return "port!"
+	case PAIR:
+		return "pair!"
 	case RANGE:
 		return "range!"
 	case PAREN:
@@ -145,6 +148,8 @@ func StrToType(s string) uint8{
 		return URL
 	case "port!":
 		return PORT
+	case "pair!":
+		return PAIR
 	case "range!":
 		return RANGE
 	case "paren!":

@@ -145,6 +145,8 @@ func (t *Token) ToString() string{
 
 	case URL:
 		return t.Str()
+	case PAIR:
+		return t.Tks()[0].ToString() + "x" + t.Tks()[1].ToString()
 	case RANGE:
 		return t.Tks()[0].ToString() + ".." + t.Tks()[1].ToString()
 	case SET_WORD:
