@@ -85,8 +85,8 @@ func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Tok
 	p.PutNow("host-addr", &Token{STRING, addr})
 	p.PutNow("local-addr", &Token{STRING, conn.LocalAddr().String()})
 	p.PutNow("remote-addr", &Token{STRING, conn.RemoteAddr().String()})
-	p.PutNow("read-timeout", &Token{INTEGER, 0})
-	p.PutNow("write-timeout", &Token{INTEGER, 0})
+	p.PutNow("read-timeout", &Token{INTEGER, 200})
+	p.PutNow("write-timeout", &Token{INTEGER, 200})
 	p.PutNow("in-buffer", &Token{NONE, "none"})
 	p.PutNow("out-buffer", &Token{NONE, "none"})
 	p.PutNow("in-buffer-size", &Token{INTEGER, 4096})
@@ -144,14 +144,14 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 	var buffer = make([]byte, bufferSize)
 
 
+	timeout := time.Millisecond * time.Duration(200)
+	if p.GetNow("read-timeout").Int() > 0{
+		timeout = time.Millisecond * time.Duration(p.GetNow("read-timeout").Int())
+	}
 
 	for {
-
-		if p.GetNow("read-timeout").Int() > 0{
-			conn.SetReadDeadline(time.Now().Add(time.Millisecond * time.Duration(p.GetNow("read-timeout").Int())))
-		}else{
-			conn.SetReadDeadline(time.Now().Add(time.Millisecond * time.Duration(200)))
-		}
+		
+		conn.SetReadDeadline(time.Now().Add(timeout))
 
 		n, err := conn.Read(buffer)
 		// fmt.Println("conn awake")
@@ -176,7 +176,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 					}
 				}
 
-				// time.Sleep(time.Duration(200) * time.Millisecond)
+				time.Sleep(timeout)
 				continue
 			} else if strings.Contains(err.Error(), "use of closed network connection") || strings.Contains(err.Error(), "wsarecv") {
 				conn.Close()
