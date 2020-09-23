@@ -272,7 +272,7 @@ func (es *EvalStack) EvalExp(ctx *BindMap) (*Token, error){
 		}
 		temp = es.Line[endPos]
 	case PUT_WORD:
-		ctx.PutLocal(startToken.Str(), es.Line[endPos])
+		ctx.PutNow(startToken.Str(), es.Line[endPos])
 		temp = es.Line[endPos]
 	case PATH:
 		if startToken.Tks()[0].Tp == FUNC {
