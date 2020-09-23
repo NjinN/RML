@@ -37,6 +37,17 @@ func Oopen(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 
 		if addr[0] == ':' || temp[0] == "127.0.0.1" || temp[0] == "localhost" {
+			if strings.Index(protocol, "udp") == 0 {
+				udpaddr, err := net.ResolveUDPAddr(protocol, addr)
+				if err != nil {
+					return &Token{ERR, err.Error()}, nil
+				}
+				udpconn, err := net.ListenUDP(protocol, udpaddr)
+				if err != nil {
+					return &Token{ERR, err.Error()}, nil
+				}
+				return newConnPort(udpconn, protocol, addr, ctx), nil
+			}
 			listener, err := net.Listen(protocol, addr)
 			if err != nil {
 				return &Token{ERR, err.Error()}, nil
@@ -83,8 +94,12 @@ func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Tok
 	p.PutNow("is-host", &Token{LOGIC, false})
 	p.PutNow("protocol", &Token{STRING, protocol})
 	p.PutNow("host-addr", &Token{STRING, addr})
-	p.PutNow("local-addr", &Token{STRING, conn.LocalAddr().String()})
-	p.PutNow("remote-addr", &Token{STRING, conn.RemoteAddr().String()})
+	if nil != conn.LocalAddr() {
+		p.PutNow("local-addr", &Token{STRING, conn.LocalAddr().String()})
+	}
+	if nil != conn.RemoteAddr() {
+		p.PutNow("remote-addr", &Token{STRING, conn.RemoteAddr().String()})
+	}
 	p.PutNow("read-timeout", &Token{INTEGER, 200})
 	p.PutNow("write-timeout", &Token{INTEGER, 200})
 	p.PutNow("in-buffer", &Token{NONE, "none"})
@@ -171,7 +186,7 @@ func listenConn(conn net.Conn, p *BindMap, es *EvalStack) {
 								fmt.Println(temp.Str())
 							}
 						}
-
+						p.GetNow("listening").Val = false
 						break
 					}
 				}
