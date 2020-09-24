@@ -233,6 +233,21 @@ func (bm *BindMap)Unset(key string){
 	
 }
 
+func (bm *BindMap) Clone() *BindMap{
+	var result BindMap
+
+	result.Father = nil
+	result.Tp = bm.Tp
+	result.Lock = sync.RWMutex{}
+	result.Table = make(map[string]*Token, 8)
+
+	for k, v := range bm.Table {
+		result.Table[k] = v.CloneDeep()
+	}
+
+	return &result
+}
+
 func (bm *BindMap) Echo() {
 	var buffer bytes.Buffer
 	buffer.WriteString("{")

@@ -60,6 +60,11 @@ func (t *Token) Table() map[string]TokenPair {
 	return t.Val.(*Rmap).Table
 }
 
+func (t *Token) View() *View {
+	return t.Val.(*View)
+}
+
+
 func (t *Token) ToString() string{
 	if t == nil {
 		return "nil"
@@ -196,6 +201,9 @@ func (t *Token) ToString() string{
 			buffer.WriteString("}")
 		}
 		return buffer.String()
+	case VIEW: {
+		return t.View().ToString()
+	}
 	case PATH:
 		var buffer bytes.Buffer
 		for _, item := range t.Tks(){
@@ -596,8 +604,6 @@ func (t *Token)ToBool() bool {
 		return false
 	}
 }
-
-
 
 
 

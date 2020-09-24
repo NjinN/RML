@@ -24,6 +24,7 @@ const (
 	BLOCK
 	MAP
 	OBJECT
+	VIEW
 	PROP
 	WORD
 	WRAP
@@ -86,6 +87,8 @@ func TypeToStr(n uint8) string{
 		return "map!"
 	case OBJECT:
 		return "object!"
+	case VIEW:
+		return "view!"
 	case PROP:
 		return "prop!"
 	case PATH:
@@ -160,6 +163,8 @@ func StrToType(s string) uint8{
 		return MAP
 	case "object!":
 		return OBJECT
+	case "view!":
+		return VIEW
 	case "prop!":
 		return PROP
 	case "word!":

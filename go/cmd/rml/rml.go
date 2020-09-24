@@ -15,6 +15,8 @@ import (
 	. "github.com/NjinN/RML/go/oplib"
 	. "github.com/NjinN/RML/go/moplib"
 	. "github.com/NjinN/RML/go/modlib"
+	. "github.com/NjinN/RML/go/view"
+
 
 	. "github.com/NjinN/RML/go/extlib"
 
@@ -33,6 +35,7 @@ func main() {
 	InitOp(&libCtx)
 	InitMop(&libCtx)
 	InitMod(&libCtx)
+	InitView(&libCtx)
 	
 	InitExt(&libCtx)
 
