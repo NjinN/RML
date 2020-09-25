@@ -16,7 +16,7 @@ func (f Func) Run(es *EvalStack, ctx *BindMap) (*Token, error){
 		Table: 	make(map[string]*Token, 8),
 		Father: ctx,
 		Tp:		TMP_CTX,
-		Lock:  	sync.RWMutex{},
+		Lock:  	&sync.RWMutex{},
 	}
 	for i, item := range f.Args.List() {
 		c.PutNow(item.Str(), es.Line[int(es.LastStartPos()) + i + 1])
@@ -44,7 +44,7 @@ func (f Func) RunWithProps(es *EvalStack, ctx *BindMap, ps []*Token) (*Token, er
 		Table: 	make(map[string]*Token, 8),
 		Father: fatherCtx,
 		Tp:		TMP_CTX,
-		Lock:  	sync.RWMutex{},
+		Lock:  	&sync.RWMutex{},
 	}
 	for i, item := range f.Args.List() {
 		c.PutNow(item.Str(), es.Line[startPos + i + 1])

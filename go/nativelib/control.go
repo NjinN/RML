@@ -84,7 +84,7 @@ func Repeat(es *EvalStack, ctx *BindMap) (*Token, error) {
 	// args[2].Echo()
 
 	if args[1].Tp == WORD && args[2].Tp == INTEGER && args[3].Tp == BLOCK {
-		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 		var countToken = Token{INTEGER, 1}
 
 		c.PutNow(args[1].Str(), &countToken)
@@ -118,7 +118,7 @@ func Ffor(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == WORD && args[5].Tp == BLOCK && (args[2].Tp == INTEGER || args[2].Tp == DECIMAL) && (args[3].Tp == INTEGER || args[3].Tp == DECIMAL) && (args[4].Tp == INTEGER || args[4].Tp == DECIMAL) {
-		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 		var countToken = args[2].Dup()
 		c.PutNow(args[1].Str(), countToken)
 		var rs *Token
@@ -284,7 +284,7 @@ func Wwhile(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
 	if args[1].Tp == BLOCK && args[2].Tp == BLOCK {
-		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+		var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 		b, e1 := es.Eval(args[1].Tks(), &c)
 		if e1 != nil {
 			return nil, e1
@@ -370,7 +370,7 @@ func Ttry(es *EvalStack, ctx *BindMap) (*Token, error) {
 				temp.Val = err.Error()
 			}
 
-			var c = BindMap{make(map[string]*Token, 4), ctx, TMP_CTX, sync.RWMutex{}}
+			var c = BindMap{make(map[string]*Token, 4), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 			temp.Tp = STRING
 			c.PutNow("e", temp)
 

@@ -9,7 +9,7 @@ import (
 func InitMod(ctx *BindMap) {
 
 	// init Robot start
-	var robotObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var robotObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, &sync.RWMutex{}, nil}
 	var robotToken = Token{Tp: OBJECT, Val: &robotObj}
 
 	var scrollMouseToken = Token{
@@ -317,7 +317,7 @@ func InitMod(ctx *BindMap) {
 
 
 	// init wlog start
-	var wlogObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var wlogObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, &sync.RWMutex{}, nil}
 	var wlogToken = Token{OBJECT, &wlogObj}
 
 	var logToken = Token{
@@ -414,7 +414,7 @@ func InitMod(ctx *BindMap) {
 
 
 	// init audio start
-	var audioObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var audioObj = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, &sync.RWMutex{}, nil}
 	var audioToken = Token{OBJECT, &audioObj}
 
 	var playAudioToken = Token{

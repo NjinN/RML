@@ -492,7 +492,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 
 	if args[1].Tp == WORD {
 		if args[2].Tp == BLOCK || args[2].Tp == PAREN || args[2].Tp == PATH {
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 			for i := 0; i < args[2].List().Len(); i++ {
 				c.PutNow(args[1].Str(), args[2].Tks()[i])
 				if args[3].Tp == BLOCK {
@@ -530,7 +530,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 			return &Token{NIL, nil}, nil
 
 		} else if args[2].Tp == OBJECT {
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 			for k, v := range args[2].Ctx().Table {
 				var blk = NewTks(4)
 				blk.AddArr([]*Token{&Token{SET_WORD, k}, v})
@@ -571,7 +571,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 			if len(args[2].Table()) == 0 {
 				return &Token{NIL, nil}, nil
 			}
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 			for _, v := range args[2].Table() {
 				var blk = NewTks(4)
 				blk.AddArr([]*Token{v.Key.CloneDeep(), v.Val})
@@ -619,7 +619,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 		}
 
 		if args[2].Tp == BLOCK {
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 			for i := 0; i < args[2].List().Len(); i += args[1].List().Len() {
 				for j := 0; j < args[1].List().Len(); j++ {
 					if i+j < args[2].List().Len() {
@@ -649,7 +649,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 				var result = Token{ERR, "Type Mismatch"}
 				return &result, nil
 			}
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 			for k, v := range args[2].Ctx().Table {
 				c.PutNow(args[1].Tks()[0].Str(), &Token{WORD, k})
 				c.PutNow(args[1].Tks()[1].Str(), v)
@@ -676,7 +676,7 @@ func Fforeach(es *EvalStack, ctx *BindMap) (*Token, error) {
 			if len(args[2].Table()) == 0 {
 				return &Token{NIL, nil}, nil
 			}
-			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+			var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 			for _, v := range args[2].Table() {
 				c.PutNow(args[1].Tks()[0].Str(), v.Key.CloneDeep())
 				c.PutNow(args[1].Tks()[1].Str(), v.Val)

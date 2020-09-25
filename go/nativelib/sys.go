@@ -339,7 +339,7 @@ func keep(es *EvalStack, ctx *BindMap) (*Token, error) {
 func Collect(es *EvalStack, ctx *BindMap) (*Token, error) {
 	var args = es.Line[es.LastStartPos() : es.LastEndPos()]
 
-	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, sync.RWMutex{}}
+	var c = BindMap{make(map[string]*Token, 8), ctx, TMP_CTX, &sync.RWMutex{}, nil}
 	var result = Token{BLOCK, NewTks(8)}
 	c.PutNow("__result__", &result)
 	c.PutNow("keep", &Token{

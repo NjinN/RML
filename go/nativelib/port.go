@@ -72,7 +72,7 @@ func Oopen(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func newListenerPort(listener net.Listener, protocol string, addr string, ctx *BindMap, es *EvalStack) *Token {
-	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, &sync.RWMutex{}, nil}
 
 	p.PutNow("port", &Token{NONE, listener})
 	p.PutNow("is-host", &Token{LOGIC, true})
@@ -88,7 +88,7 @@ func newListenerPort(listener net.Listener, protocol string, addr string, ctx *B
 }
 
 func newConnPort(conn net.Conn, protocol string, addr string, ctx *BindMap) *Token {
-	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, &sync.RWMutex{}, nil}
 
 	p.PutNow("port", &Token{NONE, conn})
 	p.PutNow("is-host", &Token{LOGIC, false})
@@ -427,7 +427,7 @@ func Close(es *EvalStack, ctx *BindMap) (*Token, error) {
 }
 
 func newMysqlPort(db *sql.DB, ctx *BindMap) *Token {
-	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
+	var p = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, &sync.RWMutex{}, nil}
 
 	p.PutNow("port", &Token{NONE, db})
 	p.PutNow("is-host", &Token{LOGIC, false})

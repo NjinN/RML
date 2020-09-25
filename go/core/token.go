@@ -296,7 +296,7 @@ func (t *Token) Clone() *Token{
 		
 		return result
 	case OBJECT:
-		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp, sync.RWMutex{}}
+		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp, &sync.RWMutex{}, nil}
 		for k, v := range(t.Ctx().Table) {
 			result.Ctx().PutNow(k, v.Clone())
 		}
@@ -320,7 +320,7 @@ func (t *Token) CloneDeep() *Token{
 		}
 		return result
 	case OBJECT:
-		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp, sync.RWMutex{}}
+		result.Val = &BindMap{make(map[string]*Token), t.Ctx().Father, t.Ctx().Tp, &sync.RWMutex{}, nil}
 		for k, v := range(t.Ctx().Table) {
 			result.Ctx().PutNow(k, v.CloneDeep())
 		}
@@ -351,6 +351,21 @@ func (t *Token) GetVal(ctx *BindMap, es *EvalStack) (*Token, error){
 		return es.Eval(t.Tks(), ctx)
 	case PATH:
 		return t.GetPathVal(ctx, es)
+	case OBJECT:
+		if t.Ctx().Lazy != nil {
+			t.Val = MakeObject(t.Ctx().Lazy, ctx, es)
+		}
+		return t, nil
+
+	case MAP:
+		if t.Map().Lazy != nil {
+			v, err := MakeRmap(t.Map().Lazy, ctx, es)
+			if err != nil {
+				return &Token{ERR, err.Error()}, nil
+			}
+			t.Val = v
+		}
+		return t, nil
 	default:
 		return t, nil
 	}

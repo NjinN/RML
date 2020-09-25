@@ -11,7 +11,8 @@ type TokenPair struct {
 
 type Rmap struct {
 	Table 	map[string]TokenPair
-	Lock 	sync.RWMutex
+	Lock 	*sync.RWMutex
+	Lazy	[]*Token
 }
 
 func (r *Rmap) ToString() string{

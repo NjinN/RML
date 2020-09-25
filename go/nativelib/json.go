@@ -190,7 +190,7 @@ func DecodeJson(s string) *Token {
 
 	if str[0] == '{' {
 		result.Tp = OBJECT
-		var m = BindMap{make(map[string]*Token, 8), nil, USR_CTX, sync.RWMutex{}}
+		var m = BindMap{make(map[string]*Token, 8), nil, USR_CTX, &sync.RWMutex{}, nil}
 
 		arr := JsonStrCut(str[1:len(str)-1])
 

@@ -17,7 +17,8 @@ type BindMap struct{
 	Table 	map[string]*Token
 	Father 	*BindMap
 	Tp 		int
-	Lock 	sync.RWMutex
+	Lock 	*sync.RWMutex
+	Lazy 	[]*Token
 }
 
 func (bm *BindMap)GetNow(key string) *Token{
@@ -238,7 +239,7 @@ func (bm *BindMap) Clone() *BindMap{
 
 	result.Father = nil
 	result.Tp = bm.Tp
-	result.Lock = sync.RWMutex{}
+	result.Lock = &sync.RWMutex{}
 	result.Table = make(map[string]*Token, 8)
 
 	for k, v := range bm.Table {

@@ -5,6 +5,7 @@ import "strconv"
 import "encoding/hex"
 import "sync"
 import "regexp"
+import "errors"
 // import "fmt"
 
 func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
@@ -145,12 +146,8 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			}
 		}
 		var blk = ToTokens(str[1 : endIdx], ctx, es)
-		var c = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, sync.RWMutex{}}
-		var orginSts = es.IsLocal
-		es.IsLocal = true
-		es.Eval(blk, &c)
-		es.IsLocal = orginSts
-		result.Val = &c
+		
+		result.Val = &BindMap{nil, nil, USR_CTX, nil, blk}
 		es.TempResult = &result
 		return &result
 	}
@@ -305,20 +302,7 @@ func ToToken(s string, ctx *BindMap, es *EvalStack) *Token{
 			} 
 		}else if typeStr == "map" {
 			var m Rmap 
-			m.Table = make(map[string]TokenPair, 8)
-			for _, item := range bodyBlock {
-				if item.Tp != BLOCK || item.List().Len() != 2 {
-					return &Token{ERR, "Error format of " + str}
-				}
-				var pair TokenPair
-				pair.Key = item.Tks()[0]
-				pair.Val = item.Tks()[1]
-				
-				var keyString = TypeToStr(item.Tks()[0].Tp) + item.Tks()[0].ToString()
-				m.Lock.Lock()
-				m.Table[keyString] = pair
-				m.Lock.Unlock()
-			}
+			m.Lazy = bodyBlock
 			result.Tp = MAP
 			result.Val = &m
 			return &result
@@ -515,4 +499,65 @@ func PathToTokens(str string, ctx *BindMap, es *EvalStack) *TokenList{
 	}
 	return result
 }
+
+
+func MakeObject(blk []*Token, ctx *BindMap, es *EvalStack) *BindMap {
+	var c = BindMap{make(map[string]*Token, 8), ctx, USR_CTX, &sync.RWMutex{}, nil}
+	var orginSts = es.IsLocal
+	es.IsLocal = true
+	es.Eval(blk, &c)
+	es.IsLocal = orginSts
+	return &c
+}
+
+
+func MakeRmap(bodyBlock []*Token, ctx *BindMap, es *EvalStack) (*Rmap, error) {
+	var m Rmap
+	m.Table = make(map[string]TokenPair, 8)
+	m.Lock = &sync.RWMutex{}
+	for _, item := range bodyBlock {
+		
+
+		if item.Tp != BLOCK {
+			return nil, errors.New("Error format") 
+		}
+		blk, err := es.Eval(item.Tks(), ctx, 1)
+		if err != nil {
+			return nil, errors.New(err.Error())
+		}
+		if blk.List().Len() != 2 {
+			return nil, errors.New("Error format") 
+		}
+
+		if item.List().Len() == 2 {
+			var pair TokenPair
+			pair.Key = item.Tks()[0]
+			pair.Val = blk.Tks()[1]
+			
+			var keyString = TypeToStr(item.Tks()[0].Tp) + item.Tks()[0].ToString()
+			m.Table[keyString] = pair
+		}else{
+			var pair TokenPair
+			pair.Key = blk.Tks()[0]
+			pair.Val = blk.Tks()[1]
+			
+			var keyString = TypeToStr(blk.Tks()[0].Tp) + blk.Tks()[0].ToString()
+			m.Table[keyString] = pair
+		}
+		
+	
+	}
+	return &m, nil
+}
+
+
+
+
+
+
+
+
+
+
+
 
